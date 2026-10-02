@@ -5,6 +5,15 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.13.1] — 2026-10-02
+
+### Changed
+
+- The eating-out category is called «Кафе» in Russian, so its name fits a
+  selected category tile instead of ending in «Еда вне до…». Records saved
+  under the old name still show as this category.
+- In English, "Phone and internet" is now "Phone", for the same reason.
+
 ## [0.13.0] — 2026-10-02
 
 First public release.
@@ -61,4 +70,5 @@ First public release.
 - Spending is never recorded from bank notifications. Saying the purchase out
   loud is the point.
 
+[0.13.1]: https://github.com/shamil-aminov/golda/releases/tag/v0.13.1
 [0.13.0]: https://github.com/shamil-aminov/golda/releases/tag/v0.13.0

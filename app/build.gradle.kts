@@ -50,8 +50,8 @@ android {
         applicationId = "sh.aminov.golda"
         minSdk = 36
         targetSdk = 37
-        versionCode = 14
-        versionName = "0.13.0"
+        versionCode = 15
+        versionName = "0.13.1"
     }
 
     signingConfigs {
