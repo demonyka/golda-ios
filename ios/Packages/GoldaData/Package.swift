@@ -9,5 +9,6 @@ let package = Package(
     dependencies: [.package(path: "../GoldaCore")],
     targets: [
         .target(name: "GoldaData", dependencies: [.product(name: "GoldaCore", package: "GoldaCore")]),
+        .testTarget(name: "GoldaDataTests", dependencies: ["GoldaData"]),
     ]
 )
