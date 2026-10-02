@@ -95,6 +95,9 @@ enum Schema {
             t.column("accountId", .blob)
             t.column("savedMinor", .integer).notNull()
             t.column("isMain", .boolean).notNull()
+            // Creation order within the profile: Android's autoincrement id told which goal is the
+            // oldest (it becomes main when none is), and UUIDs do not (D27).
+            t.column("createdAt", .integer).notNull()
         }
 
         try db.create(table: "wish") { t in

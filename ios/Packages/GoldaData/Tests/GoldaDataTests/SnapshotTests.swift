@@ -45,7 +45,8 @@ import Testing
         #expect(snapshot.operations.map(\.op.id) == [20, 21, 22, 23].map(StoreFixture.id))
         #expect(snapshot.operations.last?.postings.map(\.id) == [39, 38].map(StoreFixture.id))
         #expect(snapshot.obligations.map(\.id) == [41, 40, 42].map(StoreFixture.id))
-        #expect(snapshot.goals.map(\.id) == [53, 51, 52].map(StoreFixture.id))
+        // The main goal, then the others in the order they were created, whatever their ids.
+        #expect(snapshot.goals.map(\.id) == [53, 52, 51].map(StoreFixture.id))
         // BOUGHT < SKIPPED < WAITING, as Room sorted the enum names.
         #expect(snapshot.wishes.map(\.id) == [61, 63, 62, 60].map(StoreFixture.id))
     }

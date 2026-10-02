@@ -193,8 +193,12 @@ struct GoalRecord: ProfileOwnedRecord {
     var accountId: UUID?
     var savedMinor: Int64
     var isMain: Bool
+    /// The goal's place in its profile's creation order (1, 2, 3…), not a time: the domain model
+    /// has no such field, so the store fills it in when it is nil (D27). The column is NOT NULL, so
+    /// a record that skips the store cannot be written without one.
+    var createdAt: Int64?
 
-    init(_ goal: Goal, profileId: UUID) {
+    init(_ goal: Goal, profileId: UUID, createdAt: Int64? = nil) {
         id = goal.id
         self.profileId = profileId
         name = goal.name
@@ -203,6 +207,7 @@ struct GoalRecord: ProfileOwnedRecord {
         accountId = goal.accountId
         savedMinor = goal.savedMinor
         isMain = goal.isMain
+        self.createdAt = createdAt
     }
 
     var goal: Goal {

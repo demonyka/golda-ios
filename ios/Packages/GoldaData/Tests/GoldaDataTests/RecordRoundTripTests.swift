@@ -1,5 +1,6 @@
 import Foundation
 import GoldaCore
+import GRDB
 import Testing
 
 @testable import GoldaData
@@ -97,6 +98,30 @@ import Testing
         #expect(try await database.read { try $0.goal(full.id, profileId: profileId) } == full)
         try await database.write { try $0.save(bare, profileId: profileId) }
         #expect(try await database.read { try $0.goals(profileId: profileId) } == [bare])
+    }
+
+    @Test func goalsKeepTheirPlaceInTheCreationOrder() async throws {
+        let database = try await StoreFixture.database(profiles: 1, 2)
+        @Sendable func goal(_ n: Int, _ name: String = "") -> Goal {
+            Goal(id: StoreFixture.id(n), name: name, targetMinor: 1, currency: "RUB")
+        }
+        try await database.write { store in
+            try store.save(goal(9), profileId: profileId)
+            try store.save(goal(1), profileId: profileId)
+            // An edit keeps the goal's place.
+            try store.save(goal(9, "Машина"), profileId: profileId)
+            // An import passes the original order, and later goals go after it.
+            try store.save(goal(5), profileId: profileId, createdAt: 100)
+            try store.save(goal(7), profileId: profileId)
+            // Each profile counts on its own.
+            try store.save(goal(8), profileId: StoreFixture.id(2))
+        }
+        let stored = try await database.writer.read { db in
+            try GoalRecord.order(Column("profileId"), Column("createdAt")).fetchAll(db)
+        }
+        #expect(stored.map(\.id) == [9, 1, 5, 7, 8].map(StoreFixture.id))
+        #expect(stored.map(\.createdAt) == [1, 2, 100, 101, 1])
+        #expect(try await database.read { try $0.goals(profileId: profileId) }.map(\.id) == [9, 1, 5, 7].map(StoreFixture.id))
     }
 
     @Test func wish() async throws {

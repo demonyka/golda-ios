@@ -151,16 +151,29 @@ public struct Store {
 
     // MARK: Goals
 
+    /// The main goal first, then the oldest (D27).
     public func goals(profileId: UUID) throws -> [Goal] {
-        try GoalRecord.owned(by: profileId).order(Column("isMain").desc, Column("id")).fetchAll(db).map(\.goal)
+        try GoalRecord.owned(by: profileId)
+            .order(Column("isMain").desc, Column("createdAt"), Column("id"))
+            .fetchAll(db)
+            .map(\.goal)
     }
 
     public func goal(_ id: UUID, profileId: UUID) throws -> Goal? {
         try GoalRecord.owned(by: profileId).filter(id: id).fetchOne(db)?.goal
     }
 
-    public func save(_ goal: Goal, profileId: UUID) throws {
-        try saveOwned(GoalRecord(goal, profileId: profileId))
+    /// [createdAt] is the goal's place in the creation order. Nil keeps the place of a goal that is
+    /// already stored and puts a new one after every other goal of the profile; an import passes the
+    /// original order.
+    public func save(_ goal: Goal, profileId: UUID, createdAt: Int64? = nil) throws {
+        var record = GoalRecord(goal, profileId: profileId, createdAt: createdAt)
+        if record.createdAt == nil {
+            let stored = try Int64.fetchOne(db, GoalRecord.filter(id: goal.id).select(Column("createdAt")))
+            let last = try Int64.fetchOne(db, GoalRecord.owned(by: profileId).select(max(Column("createdAt"))))
+            record.createdAt = stored ?? (last ?? 0) + 1
+        }
+        try saveOwned(record)
     }
 
     @discardableResult

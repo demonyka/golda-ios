@@ -60,7 +60,7 @@ public struct ProfileSnapshot: Equatable, Sendable {
     public var operations: [OperationFull]
     /// By day of month, then id.
     public var obligations: [Obligation]
-    /// The main goal first, then by id.
+    /// The main goal first, then the oldest.
     public var goals: [Goal]
     /// By status, then the latest decision date first.
     public var wishes: [Wish]
