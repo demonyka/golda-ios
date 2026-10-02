@@ -225,7 +225,7 @@ class Repo(private val context: Context) {
 
 object DefaultCategories {
     val all = listOf(
-        Category(key = "eating_out", name = "Еда вне дома", emoji = "🍔", kind = CategoryKind.EXPENSE, sort = 0),
+        Category(key = "eating_out", name = "Кафе", emoji = "🍔", kind = CategoryKind.EXPENSE, sort = 0),
         Category(key = "groceries", name = "Продукты", emoji = "🛒", kind = CategoryKind.EXPENSE, sort = 1),
         Category(key = "transport", name = "Транспорт", emoji = "🚕", kind = CategoryKind.EXPENSE, sort = 2),
         Category(key = "housing", name = "Жильё", emoji = "🏠", kind = CategoryKind.EXPENSE, sort = 3),
