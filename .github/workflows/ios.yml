@@ -24,10 +24,12 @@ jobs:
         working-directory: ios/Packages/GoldaCore
         run: swift test
 
-      - name: Other packages
-        run: |
-          swift build --package-path ios/Packages/GoldaData
-          swift build --package-path ios/Packages/GoldaSync
+      - name: Data tests
+        working-directory: ios/Packages/GoldaData
+        run: swift test
+
+      - name: Sync package
+        run: swift build --package-path ios/Packages/GoldaSync
 
       - name: Generate the Xcode project
         working-directory: ios
