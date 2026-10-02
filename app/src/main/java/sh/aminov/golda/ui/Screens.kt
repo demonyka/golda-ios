@@ -86,10 +86,11 @@ fun HomeScreen(data: AppData, padding: PaddingValues, listState: LazyListState, 
                     }
                 }
                 VSpace(Gap.xs)
-                // Whole rubles only, as big as the tile allows.
-                val whole = Fmt.split(budget.leftTodayRub, "RUB").first
-                BigNumber("$whole ₽", budget.leftTodayRub, color = ink)
-                Text(data.others(budget.leftTodayRub, "RUB"), Modifier.testTag(Tags.HOME_OTHERS), style = MaterialTheme.typography.bodyLarge.merge(Tnum), color = quiet)
+                // Whole units of the main currency only, as big as the tile allows; the rest of the
+                // shown currencies under it.
+                val base = data.base
+                BigNumber(base.whole(budget.leftTodayRub), base.minor(budget.leftTodayRub), ink, Modifier.testTag(Tags.HOME_BIG))
+                Text(data.others(budget.leftTodayRub, base.code), Modifier.testTag(Tags.HOME_OTHERS), style = MaterialTheme.typography.bodyLarge.merge(Tnum), color = quiet)
                 VSpace(Gap.m)
                 // What is still left of today's budget, like the number above; flat and full once it is spent.
                 val left = when {
@@ -100,7 +101,7 @@ fun HomeScreen(data: AppData, padding: PaddingValues, listState: LazyListState, 
                 // The tile's quiet ink, not black: a black line with no visible track reads as a divider.
                 WavyBar(left, ink = quiet, hero = true, flat = over || left >= 1f)
                 VSpace(Gap.s)
-                val perDay = Fmt.approx(budget.perDayRub / 100.0, "RUB")
+                val perDay = base.approx(budget.perDayRub)
                 val days = budget.daysLeft.toLong()
                 val dayWord = plural(days, "день", "дня", "дней", "day", "days")
                 // What the bar is measured against, how it compares with the start of the pay period
@@ -111,7 +112,7 @@ fun HomeScreen(data: AppData, padding: PaddingValues, listState: LazyListState, 
                     Text(tr("$perDay в день", "$perDay a day"), style = body, color = quiet, maxLines = 1)
                     if (pace != null) {
                         val arrow = if (pace >= 0) "▲" else "▼"
-                        RollingNumber(" $arrow" + Fmt.approx(kotlin.math.abs(pace) / 100.0, "RUB").removeSuffix(" ₽"), pace, body, color = if (pace >= 0) ink else quiet)
+                        RollingNumber(" $arrow" + base.approx(kotlin.math.abs(pace)).removeSuffix(" " + base.symbol), pace, body, color = if (pace >= 0) ink else quiet)
                     }
                     Text(
                         tr(" · $days $dayWord до зарплаты", " · $days $dayWord to payday"),
@@ -127,7 +128,7 @@ fun HomeScreen(data: AppData, padding: PaddingValues, listState: LazyListState, 
                 }
                 if (budget.obligationsRub > 0) {
                     Text(
-                        tr("Отложено на платежи: ", "Set aside for payments: ") + Fmt.approx(budget.obligationsRub / 100.0, "RUB"),
+                        tr("Отложено на платежи: ", "Set aside for payments: ") + base.approx(budget.obligationsRub),
                         style = body,
                         color = quiet,
                     )
@@ -177,8 +178,8 @@ fun AccountsScreen(
             HeroTile(Modifier.padding(horizontal = Gap.m)) {
                 Caption(tr("Всего", "Total"), color = scheme.onPrimaryFixedVariant)
                 VSpace(Gap.xs)
-                BigNumber(Fmt.split(total, "RUB").first + " ₽", total, scheme.onPrimaryFixed)
-                Text(data.others(total, "RUB"), style = MaterialTheme.typography.bodyLarge.merge(Tnum), color = scheme.onPrimaryFixedVariant)
+                BigNumber(data.base.whole(total), data.base.minor(total), scheme.onPrimaryFixed, Modifier.testTag(Tags.ACCOUNTS_TOTAL))
+                Text(data.others(total, data.base.code), style = MaterialTheme.typography.bodyLarge.merge(Tnum), color = scheme.onPrimaryFixedVariant)
                 Debts.advice(data.accounts, data.states)?.let {
                     VSpace(Gap.m)
                     Text(it, style = MaterialTheme.typography.bodyMedium, color = scheme.onPrimaryFixedVariant)
@@ -203,7 +204,7 @@ fun AccountsScreen(
             if (group != null) {
                 item(key = "group-$group") {
                     val rub = accounts.sumOf { data.states[it.id]?.rubMinor ?: 0 }
-                    GroupLabel("$group · ${Fmt.approx(rub / 100.0, "RUB")}", Modifier.padding(horizontal = Gap.m))
+                    GroupLabel("$group · ${data.base.approx(rub)}", Modifier.padding(horizontal = Gap.m))
                 }
             }
             val count = accounts.size + if (withAdd) 1 else 0
@@ -265,19 +266,22 @@ private fun accountBlocks(accounts: List<Account>): List<Pair<String?, List<Acco
     return blocks
 }
 
-/** "Карта · ≈ 16 001 ₽", or for savings with a rate just "+1 605 ₽ за октябрь": that says what it is. */
+/**
+ * "Карта · ≈ 16 001 ₽" (the equivalent in the main currency, unless the account is in it), or for
+ * savings with a rate just "+1 605 ₽ за октябрь" in the account's own currency: that says what it is.
+ */
 private fun accountSubline(data: AppData, state: AccountState): String {
     val account = state.account
     val today = LocalDate.now(data.zone)
     val forecast = if (account.type == AccountType.SAVINGS && account.interestRate != null) {
         Budget.interestForecast(account, data.operations, today, data.zone)?.let {
-            tr("+${Fmt.approx(it / 100.0, "RUB")} за ${monthName(today)}", "+${Fmt.approx(it / 100.0, "RUB")} for ${monthName(today)}")
+            interestLine(it, account.currency, today)
         }
     } else {
         null
     }
     val parts = mutableListOf(forecast ?: typeLabel(account.type))
-    if (state.currency != "RUB") parts += "≈ " + Fmt.approx(state.rubMinor / 100.0, "RUB")
+    if (state.currency != data.base.code) parts += "≈ " + data.base.approx(state.rubMinor)
     return parts.joinToString(" · ")
 }
 
@@ -393,7 +397,7 @@ fun AccountScreen(
                         val today = LocalDate.now(data.zone)
                         Budget.interestForecast(account, data.operations, today, data.zone)?.let {
                             Text(
-                                tr("+${Fmt.approx(it / 100.0, "RUB")} за ${monthName(today)}", "+${Fmt.approx(it / 100.0, "RUB")} for ${monthName(today)}"),
+                                interestLine(it, account.currency, today),
                                 style = MaterialTheme.typography.bodyMedium.merge(Tnum),
                                 color = quiet,
                             )
@@ -462,4 +466,10 @@ fun ReconcileSheet(state: AccountState, onDismiss: () -> Unit, onReconcile: (Lon
             textAlign = TextAlign.Center,
         )
     }
+}
+
+/** "+1 605 ₽ за октябрь": a savings account's interest this month, in the account's own currency. */
+private fun interestLine(minor: Long, currency: String, today: LocalDate): String {
+    val amount = Fmt.approx(Currencies.toMajor(minor, currency), currency)
+    return tr("+$amount за ${monthName(today)}", "+$amount for ${monthName(today)}")
 }

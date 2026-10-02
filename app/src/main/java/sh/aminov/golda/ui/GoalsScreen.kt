@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import sh.aminov.golda.data.Goal
 import sh.aminov.golda.data.Wish
 import sh.aminov.golda.data.WishStatus
+import sh.aminov.golda.domain.Base
 import sh.aminov.golda.domain.Currencies
 import sh.aminov.golda.domain.Fmt
 import sh.aminov.golda.domain.Goals
@@ -101,7 +102,7 @@ fun GoalsScreen(
                         VSpace(Gap.xs)
                         Text(tr("Звезда в цели делает её главной", "The star in a goal makes it the main one"), style = MaterialTheme.typography.bodyLarge)
                     }
-                    SkippedLine(skippedRub, quiet)
+                    SkippedLine(skippedRub, data.base, quiet)
                 }
             } else {
                 MainGoalTile(data, main, skippedRub, onEdit = { onEditGoal(main) }, onBuy = onBuyGoal, onCelebrated = onCelebrated)
@@ -182,8 +183,8 @@ private fun left(wish: Wish, now: Long): String {
  * ("0 ₽ отказами"), so the mechanic is visible before it is first used.
  */
 @Composable
-private fun SkippedLine(skippedRub: Long, color: Color) {
-    val amount = (if (skippedRub > 0) "+" else "") + Fmt.approx(skippedRub / 100.0, "RUB")
+private fun SkippedLine(skippedRub: Long, base: Base, color: Color) {
+    val amount = (if (skippedRub > 0) "+" else "") + base.approx(skippedRub)
     Text(
         tr("$amount отказами", "$amount from what you skipped"),
         style = MaterialTheme.typography.bodyMedium.merge(Tnum),
@@ -232,7 +233,7 @@ private fun MainGoalTile(data: AppData, main: Goal, skippedRub: Long, onEdit: ()
             color = quiet,
             maxLines = 1,
         )
-        SkippedLine(skippedRub, quiet)
+        SkippedLine(skippedRub, data.base, quiet)
         if (reached) {
             VSpace(Gap.l)
             Button(

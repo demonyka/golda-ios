@@ -70,6 +70,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import sh.aminov.golda.domain.Analytics
+import sh.aminov.golda.domain.Base
+import androidx.compose.ui.platform.testTag
 import sh.aminov.golda.domain.Budget
 import sh.aminov.golda.domain.CategorySpend
 import sh.aminov.golda.domain.Fmt
@@ -174,9 +176,9 @@ fun AnalyticsScreen(data: AppData, padding: PaddingValues) {
                         }
                         val rub = focus?.let { slices[it] } ?: report.spentRub
                         label?.let { Text(it, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis) }
-                        BigNumber(Fmt.approx(rub / 100.0, "RUB"), rub, MaterialTheme.colorScheme.onSurface, maxSp = 56f, alignment = Alignment.Center)
+                        BigNumber(data.base.approx(rub), data.base.minor(rub), MaterialTheme.colorScheme.onSurface, Modifier.testTag(Tags.INSIGHTS_TOTAL), maxSp = 56f, alignment = Alignment.Center)
                         Text(
-                            if (focus == null) tr("≈ ${Fmt.approx(report.averagePerDayRub / 100.0, "RUB")}/день", "≈ ${Fmt.approx(report.averagePerDayRub / 100.0, "RUB")}/day")
+                            if (focus == null) tr("≈ ${data.base.approx(report.averagePerDayRub)}/день", "≈ ${data.base.approx(report.averagePerDayRub)}/day")
                             else if (report.spentRub > 0) wholePercent(rub.toDouble() / report.spentRub) else "",
                             style = MaterialTheme.typography.bodyMedium.merge(Tnum),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -209,7 +211,7 @@ fun AnalyticsScreen(data: AppData, padding: PaddingValues) {
                         },
                         trailing = {
                             Row(verticalAlignment = Alignment.Bottom) {
-                                Text(Fmt.approx(spend.rubMinor / 100.0, "RUB"), style = MaterialTheme.typography.titleMedium.merge(Tnum))
+                                Text(data.base.approx(spend.rubMinor), style = MaterialTheme.typography.titleMedium.merge(Tnum))
                                 Text(
                                     " · " + wholePercent(share),
                                     style = MaterialTheme.typography.bodyMedium.merge(Tnum),
@@ -223,7 +225,7 @@ fun AnalyticsScreen(data: AppData, padding: PaddingValues) {
             item(key = "chart") {
                 val budget = remember(data) { Budget.today(data.states, data.operations, data.settings, today, data.zone, data.allObligations, data.rates) }
                 Tile(Modifier.fillMaxWidth().padding(horizontal = Gap.m).padding(top = Gap.l)) {
-                    DayBars(report.days, today, kind, budget.perDayRub.takeIf { it > 0 })
+                    DayBars(report.days, today, kind, budget.perDayRub.takeIf { it > 0 }, data.base)
                 }
             }
         }
@@ -232,12 +234,12 @@ fun AnalyticsScreen(data: AppData, padding: PaddingValues) {
                 Tile(Modifier.weight(1f).fillMaxHeight()) {
                     Caption(tr("Доходы", "Income"))
                     VSpace(Gap.xs)
-                    Text(Fmt.approx(report.incomeRub / 100.0, "RUB"), style = MaterialTheme.typography.headlineSmall.merge(Tnum), maxLines = 1)
+                    Text(data.base.approx(report.incomeRub), style = MaterialTheme.typography.headlineSmall.merge(Tnum), maxLines = 1)
                 }
                 Tile(Modifier.weight(1f).fillMaxHeight()) {
                     Caption(tr("Потери на обмене", "Lost on exchange"))
                     VSpace(Gap.xs)
-                    Text(Fmt.approx(report.fxLossRub / 100.0, "RUB"), style = MaterialTheme.typography.headlineSmall.merge(Tnum), maxLines = 1)
+                    Text(data.base.approx(report.fxLossRub), style = MaterialTheme.typography.headlineSmall.merge(Tnum), maxLines = 1)
                     Text(
                         if (report.fxVolumeRub > 0) wholePercent(report.fxLossRub.toDouble() / report.fxVolumeRub) + tr(" против ЦБ", " against the CBR")
                         else tr("обменов не было", "no exchanges"),
@@ -334,7 +336,7 @@ private fun RangeDialog(period: Period, onDismiss: () -> Unit, onPick: (LocalDat
  * The dashed line is the daily budget.
  */
 @Composable
-private fun DayBars(days: List<Pair<LocalDate, Long>>, today: LocalDate, kind: PeriodKind, budget: Long?) {
+private fun DayBars(days: List<Pair<LocalDate, Long>>, today: LocalDate, kind: PeriodKind, budget: Long?, base: Base) {
     if (days.isEmpty()) return
     val start = days.indexOfFirst { it.first == today }.takeIf { it >= 0 } ?: days.lastIndex
     var picked by remember(days) { mutableStateOf(start) }
@@ -360,7 +362,7 @@ private fun DayBars(days: List<Pair<LocalDate, Long>>, today: LocalDate, kind: P
                     contentColor = MaterialTheme.colorScheme.onSecondary,
                 ) {
                     Text(
-                        "${dayShort(date, today)} · ${Fmt.approx(rub / 100.0, "RUB")}",
+                        "${dayShort(date, today)} · ${base.approx(rub)}",
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                         style = MaterialTheme.typography.labelLarge.merge(Tnum),
                         maxLines = 1,

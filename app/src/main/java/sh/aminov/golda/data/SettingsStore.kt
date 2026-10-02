@@ -30,6 +30,7 @@ class SettingsStore(context: Context, private val store: DataStore<Preferences> 
         val payday = intPreferencesKey("payday")
         val displayCurrencies = stringPreferencesKey("displayCurrencies")
         val localCurrency = stringPreferencesKey("localCurrency")
+        val baseCurrency = stringPreferencesKey("baseCurrency")
         val markup = doublePreferencesKey("markup")
         val lastAccountId = longPreferencesKey("lastAccountId")
         val geminiModel = stringPreferencesKey("geminiModel")
@@ -69,6 +70,7 @@ class SettingsStore(context: Context, private val store: DataStore<Preferences> 
             payday = this[K.payday] ?: d.payday,
             displayCurrencies = this[K.displayCurrencies]?.split(',')?.filter { it.isNotBlank() } ?: d.displayCurrencies,
             localCurrency = this[K.localCurrency] ?: d.localCurrency,
+            baseCurrency = this[K.baseCurrency] ?: d.baseCurrency,
             markup = this[K.markup] ?: d.markup,
             lastAccountId = this[K.lastAccountId],
             geminiModel = this[K.geminiModel] ?: d.geminiModel,
@@ -91,6 +93,7 @@ class SettingsStore(context: Context, private val store: DataStore<Preferences> 
         this[K.payday] = s.payday
         this[K.displayCurrencies] = s.displayCurrencies.joinToString(",")
         this[K.localCurrency] = s.localCurrency
+        this[K.baseCurrency] = s.baseCurrency
         this[K.markup] = s.markup
         if (s.lastAccountId != null) this[K.lastAccountId] = s.lastAccountId else remove(K.lastAccountId)
         this[K.geminiModel] = s.geminiModel

@@ -903,6 +903,15 @@ object Tags {
     /** Home's line of the day's money in the other currencies, under the big number. */
     const val HOME_OTHERS = "home-others"
 
+    /** Home's big number, "Можно сегодня". */
+    const val HOME_BIG = "home-big"
+
+    /** Accounts' big number, "Всего". */
+    const val ACCOUNTS_TOTAL = "accounts-total"
+
+    /** Insights' big number in the donut. */
+    const val INSIGHTS_TOTAL = "insights-total"
+
     /** Home's "· N дней до зарплаты". */
     const val HOME_PAYDAY = "home-payday"
 

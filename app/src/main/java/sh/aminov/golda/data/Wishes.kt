@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.first
 import sh.aminov.golda.GoldaApplication
 import sh.aminov.golda.MainActivity
 import sh.aminov.golda.R
+import sh.aminov.golda.domain.Base
 import sh.aminov.golda.domain.Budget
 import sh.aminov.golda.domain.Facts
 import sh.aminov.golda.domain.Fmt
@@ -81,10 +82,11 @@ class Wishes(private val context: Context, private val repo: Repo, private val d
         val rub = -full.postings.sumOf { it.rubMinor }
         val hours = snap.settings.hourNet.takeIf { it > 0 }?.let { rub / 100.0 / it }
         val left = snap.today.leftTodayRub
+        val base = Base.of(snap.settings, snap.rates)
         return listOfNotNull(
             hours?.let { "≈ ${Fmt.number(it, 1)} " + tr("ч работы", "h of work") },
-            if (left >= 0) tr("на сегодня осталось ", "left for today ") + Fmt.approx(left / 100.0, "RUB")
-            else tr("перерасход ", "over budget by ") + Fmt.approx(-left / 100.0, "RUB"),
+            if (left >= 0) tr("на сегодня осталось ", "left for today ") + base.approx(left)
+            else tr("перерасход ", "over budget by ") + base.approx(-left),
         ).joinToString(" · ")
     }
 

@@ -37,10 +37,17 @@ data class Backup(
     val wishes: List<Wish>,
 )
 
-private val json = Json {
-    prettyPrint = true
-    encodeDefaults = true
-    ignoreUnknownKeys = true
+/** The file format: unknown keys are skipped and missing ones take their defaults, so older files still load. */
+object BackupFormat {
+    private val json = Json {
+        prettyPrint = true
+        encodeDefaults = true
+        ignoreUnknownKeys = true
+    }
+
+    fun encode(backup: Backup): String = json.encodeToString(Backup.serializer(), backup)
+
+    fun decode(text: String): Backup = json.decodeFromString(Backup.serializer(), text)
 }
 
 class Backups(private val db: GoldaDb, private val settings: SettingsStore) {
@@ -59,7 +66,7 @@ class Backups(private val db: GoldaDb, private val settings: SettingsStore) {
             goals = dao.goalsNow(),
             wishes = dao.wishesAll(),
         )
-        return json.encodeToString(Backup.serializer(), backup)
+        return BackupFormat.encode(backup)
     }
 
     /**
@@ -67,7 +74,7 @@ class Backups(private val db: GoldaDb, private val settings: SettingsStore) {
      * first, so a broken file changes nothing. The Gemini key stays.
      */
     suspend fun import(text: String): Backup {
-        val backup = json.decodeFromString(Backup.serializer(), text)
+        val backup = BackupFormat.decode(text)
         db.clearAllTablesSafely()
         db.withTransaction {
             dao.insertCategories(backup.categories)

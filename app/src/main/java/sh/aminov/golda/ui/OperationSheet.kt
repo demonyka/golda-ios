@@ -382,7 +382,7 @@ fun EntrySheet(
             amount == null && type == OpType.TRANSFER -> Unit
             amount == null -> {
                 val budget = remember(data) { Budget.today(data.states, data.operations, data.settings, LocalDate.now(data.zone), data.zone, data.allObligations, data.rates) }
-                UnderLine(tr("Можно сегодня ", "Safe today ") + Fmt.approx(budget.leftTodayRub / 100.0, "RUB"))
+                UnderLine(tr("Можно сегодня ", "Safe today ") + data.base.approx(budget.leftTodayRub))
             }
             secondCode != null && type == OpType.TRANSFER -> ReceivedLine(secondCode, secondText, secondEdited, editingSecond, { editingSecond = it }) {
                 secondText = it

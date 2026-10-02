@@ -43,6 +43,9 @@ loud is the moment you notice you are spending.
 
 - **Every amount in several currencies.** You pick the currencies, and every
   amount shows in all of them: `15 ₾ ≈ 530 ₽ · 5,8 $`.
+- **Main currency.** Big numbers and totals can be shown in dollars, lari or
+  any shown currency. The books stay in rubles; a non-ruble figure is the ruble
+  amount at today's display rate.
 - **Real cost, not the official rate.** Each account remembers what its money
   cost in rubles, and spending and transfers carry that cost along.
 - **Voice entry.** Tap the mic, the home-screen widget, the Quick Settings tile

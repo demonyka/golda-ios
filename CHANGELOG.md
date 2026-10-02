@@ -5,6 +5,22 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- **Main currency** (Settings → Where I am). The big numbers and totals —
+  Home, Accounts, Insights, goals, "Not sure" and the snackbars — can be shown
+  in any shown currency instead of rubles. The books stay in rubles: a
+  non-ruble figure is the ruble amount at today's display rate. Amounts in an
+  account's own currency stay in it, and the hourly rate stays in rubles. It
+  is saved in backups; older backups restore with rubles.
+
+### Fixed
+
+- The interest forecast on a foreign-currency debt was written in rubles; it
+  is now in the account's currency.
+
 ## [0.14.1] — 2026-10-02
 
 ### Fixed

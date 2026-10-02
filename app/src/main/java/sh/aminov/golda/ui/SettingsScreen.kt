@@ -66,7 +66,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 /** Which small sheet is open over the settings. */
-private enum class Edit { Local, Shown, Markup, Rate, TaxHours, Payday, Key, Model, Language }
+private enum class Edit { Local, Base, Shown, Markup, Rate, TaxHours, Payday, Key, Model, Language }
 
 /**
  * Settings as grouped lists, one value per row; a row opens a small sheet where that value is
@@ -113,12 +113,18 @@ fun SettingsScreen(
         ) {
             GroupLabel(tr("Где я", "Where I am"))
             SettingRow(
-                0, 2, tr("Местная валюта", "Local currency"),
+                0, 3, tr("Местная валюта", "Local currency"),
                 painter = painterResource(R.drawable.ic_location),
                 value = currencyLabel(s.localCurrency),
                 supporting = tr("Для новых трат и голоса", "For new purchases and voice"),
             ) { edit = Edit.Local }
-            SettingRow(1, 2, tr("Показывать суммы в", "Show amounts in"), painter = painterResource(R.drawable.ic_eye), value = s.displayCurrencies.joinToString(" ") { Currencies.symbol(it) }) { edit = Edit.Shown }
+            SettingRow(
+                1, 3, tr("Основная валюта", "Main currency"),
+                painter = painterResource(R.drawable.ic_coins),
+                value = currencyLabel(s.baseCurrency),
+                supporting = tr("Крупные цифры и итоги", "Big numbers and totals"),
+            ) { edit = Edit.Base }
+            SettingRow(2, 3, tr("Показывать суммы в", "Show amounts in"), painter = painterResource(R.drawable.ic_eye), value = s.displayCurrencies.joinToString(" ") { Currencies.symbol(it) }) { edit = Edit.Shown }
 
             VSpace(Gap.l)
             val ratesDay = data.ratesDate?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
@@ -211,6 +217,9 @@ fun SettingsScreen(
     }
 
     when (edit) {
+        Edit.Base -> PickSheet(tr("Основная валюта — итоги по сегодняшнему курсу", "Main currency: totals at today's rate"), onDismiss = { edit = null }) {
+            BaseCurrencyChoice(s) { f -> onChange(f); edit = null }
+        }
         Edit.Local -> PickSheet(tr("Местная валюта — в ней суммы, сказанные без валюты", "Local currency, for amounts said without one"), onDismiss = { edit = null }) {
             LocalCurrencyChoice(s) { f -> onChange(f); edit = null }
         }

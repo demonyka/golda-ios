@@ -227,8 +227,9 @@ fun OperationRow(data: AppData, full: OperationFull, accountId: Long?, onClick: 
             main = Fmt.amount(own.amountMinor, ownCode, signed = true)
             if (op.purchaseCurrency != null && op.purchaseAmountMinor != null) {
                 secondary = Fmt.amount(-op.purchaseAmountMinor, op.purchaseCurrency)
-            } else if (ownCode != "RUB") {
-                secondary = Fmt.approx(own.rubMinor / 100.0, "RUB")
+            } else if (ownCode != data.base.code) {
+                // What the account's own amount comes to in the main currency.
+                secondary = data.base.approx(own.rubMinor)
                 approximate = true
             }
         }
@@ -338,8 +339,10 @@ fun lastMonthPay(settings: Settings): String {
 fun toggleDisplayCurrency(s: Settings, code: String): Settings {
     if (code == "RUB") return s
     val list = if (code in s.displayCurrencies) s.displayCurrencies - code else s.displayCurrencies + code
+    // A hidden currency can't stay local or main: both fall back to rubles.
     val local = if (s.localCurrency in list) s.localCurrency else "RUB"
-    return s.copy(displayCurrencies = Currencies.common.filter { it in list }, localCurrency = local)
+    val base = if (s.baseCurrency in list) s.baseCurrency else "RUB"
+    return s.copy(displayCurrencies = Currencies.common.filter { it in list }, localCurrency = local, baseCurrency = base)
 }
 
 /** Every currency as a toggle in one fixed order, so nothing jumps when one is switched. */
@@ -356,13 +359,23 @@ fun DisplayCurrencyToggles(settings: Settings, onChange: ((Settings) -> Settings
 /** Where you are now, out of the shown currencies. */
 @Composable
 fun LocalCurrencyChoice(settings: Settings, onChange: ((Settings) -> Settings) -> Unit) {
+    ShownCurrencyChoice(settings, settings.localCurrency) { code -> onChange { it.copy(localCurrency = code) } }
+}
+
+/** The main currency, out of the shown currencies. */
+@Composable
+fun BaseCurrencyChoice(settings: Settings, onChange: ((Settings) -> Settings) -> Unit) {
+    ShownCurrencyChoice(settings, settings.baseCurrency) { code -> onChange { it.copy(baseCurrency = code) } }
+}
+
+/** One of the shown currencies: a connected group, or loose toggles when there are many. */
+@Composable
+private fun ShownCurrencyChoice(settings: Settings, selected: String, onPick: (String) -> Unit) {
     val options = settings.displayCurrencies
     if (options.size <= 5) {
-        ChoiceGroup(options, settings.localCurrency, { code -> onChange { it.copy(localCurrency = code) } }, Modifier.fillMaxWidth()) {
-            ChoiceText(currencyLabel(it))
-        }
+        ChoiceGroup(options, selected, onPick, Modifier.fillMaxWidth()) { ChoiceText(currencyLabel(it)) }
     } else {
-        ToggleFlow(options, { it == settings.localCurrency }, { code -> onChange { it.copy(localCurrency = code) } }, ::currencyLabel)
+        ToggleFlow(options, { it == selected }, onPick, ::currencyLabel)
     }
 }
 

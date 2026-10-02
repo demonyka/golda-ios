@@ -13,6 +13,7 @@ import sh.aminov.golda.data.OpType
 import sh.aminov.golda.data.OperationFull
 import sh.aminov.golda.data.Rate
 import sh.aminov.golda.domain.AccountState
+import sh.aminov.golda.domain.Base
 import sh.aminov.golda.domain.Currencies
 import sh.aminov.golda.domain.Fmt
 import sh.aminov.golda.domain.I18n
@@ -39,6 +40,9 @@ class AppData(
 ) {
     val rates = Rates(rateList.associate { it.code to it.rubPerUnit }, settings.markup)
     val ratesDate: String? = rateList.maxOfOrNull { it.date }
+
+    /** The main currency the big numbers and totals are shown in. */
+    val base = Base.of(settings, rates)
     val states: Map<Long, AccountState> = Ledger.states(accounts, operations.flatMap { it.postings })
     val accountById = accounts.associateBy { it.id }
     val categoryById = categories.associateBy { it.id }

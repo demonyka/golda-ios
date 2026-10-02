@@ -19,6 +19,11 @@ data class Settings(
     val displayCurrencies: List<String> = listOf("RUB", "USD"),
     /** Currency of the country you are in; voice input falls back to it. */
     val localCurrency: String = "RUB",
+    /**
+     * The main currency ("Основная валюта"): the big numbers and totals are shown in it. The ledger
+     * stays in rubles; see [Base].
+     */
+    val baseCurrency: String = "RUB",
     /** How much more than the CBR rate rubles cost you abroad. */
     val markup: Double = 0.10,
     val lastAccountId: Long? = null,
