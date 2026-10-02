@@ -7,7 +7,9 @@
     android:viewportHeight="108">
     <path android:fillColor="#FFFFFFFF" android:fillAlpha="0.69" android:pathData="M65.00,44.50 L62.03,29.27 L75.03,38.72 L80.00,54.00 Z" />
     <path android:fillColor="#FFFFFFFF" android:fillAlpha="0.62" android:pathData="M80.00,54.00 L62.00,65.00 L65.00,44.50 Z" />
-    <path android:fillColor="#FFFFFFFF" android:fillAlpha="0.66" android:pathData="M62.00,65.00 L80.00,54.00 L75.03,69.28 L62.03,78.73 L45.97,78.73 Z" />
+    <path android:fillColor="#FFFFFFFF" android:fillAlpha="0.67" android:pathData="M62.00,65.00 L80.00,54.00 L75.03,69.28 Z" />
+    <path android:fillColor="#FFFFFFFF" android:fillAlpha="0.63" android:pathData="M62.00,65.00 L75.03,69.28 L62.03,78.73 Z" />
+    <path android:fillColor="#FFFFFFFF" android:fillAlpha="0.68" android:pathData="M62.00,65.00 L62.03,78.73 L45.97,78.73 Z" />
     <path android:fillColor="#FFFFFFFF" android:fillAlpha="0.62" android:pathData="M45.97,78.73 L41.00,61.00 L62.00,65.00 Z" />
     <path android:fillColor="#FFFFFFFF" android:fillAlpha="0.70" android:pathData="M41.00,61.00 L45.97,78.73 L32.97,69.28 L28.00,54.00 Z" />
     <path android:fillColor="#FFFFFFFF" android:fillAlpha="0.83" android:pathData="M28.00,54.00 L43.00,40.00 L41.00,61.00 Z" />

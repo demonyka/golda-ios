@@ -13,6 +13,9 @@ for i in range(10):
     mid = ((a[0]+b[0])/2, (a[1]+b[1])/2)
     q = min(range(4), key=lambda j: (Q[j][0]-mid[0])**2 + (Q[j][1]-mid[1])**2)
     assign.append(q)
+# Fans from these table corners are cut into triangles (the bottom-right one, by the owner's eye).
+SPLIT = {2}
+
 # One facet per run of rim edges that lean on the same table corner, so the cut stays simple:
 # the table, four fans from its corners to the rim, and a triangle where two fans meet.
 start = next(i for i in range(10) if assign[i] != assign[i-1])
@@ -23,7 +26,12 @@ while True:
     while assign[(run[-1]+1) % 10] == q and (run[-1]+1) % 10 != start:
         run.append((run[-1]+1) % 10)
     edge = [V[k] for k in run] + [V[(run[-1]+1) % 10]]
-    faces.append([Q[q]] + [(x, y, 0.0) for x, y in edge])
+    if q in SPLIT:
+        # Cut this fan into one triangle per rim edge, so the corner catches the light in steps.
+        for a, b in zip(edge, edge[1:]):
+            faces.append([Q[q], (a[0], a[1], 0.0), (b[0], b[1], 0.0)])
+    else:
+        faces.append([Q[q]] + [(x, y, 0.0) for x, y in edge])
     nxt = (run[-1]+1) % 10
     faces.append([(edge[-1][0], edge[-1][1], 0.0), Q[assign[nxt]], Q[q]])
     i = nxt
@@ -95,5 +103,5 @@ head = '''<?xml version="1.0" encoding="utf-8"?>
 open('ic_launcher_foreground.xml', 'w', newline='\n').write(head + base + '\n' + '\n'.join(fg) + '\n</vector>\n')
 open('ic_launcher_monochrome.xml', 'w', newline='\n').write(head.replace('xmlns:aapt="http://schemas.android.com/aapt"\n    ', '').replace("lit from the top left. Generated", "in one colour, facets by opacity. Generated") + '\n'.join(mono) + '\n</vector>\n')
 def page(bg, scale):
-    return f'<svg xmlns="http://www.w3.org/2000/svg" width="{108*scale}" height="{108*scale}" viewBox="0 0 108 108"><defs><clipPath id="m"><circle cx="54" cy="54" r="36"/></clipPath></defs><g clip-path="url(#m)"><rect width="108" height="108" fill="{bg}"/>{"".join(svg)}<path d="{outline}" fill="none" stroke="#FFF4D2" stroke-opacity="0.4" stroke-width="0.8" stroke-linejoin="round"/></g></svg>'
+    return f'<svg xmlns="http://www.w3.org/2000/svg" width="{108*scale}" height="{108*scale}" viewBox="0 0 108 108"><defs><clipPath id="m"><circle cx="54" cy="54" r="36"/></clipPath></defs><g clip-path="url(#m)"><rect width="108" height="108" fill="{bg}"/><path d="{outline}" fill="{gold(0.5)}"/>{"".join(svg)}</g></svg>'
 
