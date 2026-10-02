@@ -48,7 +48,7 @@ android {
 
     defaultConfig {
         applicationId = "sh.aminov.golda"
-        minSdk = 36
+        minSdk = 26
         targetSdk = 37
         versionCode = 15
         versionName = "0.13.1"
@@ -62,6 +62,14 @@ android {
                 keyAlias = secret("keyAlias", "GOLDA_KEY_ALIAS")
                 keyPassword = secret("keyPassword", "GOLDA_KEY_PASSWORD")
             }
+        }
+    }
+
+    // The language is picked inside the app (on Android 8–12 without the system's per-app setting),
+    // so an app bundle must keep every language in the base APK.
+    bundle {
+        language {
+            enableSplit = false
         }
     }
 

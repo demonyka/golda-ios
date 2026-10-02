@@ -2,6 +2,7 @@ package sh.aminov.golda.data
 
 import android.content.Context
 import android.media.MediaRecorder
+import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
@@ -23,7 +24,10 @@ import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 import sh.aminov.golda.domain.tr
 
-/** Records one voice note to an Opus file. */
+/**
+ * Records one voice note: Opus in OGG from Android 10, where MediaRecorder has it; AAC in an ADTS
+ * stream (.aac, what Gemini takes as audio/aac) on Android 8–9.
+ */
 class VoiceRecorder(private val context: Context) {
     private var recorder: MediaRecorder? = null
     private var file: File? = null
@@ -32,14 +36,22 @@ class VoiceRecorder(private val context: Context) {
     private var samples = 0
 
     fun start(): File {
-        val target = File(VoiceQueue.dir(context), "${System.currentTimeMillis()}.ogg")
-        recorder = MediaRecorder(context).apply {
+        val opus = Build.VERSION.SDK_INT >= 29
+        val target = File(VoiceQueue.dir(context), "${System.currentTimeMillis()}." + if (opus) "ogg" else "aac")
+        val created = if (Build.VERSION.SDK_INT >= 31) MediaRecorder(context) else @Suppress("DEPRECATION") MediaRecorder()
+        recorder = created.apply {
             setAudioSource(MediaRecorder.AudioSource.VOICE_RECOGNITION)
-            setOutputFormat(MediaRecorder.OutputFormat.OGG)
-            setAudioEncoder(MediaRecorder.AudioEncoder.OPUS)
+            if (opus) {
+                setOutputFormat(MediaRecorder.OutputFormat.OGG)
+                setAudioEncoder(MediaRecorder.AudioEncoder.OPUS)
+                setAudioEncodingBitRate(24_000)
+            } else {
+                setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS)
+                setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+                setAudioEncodingBitRate(32_000)
+            }
             setAudioChannels(1)
             setAudioSamplingRate(16_000)
-            setAudioEncodingBitRate(24_000)
             setMaxDuration(60_000)
             setOutputFile(target)
             prepare()
@@ -88,7 +100,10 @@ object VoiceQueue {
     fun dir(context: Context) = File(context.filesDir, "voice").apply { mkdirs() }
 
     fun pending(context: Context): List<File> =
-        dir(context).listFiles { f -> f.extension == "ogg" || f.extension == "wav" }.orEmpty().sortedBy { it.name }
+        dir(context).listFiles { f -> f.extension in AUDIO }.orEmpty().sortedBy { it.name }
+
+    /** What a note can be: Opus (10+), AAC (8–9), and WAV for tests. */
+    private val AUDIO = setOf("ogg", "aac", "m4a", "wav")
 
     fun recordedAt(file: File): Long = file.nameWithoutExtension.toLongOrNull() ?: file.lastModified()
 }
@@ -99,7 +114,12 @@ object Gemini {
     const val DEFAULT_MODEL = "gemini-3.5-flash-lite"
 
     suspend fun parse(audio: File, system: String, key: String, model: String): VoiceResult = withContext(Dispatchers.IO) {
-        val mime = if (audio.extension == "wav") "audio/wav" else "audio/ogg"
+        val mime = when (audio.extension) {
+            "wav" -> "audio/wav"
+            "aac" -> "audio/aac"
+            "m4a" -> "audio/mp4"
+            else -> "audio/ogg"
+        }
         val body = JSONObject()
             .put("systemInstruction", JSONObject().put("parts", JSONArray().put(JSONObject().put("text", system))))
             .put(

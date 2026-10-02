@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Before Android 12 there is no system widget radius: a round 16 dp. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
     <solid android:color="@color/widget_background" />
-    <corners android:radius="16dp" />
+    <corners android:radius="@android:dimen/system_app_widget_background_radius" />
 </shape>

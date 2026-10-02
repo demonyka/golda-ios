@@ -1,5 +1,6 @@
 package sh.aminov.golda.data
 
+import sh.aminov.golda.domain.AppLanguage
 import android.content.Context
 import androidx.room.withTransaction
 import androidx.work.CoroutineWorker
@@ -113,7 +114,7 @@ object ReconcileSchedule {
 class ReconcileReminder(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
         val app = applicationContext as GoldaApplication
-        I18n.russian = app.resources.configuration.locales[0].language == "ru"
+        I18n.russian = AppLanguage.russian(app)
         notify(
             app, "reconcile", tr("Сверка", "Reconciling"), 300_000,
             tr("Сверь балансы", "Check your balances"),

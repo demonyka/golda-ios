@@ -1,5 +1,8 @@
 package sh.aminov.golda
 
+import sh.aminov.golda.domain.AppLanguage
+import android.annotation.SuppressLint
+import android.os.Build
 import android.app.Application
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
@@ -35,7 +38,7 @@ class GoldaApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        I18n.russian = resources.configuration.locales[0].language == "ru"
+        I18n.russian = AppLanguage.russian(this)
     }
 }
 
@@ -64,10 +67,15 @@ class MainActivity : ComponentActivity() {
     /** Tabs to open, from notifications. */
     private val tabRequests = Channel<Int>(Channel.CONFLATED)
 
+    /** Before Android 13 the app's own language is applied here; from 13 the system does it. */
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(AppLanguage.wrap(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Changing the app's language recreates the activity, so this stays current.
-        I18n.russian = resources.configuration.locales[0].language == "ru"
+        I18n.russian = AppLanguage.russian(this)
         enableEdgeToEdge()
         if (savedInstanceState == null) handle(intent)
         lifecycleScope.launch {
@@ -114,9 +122,21 @@ class MainActivity : ComponentActivity() {
 
 /** Quick Settings tile: one tap starts recording. */
 class VoiceTileService : TileService() {
+    // The Intent overload is used only before 14, where the PendingIntent one does not exist.
+    @SuppressLint("StartActivityAndCollapseDeprecated")
     override fun onClick() {
         super.onClick()
-        startActivityAndCollapse(voicePendingIntent(this))
+        if (Build.VERSION.SDK_INT >= 34) {
+            startActivityAndCollapse(voicePendingIntent(this))
+        } else {
+            // Before 14 the tile starts the activity by an intent; same target, same flags.
+            @Suppress("DEPRECATION")
+            startActivityAndCollapse(
+                Intent(this, MainActivity::class.java)
+                    .setAction(ACTION_VOICE)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP),
+            )
+        }
     }
 }
 

@@ -1,5 +1,6 @@
 package sh.aminov.golda.ui
 
+import android.os.Build
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.pager.HorizontalPager
@@ -355,7 +356,7 @@ private fun MainScreen(
                     },
                     onThink = { consider ->
                         sheet = null
-                        if (context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                        if (Build.VERSION.SDK_INT >= 33 && context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                             notifications.launch(Manifest.permission.POST_NOTIFICATIONS)
                         }
                         scope.launch {

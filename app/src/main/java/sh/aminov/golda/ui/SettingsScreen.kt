@@ -1,8 +1,10 @@
 package sh.aminov.golda.ui
 
-import android.app.LocaleManager
+import sh.aminov.golda.domain.AppLanguage
+import android.content.ContextWrapper
+import android.content.Context
+import android.app.Activity
 import android.net.Uri
-import android.os.LocaleList
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -467,20 +469,17 @@ private fun languageName(tag: String) = when (tag) {
 }
 
 @Composable
-private fun currentLanguage(): String {
-    val manager = LocalContext.current.getSystemService(LocaleManager::class.java)
-    return manager.applicationLocales.takeIf { !it.isEmpty }?.get(0)?.language.orEmpty()
-}
+private fun currentLanguage(): String = AppLanguage.tag(LocalContext.current)
 
 /** Russian, English or whatever the phone speaks; the system recreates the screen in the new language. */
 @Composable
 private fun LanguageSheet(onDismiss: () -> Unit) {
-    val manager = LocalContext.current.getSystemService(LocaleManager::class.java)
+    val activity = LocalContext.current.findActivity()
     val current = currentLanguage()
     PickSheet(tr("Язык приложения", "App language"), onDismiss) {
         ChoiceGroup(listOf("ru", "en", ""), current, { tag ->
             onDismiss()
-            manager.applicationLocales = if (tag.isEmpty()) LocaleList.getEmptyLocaleList() else LocaleList.forLanguageTags(tag)
+            activity?.let { AppLanguage.set(it, tag) }
         }, Modifier.fillMaxWidth()) { ChoiceText(if (it.isEmpty()) tr("Системный", "System") else languageName(it)) }
     }
 }
@@ -516,4 +515,11 @@ private fun ObligationSheet(data: AppData, obligation: Obligation, onSave: (Obli
         VSpace(Gap.s)
         DayGrid(day) { day = it }
     }
+}
+
+/** The activity behind a Compose context, through any wrappers. */
+private tailrec fun Context.findActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
 }

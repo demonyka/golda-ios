@@ -1,5 +1,7 @@
 package sh.aminov.golda.data
 
+import sh.aminov.golda.domain.AppLanguage
+import android.os.Build
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -176,7 +178,7 @@ class Wishes(private val context: Context, private val repo: Repo, private val d
 class WishReminder(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
         val app = applicationContext as GoldaApplication
-        I18n.russian = app.resources.configuration.locales[0].language == "ru"
+        I18n.russian = AppLanguage.russian(app)
         val wish = app.repo.wishes.wish(inputData.getLong("id", 0)) ?: return Result.success()
         if (wish.status != WishStatus.WAITING) return Result.success()
         notify(app, CHANNEL, tr("Вишлист", "Wishlist"), wish.id.toInt(), wish.title, app.repo.wishes.reminderLine(wish), tab = TAB_GOALS)
@@ -190,7 +192,8 @@ class WishReminder(context: Context, params: WorkerParameters) : CoroutineWorker
 
 /** Posts a notification that opens the app, when notifications are allowed. */
 fun notify(context: Context, channel: String, channelName: String, id: Int, title: String, text: String, tab: Int? = null) {
-    if (context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) return
+    // The permission exists from Android 13; before, notifications are simply allowed.
+    if (Build.VERSION.SDK_INT >= 33 && context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) return
     val manager = context.getSystemService(NotificationManager::class.java)
     manager.createNotificationChannel(NotificationChannel(channel, channelName, NotificationManager.IMPORTANCE_DEFAULT))
     val open = PendingIntent.getActivity(
@@ -213,7 +216,7 @@ fun notify(context: Context, channel: String, channelName: String, id: Int, titl
 class DebtReminder(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
         val app = applicationContext as GoldaApplication
-        I18n.russian = app.resources.configuration.locales[0].language == "ru"
+        I18n.russian = AppLanguage.russian(app)
         val today = LocalDate.now()
         val states = app.repo.debtStates()
         for (state in states) {
