@@ -6,9 +6,18 @@ let package = Package(
     name: "GoldaData",
     platforms: [.iOS(.v26), .macOS(.v15)],
     products: [.library(name: "GoldaData", targets: ["GoldaData"])],
-    dependencies: [.package(path: "../GoldaCore")],
+    dependencies: [
+        .package(path: "../GoldaCore"),
+        .package(url: "https://github.com/groue/GRDB.swift", from: "7.11.1"),
+    ],
     targets: [
-        .target(name: "GoldaData", dependencies: [.product(name: "GoldaCore", package: "GoldaCore")]),
+        .target(
+            name: "GoldaData",
+            dependencies: [
+                .product(name: "GoldaCore", package: "GoldaCore"),
+                .product(name: "GRDB", package: "GRDB.swift"),
+            ]
+        ),
         .testTarget(name: "GoldaDataTests", dependencies: ["GoldaData"]),
     ]
 )
