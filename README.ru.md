@@ -12,7 +12,7 @@
   <a href="https://github.com/shamil-aminov/golda/actions/workflows/ci.yml"><img src="https://github.com/shamil-aminov/golda/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/shamil-aminov/golda/releases/latest"><img src="https://img.shields.io/github/v/release/shamil-aminov/golda?label=release&color=D9A93E" alt="Release"></a>
   <a href="https://github.com/shamil-aminov/golda/releases"><img src="https://img.shields.io/github/downloads/shamil-aminov/golda/total?label=downloads&color=52525B" alt="Downloads"></a>
-  <a href="#что-нужно"><img src="https://img.shields.io/badge/Android-16%2B-52525B?logo=android&logoColor=white" alt="Android 16+"></a>
+  <a href="#что-нужно"><img src="https://img.shields.io/badge/Android-8.0%2B-52525B?logo=android&logoColor=white" alt="Android 8.0+"></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/shamil-aminov/golda?color=D9A93E" alt="License: MIT"></a>
 </p>
 
@@ -96,7 +96,8 @@ flowchart LR
 
 ## Что нужно
 
-- **Телефон:** Android 16 (API 36) или новее.
+- **Телефон:** Android 8.0 (API 26) или новее. Голосовые заметки пишутся
+  в Opus с Android 10 и в AAC на Android 8–9.
 - **Для голосового ввода:** свой ключ Google Gemini API (см. ниже). Всё
   остальное работает и без него.
 

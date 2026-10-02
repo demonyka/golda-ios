@@ -5,6 +5,24 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.14.0] — 2026-10-02
+
+### Changed
+
+- **Runs on Android 8.0 (API 26) and newer**, not only Android 16. Where an
+  older version lacks something, there is a fallback:
+  - Voice notes are recorded as AAC on Android 8–9 (Opus needs Android 10)
+    and sent to Gemini with the matching type. Notes already waiting in the
+    queue are picked up in either format.
+  - The app's own language is kept by the system from Android 13 and in the
+    app's settings before that, and survives a restart either way.
+  - Notifications ask for permission only on Android 13 and newer, where the
+    permission exists; before that they are simply shown.
+  - The Quick Settings tile and the widget work on every supported version;
+    the widget has its own rounded corners before Android 12.
+  - The keyboard slides the form's action bar up with it from Android 11;
+    on older versions the form simply resizes.
+
 ## [0.13.1] — 2026-10-02
 
 ### Changed
@@ -70,5 +88,6 @@ First public release.
 - Spending is never recorded from bank notifications. Saying the purchase out
   loud is the point.
 
+[0.14.0]: https://github.com/shamil-aminov/golda/releases/tag/v0.14.0
 [0.13.1]: https://github.com/shamil-aminov/golda/releases/tag/v0.13.1
 [0.13.0]: https://github.com/shamil-aminov/golda/releases/tag/v0.13.0

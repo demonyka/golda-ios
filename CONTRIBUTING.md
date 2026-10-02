@@ -13,7 +13,8 @@ recorded instead usually pin it down.
 
 Android Studio, or JDK 21 or newer with the Android SDK. The JDK bundled with
 Android Studio (`jbr`) works. The app needs a phone or emulator with
-Android 16 (API 36).
+Android 8.0 (API 26) or newer; check changes on an old version (API 26) as well
+as a current one.
 
 ```bash
 ./gradlew test lintDebug assembleDebug

@@ -12,7 +12,7 @@
   <a href="https://github.com/shamil-aminov/golda/actions/workflows/ci.yml"><img src="https://github.com/shamil-aminov/golda/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/shamil-aminov/golda/releases/latest"><img src="https://img.shields.io/github/v/release/shamil-aminov/golda?label=release&color=D9A93E" alt="Release"></a>
   <a href="https://github.com/shamil-aminov/golda/releases"><img src="https://img.shields.io/github/downloads/shamil-aminov/golda/total?label=downloads&color=52525B" alt="Downloads"></a>
-  <a href="#requirements"><img src="https://img.shields.io/badge/Android-16%2B-52525B?logo=android&logoColor=white" alt="Android 16+"></a>
+  <a href="#requirements"><img src="https://img.shields.io/badge/Android-8.0%2B-52525B?logo=android&logoColor=white" alt="Android 8.0+"></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/shamil-aminov/golda?color=D9A93E" alt="License: MIT"></a>
 </p>
 
@@ -99,7 +99,8 @@ The full design, in Russian, is in [SPEC.md](SPEC.md).
 
 ## Requirements
 
-- **Phone:** Android 16 (API 36) or newer.
+- **Phone:** Android 8.0 (API 26) or newer. Voice notes are recorded as
+  Opus from Android 10 and as AAC on Android 8–9.
 - **For voice entry:** your own Google Gemini API key (see below). Everything
   else works without it.
 
