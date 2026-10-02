@@ -22,6 +22,26 @@ as a current one.
 
 CI runs exactly these on every push and pull request.
 
+## Scenario tests (instrumented, emulator only)
+
+`app/src/androidTest` drives the real UI: change a setting, go back, and check
+that it changed what it should (the local currency, the shown currencies,
+payday, rate and tax, markup, the language, and that settings survive a
+restart). They run in a test application whose database is in memory and whose
+settings live in a separate file, so they never see the app's own data.
+
+**Run them on an emulator only.** Gradle installs the app on *every* connected
+device and uninstalls it afterwards, and an uninstall wipes that phone's data.
+The tests themselves refuse to start anywhere but an emulator, but that cannot
+stop Gradle's own install and uninstall, so always name the emulator:
+
+```bash
+ANDROID_SERIAL=emulator-5554 ./gradlew connectedDebugAndroidTest
+```
+
+Use the emulator's serial from `adb devices`. Never run the task without
+`ANDROID_SERIAL` while a phone is plugged in.
+
 ## Trying it without your own data
 
 Debug builds have two shortcuts that fill the app with a made-up person's
@@ -38,7 +58,7 @@ To keep a real install safe while you develop, add `applicationIdSuffix =
 ".demo"` to the `debug` build type locally. The debug build then installs as a
 separate app with its own data. Don't commit that line.
 
-A voice note can be fed in without speaking: copy a `.wav` or `.ogg` file,
+A voice note can be fed in without speaking: copy a `.wav`, `.ogg` or `.aac` file,
 named with its recording time in milliseconds, into the app's `files/voice/`
 folder with `run-as`, then start the activity with
 `--ez golda.voiceQueue true`.

@@ -52,6 +52,10 @@ android {
         targetSdk = 37
         versionCode = 16
         versionName = "0.14.0"
+
+        // Scenario tests run in an application with in-memory data and refuse to start anywhere but
+        // an emulator; see CONTRIBUTING.md before running them.
+        testInstrumentationRunner = "sh.aminov.golda.GoldaTestRunner"
     }
 
     signingConfigs {
@@ -115,4 +119,16 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     testImplementation(libs.junit)
     debugImplementation(libs.androidx.compose.ui.tooling)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.core)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    constraints {
+        // The test APK must use the app's versions, and Compose's test libraries need 1.2 of these
+        // (the app's own dependencies settle for 1.1).
+        implementation(libs.androidx.concurrent.futures)
+        implementation(libs.androidx.concurrent.futures.ktx)
+    }
 }
