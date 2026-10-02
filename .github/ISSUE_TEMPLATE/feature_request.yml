@@ -1,0 +1,21 @@
+name: Feature request
+description: An idea for Golda
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do
+      description: >
+        The situation, not the solution. What gets in the way today?
+        Golda records spending only by hand or by voice, on purpose, so
+        automatic import from banks is out of scope.
+    validations:
+      required: true
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would help
+    validations:
+      required: true

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Golda</string>
+    <string name="voice_short">Записать голосом</string>
+    <string name="widget_description">Одно касание — и говоришь, что потратил</string>
+</resources>

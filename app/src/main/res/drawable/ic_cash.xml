@@ -1,0 +1,10 @@
+<!-- Iconoteka (MIT, Oleg Turbaba): cash r-s -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M0.500488 19V5H23.5005V19H0.500488ZM2.35049 17.2H21.6505V6.8H2.35049V17.2ZM12.0005 15.725C9.90049 15.725 8.25049 14.075 8.25049 12C8.25049 9.925 9.90049 8.275 12.0005 8.275C14.1005 8.275 15.7505 9.925 15.7505 12C15.7505 14.075 14.1005 15.725 12.0005 15.725ZM12.0005 13.925C13.0755 13.925 13.9255 13.075 13.9255 12C13.9255 10.925 13.0755 10.075 12.0005 10.075C10.9255 10.075 10.0755 10.925 10.0755 12C10.0755 13.075 10.9255 13.925 12.0005 13.925Z" />
+</vector>

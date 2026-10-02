@@ -1,0 +1,84 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Signed APK and GitHub release
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Unit tests
+        run: ./gradlew test --stacktrace
+
+      # The keystore never lives in the repository. It is held as a base64
+      # secret and written to disk only for the length of this job. Without it
+      # the build would fall back to the debug key, which is fine for trying
+      # things out but never for a published release, so the job stops here.
+      - name: Decode keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::error::Keystore secrets are not set. See docs/RELEASING.md." >&2
+            exit 1
+          fi
+          echo "$KEYSTORE_BASE64" | base64 -d > release.jks
+          echo "GOLDA_STORE_FILE=$(pwd)/release.jks" >> "$GITHUB_ENV"
+
+      - name: Assemble release
+        env:
+          GOLDA_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          GOLDA_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          GOLDA_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: ./gradlew assembleRelease --stacktrace
+
+      - name: Remove the keystore
+        if: always()
+        run: rm -f release.jks
+
+      - name: Name the APK after the tag
+        run: |
+          mkdir -p dist
+          cp app/build/outputs/apk/release/app-release.apk "dist/Golda-${GITHUB_REF_NAME#v}.apk"
+          cd dist && sha256sum * > SHA256SUMS.txt
+
+      # The release text is this version's section of CHANGELOG.md, followed by
+      # a short guide to the files.
+      - name: Release notes
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          awk -v ver="$version" '
+            /^## \[/ { printing = index($0, "[" ver "]") > 0; next }
+            /^\[[^]]+\]: / { next }
+            printing
+          ' CHANGELOG.md > notes.md
+          if [ ! -s notes.md ]; then
+            echo "::error::CHANGELOG.md has no section for $version." >&2
+            exit 1
+          fi
+          cat .github/release-downloads.md >> notes.md
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v3
+        with:
+          name: Golda ${{ github.ref_name }}
+          body_path: notes.md
+          files: dist/*

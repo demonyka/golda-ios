@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Golda" parent="android:Theme.DeviceDefault.DayNight">
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+    <color name="icon_background">#F4F4F5</color>
+    <!-- The widget is the in-app mic: gold, with the dark mic glyph. -->
+    <color name="widget_background">#D9A93E</color>
+    <color name="widget_icon">#2B1D00</color>
+</resources>

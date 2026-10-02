@@ -1,0 +1,40 @@
+Golda
+Copyright (c) 2026 Shamil Aminov
+Licensed under the MIT License. See LICENSE.
+
+This product uses third-party material:
+
+--------------------------------------------------------------------------------
+Iconoteka icons (app/src/main/res/drawable/ic_*.xml, except the launcher icon
+layers ic_launcher_*.xml, which are this project's own, made by tools/coin.py)
+https://iconoteka.com, https://github.com/iconoteka/iconoteka
+Copyright (c) 2026 Oleg Turbaba
+Licensed under the MIT License.
+Full license text: third_party/iconoteka/LICENSE
+Each drawable is a vector conversion of an Iconoteka SVG and names its source
+in a comment on its first line.
+--------------------------------------------------------------------------------
+Tailwind CSS default colour palette (the Zinc and Red values in
+app/src/main/java/sh/aminov/golda/ui/Colors.kt)
+https://github.com/tailwindlabs/tailwindcss
+Copyright (c) Tailwind Labs, Inc.
+Licensed under the MIT License. Only colour values are used; no Tailwind code
+is included.
+--------------------------------------------------------------------------------
+Android Jetpack libraries (AndroidX Core, Activity, Lifecycle, Room, DataStore,
+WorkManager, Jetpack Compose, Material 3)
+Copyright The Android Open Source Project
+Licensed under the Apache License, Version 2.0.
+--------------------------------------------------------------------------------
+kotlinx.serialization
+Copyright JetBrains s.r.o. and contributors
+Licensed under the Apache License, Version 2.0.
+--------------------------------------------------------------------------------
+
+The libraries are not part of this repository; Gradle downloads them at build
+time.
+
+Golda uses two network services that are not bundled:
+- Google Gemini API, for voice entry, with the user's own API key and under
+  Google's terms for that API: https://ai.google.dev
+- Daily exchange rates of the Bank of Russia, via https://www.cbr-xml-daily.ru

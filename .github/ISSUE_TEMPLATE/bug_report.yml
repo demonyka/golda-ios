@@ -1,0 +1,67 @@
+name: Bug report
+description: Something does not work
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: >
+        Please leave out real balances, account names and your Gemini key.
+        Made-up numbers that show the problem are just as useful.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What did you expect, and what happened instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. A USD card and a GEL cash account
+        2. Say "coffee 8 lari"
+        3. ...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where
+      options:
+        - Voice entry
+        - Amounts, rates or cost basis
+        - Safe to spend today
+        - Goals, wishlist or "Not sure"
+        - Debts
+        - Insights
+        - Backup or restore
+        - Something else
+
+  - type: input
+    id: phone
+    attributes:
+      label: Phone and Android version
+      placeholder: Pixel 9, Android 16
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Golda version
+      placeholder: 0.13.0
+    validations:
+      required: true
+
+  - type: textarea
+    id: voice
+    attributes:
+      label: What you said
+      description: >
+        For voice problems: the phrase as you said it, and what Golda
+        recorded instead.
+      render: text

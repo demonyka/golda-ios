@@ -1,0 +1,10 @@
+<!-- Iconoteka (MIT, Oleg Turbaba): microphone r-f -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M11.0505 23V20.425C6.47549 19.975 3.00049 16.2 3.00049 11.5V10H4.90049V11.5C4.90049 15.5 8.02549 18.625 12.0005 18.625C15.9755 18.625 19.1005 15.5 19.1005 11.5V10H21.0005V11.5C21.0005 16.2 17.5255 19.975 12.9505 20.425V23H11.0505ZM12.0005 16.5C9.20049 16.5 7.00049 14.3 7.00049 11.5V6C7.00049 3.2 9.20049 1 12.0005 1C14.8005 1 17.0005 3.2 17.0005 6V11.5C17.0005 14.3 14.8005 16.5 12.0005 16.5Z" />
+</vector>
