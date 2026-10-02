@@ -5,7 +5,7 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [0.14.1] — 2026-10-02
 
 ### Fixed
 
@@ -105,6 +105,7 @@ First public release.
   loud is the point.
 
 [Unreleased]: https://github.com/shamil-aminov/golda/compare/v0.14.0...HEAD
+[0.14.1]: https://github.com/shamil-aminov/golda/releases/tag/v0.14.1
 [0.14.0]: https://github.com/shamil-aminov/golda/releases/tag/v0.14.0
 [0.13.1]: https://github.com/shamil-aminov/golda/releases/tag/v0.13.1
 [0.13.0]: https://github.com/shamil-aminov/golda/releases/tag/v0.13.0
