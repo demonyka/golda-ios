@@ -1,0 +1,58 @@
+name: Golda
+
+options:
+  bundleIdPrefix: com.f4studio
+  deploymentTarget:
+    iOS: "26.0"
+  developmentLanguage: ru
+  createIntermediateGroups: true
+  generateEmptyDirectories: false
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    DEVELOPMENT_TEAM: 98SBSKJT3M
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    TARGETED_DEVICE_FAMILY: "1"
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+
+packages:
+  GoldaCore:
+    path: Packages/GoldaCore
+  GoldaData:
+    path: Packages/GoldaData
+  GoldaSync:
+    path: Packages/GoldaSync
+
+targets:
+  Golda:
+    type: application
+    platform: iOS
+    sources:
+      - path: Golda
+    dependencies:
+      - package: GoldaCore
+      - package: GoldaData
+      - package: GoldaSync
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.f4studio.golda
+        PRODUCT_NAME: Golda
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Golda
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.finance
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+
+schemes:
+  Golda:
+    build:
+      targets:
+        Golda: all
+    run:
+      config: Debug
+    archive:
+      config: Release
