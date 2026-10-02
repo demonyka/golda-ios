@@ -1,6 +1,6 @@
 package sh.aminov.golda.ui
 
-import sh.aminov.golda.domain.AppLanguage
+import sh.aminov.golda.data.AppLanguage
 import android.content.ContextWrapper
 import android.content.Context
 import android.app.Activity
@@ -43,6 +43,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -111,7 +112,12 @@ fun SettingsScreen(
             Modifier.padding(padding).verticalScroll(rememberScrollState()).padding(horizontal = Gap.m).padding(top = Gap.s, bottom = Gap.xl),
         ) {
             GroupLabel(tr("Где я", "Where I am"))
-            SettingRow(0, 2, tr("Местная валюта", "Local currency"), painter = painterResource(R.drawable.ic_location), value = currencyLabel(s.localCurrency)) { edit = Edit.Local }
+            SettingRow(
+                0, 2, tr("Местная валюта", "Local currency"),
+                painter = painterResource(R.drawable.ic_location),
+                value = currencyLabel(s.localCurrency),
+                supporting = tr("Для новых трат и голоса", "For new purchases and voice"),
+            ) { edit = Edit.Local }
             SettingRow(1, 2, tr("Показывать суммы в", "Show amounts in"), painter = painterResource(R.drawable.ic_eye), value = s.displayCurrencies.joinToString(" ") { Currencies.symbol(it) }) { edit = Edit.Shown }
 
             VSpace(Gap.l)
@@ -145,7 +151,7 @@ fun SettingsScreen(
                 3, 4,
                 leading = { GlyphSpace() },
                 supporting = { Text(lastMonthPay(s), maxLines = 1, overflow = TextOverflow.Ellipsis) },
-                trailing = { Text(Fmt.approx(s.hourNet, "RUB"), style = MaterialTheme.typography.headlineSmall.merge(Tnum)) },
+                trailing = { Text(Fmt.approx(s.hourNet, "RUB"), Modifier.testTag(Tags.HOUR_NET), style = MaterialTheme.typography.headlineSmall.merge(Tnum)) },
             ) { Text(tr("Час на руки", "An hour after tax"), style = MaterialTheme.typography.titleMedium) }
 
             VSpace(Gap.l)

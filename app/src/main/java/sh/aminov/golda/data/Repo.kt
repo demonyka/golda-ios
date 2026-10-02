@@ -39,10 +39,16 @@ sealed interface VoiceOutcome {
     data class Failed(val reason: String) : VoiceOutcome
 }
 
-class Repo(private val context: Context) {
-    private val db = GoldaDb.open(context)
+/**
+ * Everything the app stores. [db] and [settings] are the real ones by default; instrumented tests
+ * pass an in-memory database and a separate settings file, so they never touch real data.
+ */
+class Repo(
+    private val context: Context,
+    private val db: GoldaDb = GoldaDb.open(context),
+    val settings: SettingsStore = SettingsStore(context),
+) {
     private val dao = db.dao()
-    val settings = SettingsStore(context)
 
     val accounts = dao.accounts()
     val operations = dao.operations()

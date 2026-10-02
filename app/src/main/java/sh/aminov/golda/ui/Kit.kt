@@ -897,3 +897,18 @@ fun Bento(modifier: Modifier = Modifier, content: @Composable RowScope.() -> Uni
 @OptIn(ExperimentalFoundationApi::class)
 fun Modifier.tapAndHold(onClick: () -> Unit, onLongClick: (() -> Unit)?): Modifier =
     combinedClickable(onClick = onClick, onLongClick = onLongClick)
+
+/** The few test tags the instrumented tests look things up by, where no text says it uniquely. */
+object Tags {
+    /** Home's line of the day's money in the other currencies, under the big number. */
+    const val HOME_OTHERS = "home-others"
+
+    /** Home's "· N дней до зарплаты". */
+    const val HOME_PAYDAY = "home-payday"
+
+    /** Settings' "Час на руки" value. */
+    const val HOUR_NET = "hour-net"
+
+    /** The big facts tile in "Сомневаюсь": the hours of work, when an hourly income is set. */
+    const val DECIDE_HOURS = "decide-hours"
+}

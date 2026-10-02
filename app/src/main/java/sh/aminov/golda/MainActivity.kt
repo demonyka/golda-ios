@@ -1,6 +1,6 @@
 package sh.aminov.golda
 
-import sh.aminov.golda.domain.AppLanguage
+import sh.aminov.golda.data.AppLanguage
 import android.annotation.SuppressLint
 import android.os.Build
 import android.app.Application
@@ -33,8 +33,11 @@ import kotlinx.coroutines.flow.first
 import androidx.work.OneTimeWorkRequestBuilder
 import sh.aminov.golda.data.ReconcileReminder
 
-class GoldaApplication : Application() {
-    val repo by lazy { Repo(this) }
+open class GoldaApplication : Application() {
+    val repo by lazy { createRepo() }
+
+    /** The real storage; the instrumented tests' application swaps in isolated storage here. */
+    protected open fun createRepo(): Repo = Repo(this)
 
     override fun onCreate() {
         super.onCreate()

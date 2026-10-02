@@ -1,6 +1,5 @@
 package sh.aminov.golda.data
 
-import sh.aminov.golda.domain.AppLanguage
 import android.os.Build
 import android.Manifest
 import android.app.NotificationChannel

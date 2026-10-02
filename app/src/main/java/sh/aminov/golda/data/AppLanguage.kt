@@ -1,4 +1,4 @@
-package sh.aminov.golda.domain
+package sh.aminov.golda.data
 
 import android.app.Activity
 import android.app.LocaleManager

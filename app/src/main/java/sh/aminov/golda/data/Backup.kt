@@ -1,6 +1,5 @@
 package sh.aminov.golda.data
 
-import sh.aminov.golda.domain.AppLanguage
 import android.content.Context
 import androidx.room.withTransaction
 import androidx.work.CoroutineWorker

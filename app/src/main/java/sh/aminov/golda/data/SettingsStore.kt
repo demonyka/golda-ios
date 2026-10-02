@@ -1,6 +1,7 @@
 package sh.aminov.golda.data
 
 import android.content.Context
+import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -17,7 +18,8 @@ import sh.aminov.golda.domain.Settings
 
 private val Context.dataStore by preferencesDataStore("settings")
 
-class SettingsStore(private val context: Context) {
+/** The settings, in the app's "settings" DataStore unless a test hands in its own [store]. */
+class SettingsStore(context: Context, private val store: DataStore<Preferences> = context.dataStore) {
     private object K {
         val onboarded = booleanPreferencesKey("onboarded")
         val incomeHourly = booleanPreferencesKey("incomeHourly")
@@ -37,22 +39,22 @@ class SettingsStore(private val context: Context) {
         val reconciledAt = stringPreferencesKey("reconciledAt")
     }
 
-    val flow: Flow<Settings> = context.dataStore.data.map { it.toSettings() }
+    val flow: Flow<Settings> = store.data.map { it.toSettings() }
 
     suspend fun update(change: (Settings) -> Settings) {
-        context.dataStore.edit { prefs -> prefs.write(change(prefs.toSettings())) }
+        store.edit { prefs -> prefs.write(change(prefs.toSettings())) }
     }
 
-    suspend fun geminiKey(): String? = context.dataStore.data.first()[K.geminiKey]?.let(KeyVault::decrypt)
+    suspend fun geminiKey(): String? = store.data.first()[K.geminiKey]?.let(KeyVault::decrypt)
 
     suspend fun setGeminiKey(key: String) {
-        context.dataStore.edit { prefs ->
+        store.edit { prefs ->
             if (key.isBlank()) prefs.remove(K.geminiKey) else prefs[K.geminiKey] = KeyVault.encrypt(key.trim())
         }
     }
 
     suspend fun clear() {
-        context.dataStore.edit { it.clear() }
+        store.edit { it.clear() }
     }
 
     private fun Preferences.toSettings(): Settings {

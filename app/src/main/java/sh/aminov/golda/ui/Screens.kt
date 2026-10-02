@@ -42,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -88,7 +89,7 @@ fun HomeScreen(data: AppData, padding: PaddingValues, listState: LazyListState, 
                 // Whole rubles only, as big as the tile allows.
                 val whole = Fmt.split(budget.leftTodayRub, "RUB").first
                 BigNumber("$whole ₽", budget.leftTodayRub, color = ink)
-                Text(data.others(budget.leftTodayRub, "RUB"), style = MaterialTheme.typography.bodyLarge.merge(Tnum), color = quiet)
+                Text(data.others(budget.leftTodayRub, "RUB"), Modifier.testTag(Tags.HOME_OTHERS), style = MaterialTheme.typography.bodyLarge.merge(Tnum), color = quiet)
                 VSpace(Gap.m)
                 // What is still left of today's budget, like the number above; flat and full once it is spent.
                 val left = when {
@@ -114,7 +115,7 @@ fun HomeScreen(data: AppData, padding: PaddingValues, listState: LazyListState, 
                     }
                     Text(
                         tr(" · $days $dayWord до зарплаты", " · $days $dayWord to payday"),
-                        modifier = Modifier.weight(1f, fill = false),
+                        modifier = Modifier.weight(1f, fill = false).testTag(Tags.HOME_PAYDAY),
                         style = body,
                         color = quiet,
                         maxLines = 1,

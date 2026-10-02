@@ -5,6 +5,22 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **Changing the local currency now changes where a new purchase comes
+  from.** The entry form started in the new currency but kept charging the
+  account used last, so the change seemed to do nothing. It now picks the
+  account the way voice does: the last one if it is in that currency, else a
+  free-money account in it, else the last one with the charge converted. The
+  setting also says what it is for.
+
+### Added
+
+- Scenario tests that change each setting in the real UI and check where it
+  shows, run on an emulator in isolated storage (see CONTRIBUTING.md).
+
 ## [0.14.0] — 2026-10-02
 
 ### Changed
@@ -88,6 +104,7 @@ First public release.
 - Spending is never recorded from bank notifications. Saying the purchase out
   loud is the point.
 
+[Unreleased]: https://github.com/shamil-aminov/golda/compare/v0.14.0...HEAD
 [0.14.0]: https://github.com/shamil-aminov/golda/releases/tag/v0.14.0
 [0.13.1]: https://github.com/shamil-aminov/golda/releases/tag/v0.13.1
 [0.13.0]: https://github.com/shamil-aminov/golda/releases/tag/v0.13.0

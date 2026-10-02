@@ -59,6 +59,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -123,10 +124,11 @@ fun EntrySheet(
     val accounts = data.accounts
     val outPosting = editing?.postings?.firstOrNull { it.amountMinor < 0 } ?: editing?.postings?.firstOrNull()
     val inPosting = editing?.postings?.firstOrNull { it.amountMinor > 0 && it !== outPosting }
-    // A purchase to decide on is paid from where voice would pay it: an account in its currency if there is one.
-    val defaultAccount = asked?.let { VoiceMapper.pick(accounts.sortedBy { it.sort }, it.currency, data.settings) }
-        ?: data.settings.lastAccountId?.let { data.accountById[it] }
-        ?: accounts.firstOrNull { it.includeInFree } ?: accounts.firstOrNull()
+    // A new purchase is paid from where voice would pay it: the last account if it is in the purchase's
+    // currency (the local one, or what is being decided on), else a free-money account in that currency,
+    // else the last one anyway, and the charge is converted. So changing the local currency moves the
+    // default account too, not only the currency.
+    val defaultAccount = VoiceMapper.pick(accounts.sortedBy { it.sort }, asked?.currency ?: data.settings.localCurrency, data.settings)
 
     if (op != null && op.type !in listOf(OpType.EXPENSE, OpType.INCOME, OpType.TRANSFER)) {
         BookkeepingSheet(data, editing, onDismiss, onDelete)
@@ -691,7 +693,7 @@ private fun FactsBento(data: AppData, facts: Facts?, priced: Boolean) {
         val big = all.first()
         Tile(Modifier.weight(2f).fillMaxHeight()) {
             Spacer(Modifier.weight(1f))
-            Text(big.value, style = MaterialTheme.typography.displayLargeEmphasized.merge(Tnum), maxLines = 1, color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha))
+            Text(big.value, Modifier.testTag(Tags.DECIDE_HOURS), style = MaterialTheme.typography.displayLargeEmphasized.merge(Tnum), maxLines = 1, color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha))
             Text(big.label, style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         val rest = all.drop(1)
