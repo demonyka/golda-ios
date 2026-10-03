@@ -27,7 +27,8 @@ final class DesignShotsUITests: XCTestCase {
         }
         func launch(samples: Bool) -> XCUIApplication {
             let app = XCUIApplication()
-            app.launchArguments = ["-AppleLanguages", "(\(language))", "-AppleLocale", russian ? "ru_RU" : "en_US", "-golda.inMemory"]
+            // The voice stub, so the mic records and thinks without a microphone or a network.
+            app.launchArguments = ["-AppleLanguages", "(\(language))", "-AppleLocale", russian ? "ru_RU" : "en_US", "-golda.inMemory", "-golda.voiceStub=shawarma"]
                 + (samples ? ["-golda.samples"] : [])
             app.launch()
             return app

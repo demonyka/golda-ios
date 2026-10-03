@@ -1,0 +1,567 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Add" : {
+      "comment" : "Voice toast button: opens the form to add an operation by hand.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Записать"
+          }
+        }
+      }
+    },
+    "Add a Gemini key in settings; the note is kept" : {
+      "comment" : "Voice toast: a note waits because no Gemini API key is set.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a Gemini key in settings; the note is kept"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавь ключ Gemini в настройках — запись сохранена"
+          }
+        }
+      }
+    },
+    "Agree" : {
+      "comment" : "Voice consent: the button that gives consent.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agree"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Согласен"
+          }
+        }
+      }
+    },
+    "Couldn’t make out “%@”. Add it with “+”" : {
+      "comment" : "Voice toast: nothing was understood; the argument is what was heard.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn’t make out “%@”. Add it with “+”"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не разобрать: «%@». Можно записать через «+»"
+          }
+        }
+      }
+    },
+    "Couldn’t save the note; it is kept for another try" : {
+      "comment" : "Voice toast: the books could not be written.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn’t save the note; it is kept for another try"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не получилось записать — запись подождёт следующей попытки"
+          }
+        }
+      }
+    },
+    "From a saved note: %@" : {
+      "comment" : "Voice toast: a note recorded earlier was booked now; the argument lists what it booked.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From a saved note: %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Из отложенного: %@"
+          }
+        }
+      }
+    },
+    "Gemini: %@" : {
+      "comment" : "Voice toast: Gemini refused the note; the argument is its own explanation.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemini: %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemini: %@"
+          }
+        }
+      }
+    },
+    "Gemini’s answer made no sense; the note is kept" : {
+      "comment" : "Voice toast: the provider answered with something unreadable.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemini’s answer made no sense; the note is kept"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemini ответил непонятно — запись сохранена"
+          }
+        }
+      }
+    },
+    "Golda does not recognise speech itself. To turn what you say into an operation, it sends the recording to Gemini, Google’s AI model." : {
+      "comment" : "Voice consent: why the recording leaves the phone.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Golda does not recognise speech itself. To turn what you say into an operation, it sends the recording to Gemini, Google’s AI model."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Golda не распознаёт речь сама. Чтобы превратить сказанное в операцию, она отправляет запись в Gemini — модель ИИ от Google."
+          }
+        }
+      }
+    },
+    "Google handles the recording under the Gemini API terms. On the phone it is deleted as soon as the operation is saved." : {
+      "comment" : "Voice consent: who processes the recording and when it leaves the phone's storage.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Google handles the recording under the Gemini API terms. On the phone it is deleted as soon as the operation is saved."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Google обрабатывает запись по условиям Gemini API. С телефона она удаляется, как только операция записана."
+          }
+        }
+      }
+    },
+    "Google’s terms" : {
+      "comment" : "Voice consent: title of the point about how Google handles the recording.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Google’s terms"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Условия Google"
+          }
+        }
+      }
+    },
+    "No connection; the note will be worked out later" : {
+      "comment" : "Voice toast: a note waits for the network.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No connection; the note will be worked out later"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет связи — запись разберётся позже"
+          }
+        }
+      }
+    },
+    "Not now" : {
+      "comment" : "Voice consent: the button that closes the screen without consent.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not now"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не сейчас"
+          }
+        }
+      }
+    },
+    "OK" : {
+      "comment" : "Voice toast button: only closes the toast.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ОК"
+          }
+        }
+      }
+    },
+    "Only the recording you make after tapping the mic, with the names and currencies of your accounts so Gemini can tell what you paid with. Balances and other records stay on the phone." : {
+      "comment" : "Voice consent: exactly what is sent to Gemini.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only the recording you make after tapping the mic, with the names and currencies of your accounts so Gemini can tell what you paid with. Balances and other records stay on the phone."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Только запись, сделанная после нажатия на микрофон, и названия и валюты счетов — чтобы Gemini понял, чем платили. Балансы и остальные записи остаются на телефоне."
+          }
+        }
+      }
+    },
+    "Profile: %@" : {
+      "comment" : "Voice toast: the profile a note was booked into, when there are several.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profile: %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Профиль: %@"
+          }
+        }
+      }
+    },
+    "Purchase" : {
+      "comment" : "Title of a purchase to weigh up when the voice note named none.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Purchase"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Покупка"
+          }
+        }
+      }
+    },
+    "Requests go straight to Google with your Gemini API key. Golda has no servers of its own." : {
+      "comment" : "Voice consent: whose key is used and where requests go.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Requests go straight to Google with your Gemini API key. Golda has no servers of its own."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запросы идут напрямую в Google с твоим ключом Gemini API. Своих серверов у Golda нет."
+          }
+        }
+      }
+    },
+    "Saved" : {
+      "comment" : "Voice toast: title of a booked operation with neither a note nor a category.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Записано"
+          }
+        }
+      }
+    },
+    "Settings" : {
+      "comment" : "Voice toast button: opens the settings.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройки"
+          }
+        }
+      }
+    },
+    "The microphone is busy or unavailable" : {
+      "comment" : "Voice toast: recording could not start.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The microphone is busy or unavailable"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Микрофон занят или недоступен"
+          }
+        }
+      }
+    },
+    "The note got lost" : {
+      "comment" : "Voice toast: the recording file is missing.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The note got lost"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запись потерялась"
+          }
+        }
+      }
+    },
+    "The note’s profile was deleted, and the note with it" : {
+      "comment" : "Voice toast: the profile a note was recorded in is gone.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The note’s profile was deleted, and the note with it"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Профиль этой записи удалён, и запись вместе с ним"
+          }
+        }
+      }
+    },
+    "Voice" : {
+      "comment" : "Title of the screen that asks before a recording is sent to the voice provider.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voice"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Голос"
+          }
+        }
+      }
+    },
+    "Voice needs microphone access" : {
+      "comment" : "Voice toast: the microphone is not allowed.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voice needs microphone access"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Без доступа к микрофону голос не работает"
+          }
+        }
+      }
+    },
+    "What is sent" : {
+      "comment" : "Voice consent: title of the point that says what leaves the phone.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What is sent"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Что уходит"
+          }
+        }
+      }
+    },
+    "You can withdraw consent in Settings. Without it voice stays off, and “+” always works." : {
+      "comment" : "Voice consent: how to take the consent back, and that manual entry works without it.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can withdraw consent in Settings. Without it voice stays off, and “+” always works."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Согласие можно отозвать в настройках. Без него голос выключен, а «+» работает всегда."
+          }
+        }
+      }
+    },
+    "Your choice" : {
+      "comment" : "Voice consent: title of the point about withdrawing consent.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your choice"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Твой выбор"
+          }
+        }
+      }
+    },
+    "Your own key" : {
+      "comment" : "Voice consent: title of the point about the API key.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your own key"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Твой ключ"
+          }
+        }
+      }
+    },
+    "Your voice goes to Google Gemini" : {
+      "comment" : "Voice consent: the headline naming the provider.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your voice goes to Google Gemini"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Голос уходит в Google Gemini"
+          }
+        }
+      }
+    },
+    "left for today %@" : {
+      "comment" : "Voice toast: what is left to spend today after the expense.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "left for today %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "на сегодня осталось %@"
+          }
+        }
+      }
+    },
+    "over budget by %@" : {
+      "comment" : "Voice toast: how far today's budget is overspent after the expense.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "over budget by %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "перерасход %@"
+          }
+        }
+      }
+    },
+    "≈ %@ h of work" : {
+      "comment" : "Voice toast: what an expense cost in hours of work, “≈ 2,6 h of work”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈ %@ h of work"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈ %@ ч работы"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

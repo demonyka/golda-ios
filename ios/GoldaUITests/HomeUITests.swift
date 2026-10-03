@@ -67,20 +67,6 @@ final class HomeUITests: XCTestCase {
         XCTAssertFalse(app.descendants(matching: .any)["home.empty"].exists)
     }
 
-    @MainActor
-    func testTheMicCyclesThroughItsStates() {
-        let app = launch()
-        let mic = app.buttons["mic"]
-        XCTAssertTrue(mic.waitForExistence(timeout: 30))
-        XCTAssertEqual(mic.label, "Say it")
-        mic.tap()
-        XCTAssertEqual(mic.label, "Listening. Tap when done")
-        mic.tap()
-        XCTAssertEqual(mic.label, "Working it out…")
-        mic.tap()
-        XCTAssertEqual(mic.label, "Say it")
-    }
-
     /// The tab bar stays whole through a scroll down and back. With `.onScrollDown` iOS 26.2 folds it
     /// on the way down and brings it back only at the very top, so after a short scroll up three of
     /// the four tabs were gone. The large title still folds on the way down and opens at the top.

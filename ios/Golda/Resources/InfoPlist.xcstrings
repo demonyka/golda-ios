@@ -1,0 +1,24 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "NSMicrophoneUsageDescription" : {
+      "comment" : "Privacy - Microphone Usage Description: shown when the mic is tapped for the first time.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Golda listens while you hold a purchase in your voice, to turn it into a record. The sound is sent to Google Gemini with your own key only after you agree."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Golda слушает, пока ты надиктовываешь покупку, чтобы превратить её в запись. Звук уходит в Google Gemini с твоим собственным ключом и только после твоего согласия."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

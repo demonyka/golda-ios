@@ -4,8 +4,8 @@ import SwiftUI
 struct GoldaApp: App {
     private let options: LaunchOptions
     @State private var model: AppModel
-    /// Stage 3 puts the recorder here; until then taps only cycle the states.
-    @State private var mic: any MicModel = StubMicModel()
+    /// The microphone and every voice note's outcome, for the life of the app.
+    @State private var voice: VoiceMicModel
 
     init() {
         let options = LaunchOptions.current
@@ -17,17 +17,21 @@ struct GoldaApp: App {
             fatalError("Golda could not open its data: \(error)")
         }
         self.options = options
-        _model = State(initialValue: AppModel(environment: environment))
+        let model = AppModel(environment: environment)
+        _model = State(initialValue: model)
+        _voice = State(initialValue: VoiceMicModel.live(model: model))
     }
 
     var body: some Scene {
         WindowGroup {
-            RootView(mic: mic)
+            RootView(mic: voice)
                 .environment(model)
                 .task {
                     // A unit-test host stays idle: the tests build and drive their own models.
                     guard !options.isHostingTests else { return }
                     await model.start(command: options.command)
+                    // After the launch command, which wipes this phone's settings with the books.
+                    await voice.start()
                 }
         }
     }

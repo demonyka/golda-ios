@@ -6,6 +6,12 @@ struct RootView: View {
     let mic: any MicModel
 
     var body: some View {
+        content
+            // The consent screen answers the mic wherever it opens from: a tap on the mic or settings.
+            .environment(\.voiceConsent, VoiceConsentAction { [mic] agreed in mic.answerConsent(agreed) })
+    }
+
+    @ViewBuilder private var content: some View {
         switch model.phase {
         case .loading:
             // A few milliseconds at launch: a blank page carries on, where a spinner would only flash.
