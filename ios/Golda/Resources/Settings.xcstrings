@@ -1,0 +1,1321 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%@ · default" : {
+      "comment" : "Settings: the Gemini model's name when it is the default one.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ · default"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ · по умолчанию"
+          }
+        }
+      }
+    },
+    "%lld accounts" : {
+      "comment" : "A number of accounts, inside the restore message.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld account"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld accounts"
+                }
+              }
+            }
+          }
+        },
+        "ru" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld счёта"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld счетов"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld счёт"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld счёта"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld operations" : {
+      "comment" : "A number of operations, inside the restore message.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld operation"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld operations"
+                }
+              }
+            }
+          }
+        },
+        "ru" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld операции"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld операций"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld операция"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld операции"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld profiles" : {
+      "comment" : "A number of profiles, inside the restore message.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld profile"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld profiles"
+                }
+              }
+            }
+          }
+        },
+        "ru" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld профиля"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld профилей"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld профиль"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld профиля"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "About" : {
+      "comment" : "Settings: header of the version and licences group.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "О приложении"
+          }
+        }
+      }
+    },
+    "Amounts said without a currency are in it, and new purchases start in it." : {
+      "comment" : "Local currency sheet: what picking it changes.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amounts said without a currency are in it, and new purchases start in it."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В ней суммы, сказанные без валюты, и с неё начинаются новые траты."
+          }
+        }
+      }
+    },
+    "App language" : {
+      "comment" : "Settings: the row that opens Golda's page in the iOS Settings.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App language"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Язык приложения"
+          }
+        }
+      }
+    },
+    "At the CBR rate plus the profile's markup, %@." : {
+      "comment" : "Settings: under the rates, how the shown rates are made, with the markup “10 %”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "At the CBR rate plus the profile's markup, %@."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "По курсу ЦБ с наценкой профиля, %@."
+          }
+        }
+      }
+    },
+    "Back to %@" : {
+      "comment" : "Gemini model sheet: puts the default model's name back.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back to %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вернуть %@"
+          }
+        }
+      }
+    },
+    "Backup saved" : {
+      "comment" : "Message after the backup file was written.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backup saved"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Копия сохранена"
+          }
+        }
+      }
+    },
+    "Big numbers and totals" : {
+      "comment" : "Settings: what the main currency is for, under its row.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Big numbers and totals"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Крупные цифры и итоги"
+          }
+        }
+      }
+    },
+    "Big numbers and totals are shown in it, at today's rate. The books stay in rubles." : {
+      "comment" : "Main currency sheet: what picking it changes.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Big numbers and totals are shown in it, at today's rate. The books stay in rubles."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В ней крупные цифры и итоги, по сегодняшнему курсу. Учёт остаётся в рублях."
+          }
+        }
+      }
+    },
+    "CBR %@" : {
+      "comment" : "Settings: the official rate at the end of a rate row, “CBR 83.25”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CBR %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ЦБ %@"
+          }
+        }
+      }
+    },
+    "CBR of %@" : {
+      "comment" : "Settings: the day of the official rates, “CBR of October 2”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CBR of %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ЦБ на %@"
+          }
+        }
+      }
+    },
+    "Cancel" : {
+      "comment" : "Closes a sheet without changes.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отмена"
+          }
+        }
+      }
+    },
+    "Changed in the iOS Settings → Golda → Language." : {
+      "comment" : "Settings: where the app language is changed.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changed in the iOS Settings → Golda → Language."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Меняется в Настройках iOS → Golda → Язык."
+          }
+        }
+      }
+    },
+    "Could not save the file" : {
+      "comment" : "Message when the backup file could not be written.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not save the file"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не получилось сохранить файл"
+          }
+        }
+      }
+    },
+    "Data" : {
+      "comment" : "Settings: header of the backup group.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Данные"
+          }
+        }
+      }
+    },
+    "Didn't work. No network?" : {
+      "comment" : "Message when fresh rates could not be fetched.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Didn't work. No network?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не получилось, нет сети?"
+          }
+        }
+      }
+    },
+    "Done" : {
+      "comment" : "Closes the settings or a sheet whose changes are already kept.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Готово"
+          }
+        }
+      }
+    },
+    "Each profile keeps its own accounts, goals, income and markup." : {
+      "comment" : "Settings: what lives in a profile, under the profiles row.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Each profile keeps its own accounts, goals, income and markup."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У каждого профиля свои счета, цели, доход и наценка."
+          }
+        }
+      }
+    },
+    "Erase" : {
+      "comment" : "Confirms erasing everything.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erase"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Стереть"
+          }
+        }
+      }
+    },
+    "Erase everything" : {
+      "comment" : "Settings: the last row, which deletes all data on this phone.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erase everything"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Стереть всё"
+          }
+        }
+      }
+    },
+    "Erase everything?" : {
+      "comment" : "Title of the confirmation before all data is erased.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erase everything?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Стереть всё?"
+          }
+        }
+      }
+    },
+    "Every amount also in these" : {
+      "comment" : "Settings: what the shown currencies are for, under their row.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every amount also in these"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Каждая сумма ещё и в них"
+          }
+        }
+      }
+    },
+    "Every profile with its accounts, operations and goals, this iPhone's settings and the Gemini key will be gone for good." : {
+      "comment" : "Confirmation before erasing: what goes.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every profile with its accounts, operations and goals, this iPhone's settings and the Gemini key will be gone for good."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все профили с их счетами, операциями и целями, настройки этого iPhone и ключ Gemini удалятся без возможности вернуть."
+          }
+        }
+      }
+    },
+    "Everything but the key, in one file" : {
+      "comment" : "Settings: what a backup holds, under its row.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Everything but the key, in one file"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Всё, кроме ключа, в один файл"
+          }
+        }
+      }
+    },
+    "Everything in Golda now will be replaced by the file. The Gemini key stays." : {
+      "comment" : "Confirmation before restoring: what happens to the current data and the key.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Everything in Golda now will be replaced by the file. The Gemini key stays."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Всё, что сейчас в Golda, заменится содержимым файла. Ключ Gemini останется."
+          }
+        }
+      }
+    },
+    "For new purchases and voice" : {
+      "comment" : "Settings: what the local currency is for, under its row.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "For new purchases and voice"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Для новых трат и голоса"
+          }
+        }
+      }
+    },
+    "From a backup file" : {
+      "comment" : "Settings: where restoring reads from, under its row.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From a backup file"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Из файла копии"
+          }
+        }
+      }
+    },
+    "Gemini key" : {
+      "comment" : "Settings: the API key voice notes are sent with.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemini key"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ключ Gemini"
+          }
+        }
+      }
+    },
+    "Gemini model" : {
+      "comment" : "Title of the sheet that changes the Gemini model.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemini model"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Модель Gemini"
+          }
+        }
+      }
+    },
+    "Golda for iOS is a port of Golda for Android by Shamil Aminov, under the MIT licence." : {
+      "comment" : "Licences page: the original app and its author.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Golda for iOS is a port of Golda for Android by Shamil Aminov, under the MIT licence."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Golda для iOS — порт Golda для Android Шамиля Аминова, по лицензии MIT."
+          }
+        }
+      }
+    },
+    "Golda keeps its data with GRDB by Gwendal Roué, under the MIT licence." : {
+      "comment" : "Licences page: the database library and its author.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Golda keeps its data with GRDB by Gwendal Roué, under the MIT licence."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Golda хранит данные с помощью GRDB Гвендаля Руэ, по лицензии MIT."
+          }
+        }
+      }
+    },
+    "Key removed" : {
+      "comment" : "Message after the Gemini key was deleted.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Key removed"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ключ удалён"
+          }
+        }
+      }
+    },
+    "Key saved" : {
+      "comment" : "Message after the Gemini key was stored.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Key saved"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ключ сохранён"
+          }
+        }
+      }
+    },
+    "Language" : {
+      "comment" : "Settings: header of the language group.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Language"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Язык"
+          }
+        }
+      }
+    },
+    "Licences" : {
+      "comment" : "Settings: the row and the page with the licences.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Licences"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Лицензии"
+          }
+        }
+      }
+    },
+    "Local currency" : {
+      "comment" : "Settings: the currency of the country you are in.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local currency"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Местная валюта"
+          }
+        }
+      }
+    },
+    "Made in Google AI Studio. Kept in this iPhone's Keychain and never put in a backup." : {
+      "comment" : "Gemini key sheet: where the key comes from and where it is kept.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Made in Google AI Studio. Kept in this iPhone's Keychain and never put in a backup."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Создаётся в Google AI Studio. Хранится в связке ключей этого iPhone и не попадает в копию."
+          }
+        }
+      }
+    },
+    "Main currency" : {
+      "comment" : "Settings: the currency big numbers and totals are shown in.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Main currency"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Основная валюта"
+          }
+        }
+      }
+    },
+    "Model" : {
+      "comment" : "Settings: the Gemini model voice notes are parsed by.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Модель"
+          }
+        }
+      }
+    },
+    "None" : {
+      "comment" : "Settings: there is no Gemini key on this phone.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "None"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет"
+          }
+        }
+      }
+    },
+    "Not everything was erased. Try again." : {
+      "comment" : "Message when erasing stopped half way.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not everything was erased. Try again."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Стёрлось не всё. Попробуй ещё раз."
+          }
+        }
+      }
+    },
+    "OK" : {
+      "comment" : "Closes a message that something failed.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ОК"
+          }
+        }
+      }
+    },
+    "Paste the key" : {
+      "comment" : "Gemini key sheet: the placeholder of the secure field.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste the key"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вставь ключ"
+          }
+        }
+      }
+    },
+    "Profiles" : {
+      "comment" : "Settings: the row that opens the profiles screen.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profiles"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Профили"
+          }
+        }
+      }
+    },
+    "Rates" : {
+      "comment" : "Settings: header of the exchange rates group.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rates"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Курс"
+          }
+        }
+      }
+    },
+    "Rates updated" : {
+      "comment" : "Message after fresh rates arrived.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rates updated"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Курсы обновлены"
+          }
+        }
+      }
+    },
+    "Reconcile reminder" : {
+      "comment" : "Settings: the weekly nudge to compare balances with the bank.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reconcile reminder"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Напоминать о сверке"
+          }
+        }
+      }
+    },
+    "Recordings go to Google Gemini with your key only while this is on." : {
+      "comment" : "Settings: what the voice consent switch allows.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recordings go to Google Gemini with your key only while this is on."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Записи уходят в Google Gemini с твоим ключом, только пока это включено."
+          }
+        }
+      }
+    },
+    "Remove key" : {
+      "comment" : "Gemini key sheet: deletes the stored key.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove key"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить ключ"
+          }
+        }
+      }
+    },
+    "Restore" : {
+      "comment" : "Settings: replaces everything with a backup file; also the button that confirms it.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Восстановить"
+          }
+        }
+      }
+    },
+    "Restore from the file?" : {
+      "comment" : "Title of the confirmation before a backup replaces everything.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore from the file?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Восстановить из файла?"
+          }
+        }
+      }
+    },
+    "Restored: %@" : {
+      "comment" : "Message after a backup was restored, with what came back, “2 accounts, 14 operations”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restored: %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Восстановлено: %@"
+          }
+        }
+      }
+    },
+    "Save" : {
+      "comment" : "Keeps what was typed in a settings sheet.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранить"
+          }
+        }
+      }
+    },
+    "Save a backup" : {
+      "comment" : "Settings: writes everything to one file.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save a backup"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранить копию"
+          }
+        }
+      }
+    },
+    "Saved" : {
+      "comment" : "Settings: there is a Gemini key on this phone.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранён"
+          }
+        }
+      }
+    },
+    "Send voice to Gemini" : {
+      "comment" : "Settings: the switch that allows sending recordings to Google Gemini.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send voice to Gemini"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отправлять голос в Gemini"
+          }
+        }
+      }
+    },
+    "Settings" : {
+      "comment" : "Title of this phone's settings.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройки"
+          }
+        }
+      }
+    },
+    "Show amounts in" : {
+      "comment" : "Settings: the currencies every amount is also shown in.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show amounts in"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать суммы в"
+          }
+        }
+      }
+    },
+    "Sundays at 19:00" : {
+      "comment" : "Settings: when the reconcile reminder comes.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sundays at 19:00"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "По воскресеньям в 19:00"
+          }
+        }
+      }
+    },
+    "That file did not fit; nothing changed" : {
+      "comment" : "Message when a file could not be restored.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "That file did not fit; nothing changed"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Файл не подошёл — ничего не изменилось"
+          }
+        }
+      }
+    },
+    "The colours come from the Tailwind CSS palette by Tailwind Labs, under the MIT licence." : {
+      "comment" : "Licences page: where the colour values come from.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The colours come from the Tailwind CSS palette by Tailwind Labs, under the MIT licence."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Цвета взяты из палитры Tailwind CSS от Tailwind Labs, по лицензии MIT."
+          }
+        }
+      }
+    },
+    "The key was not saved. Try again." : {
+      "comment" : "Message when the Keychain refused the key.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The key was not saved. Try again."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ключ не сохранился. Попробуй ещё раз."
+          }
+        }
+      }
+    },
+    "The ruble always stays. Hiding the local or the main currency turns it into the ruble." : {
+      "comment" : "Shown currencies sheet: the rules of the switches.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The ruble always stays. Hiding the local or the main currency turns it into the ruble."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Рубль остаётся всегда. Если скрыть местную или основную валюту, она станет рублём."
+          }
+        }
+      }
+    },
+    "Update rates" : {
+      "comment" : "Settings: fetches fresh rates from the Bank of Russia.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update rates"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновить курсы"
+          }
+        }
+      }
+    },
+    "Version" : {
+      "comment" : "Settings: the app's version and build.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Версия"
+          }
+        }
+      }
+    },
+    "Voice" : {
+      "comment" : "Settings: header of the voice notes group.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voice"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Голос"
+          }
+        }
+      }
+    },
+    "Voice notes are parsed by this model. Change it to move to a newer one." : {
+      "comment" : "Gemini model sheet: what the model is and why change it.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voice notes are parsed by this model. Change it to move to a newer one."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Эта модель разбирает голосовые заметки. Поменяй, чтобы перейти на новую."
+          }
+        }
+      }
+    },
+    "Where I am" : {
+      "comment" : "Settings: header of the currency group.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Where I am"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Где я"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
