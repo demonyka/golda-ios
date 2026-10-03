@@ -2,11 +2,14 @@ import Foundation
 import GoldaCore
 import GoldaData
 
-/// What "Отменить" needs after a payment was deleted: the payment itself, with its id, and the
-/// profile it came from, so the undo lands there even when another profile is open by then.
+/// What "Отменить" needs after a payment was deleted: the payment itself, with its id, its place in
+/// the creation order, and the profile it came from, so the undo lands there even when another
+/// profile is open by then.
 struct ObligationUndoToken: Equatable, Sendable {
     let profileId: UUID
     let obligation: Obligation
+    /// Nil when the payment was gone already: it then comes back after the others.
+    let createdAt: Int64?
 }
 
 /// The intents of the profiles screens. Unlike the books on screen, these name their profile: the
@@ -51,13 +54,15 @@ extension AppModel {
 
     /// Deletes the payment; the token brings it back through `restoreObligation`.
     func deleteObligation(_ obligation: Obligation, profileId: UUID) async throws -> ObligationUndoToken {
-        try await environment.repository.deleteObligation(obligation.id, profileId: profileId)
-        return ObligationUndoToken(profileId: profileId, obligation: obligation)
+        let deleted = try await environment.repository.deleteObligation(obligation.id, profileId: profileId)
+        return ObligationUndoToken(
+            profileId: profileId, obligation: deleted?.obligation ?? obligation, createdAt: deleted?.createdAt
+        )
     }
 
-    /// Undo of `deleteObligation`: the same payment with the same id. Payments of one day are
-    /// listed by id, so it also comes back to the same place.
+    /// Undo of `deleteObligation`: the same payment with the same id, back at its place among the
+    /// payments of its day (they are listed in creation order).
     func restoreObligation(_ token: ObligationUndoToken) async throws {
-        try await environment.repository.saveObligation(token.obligation, profileId: token.profileId)
+        try await environment.repository.saveObligation(token.obligation, profileId: token.profileId, createdAt: token.createdAt)
     }
 }

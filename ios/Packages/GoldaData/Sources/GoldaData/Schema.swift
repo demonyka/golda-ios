@@ -87,8 +87,14 @@ enum Schema {
             t.column("amountMinor", .integer).notNull()
             t.column("currency", .text).notNull()
             t.column("dayOfMonth", .integer).notNull()
+            // Creation order within the profile: payments of one day are listed in it, as Android's
+            // autoincrement ids listed them, and UUIDs cannot (O10).
+            t.column("createdAt", .integer).notNull()
         }
-        try db.create(index: "obligation_on_profileId_dayOfMonth", on: "obligation", columns: ["profileId", "dayOfMonth"])
+        try db.create(
+            index: "obligation_on_profileId_dayOfMonth_createdAt", on: "obligation",
+            columns: ["profileId", "dayOfMonth", "createdAt"]
+        )
 
         try db.create(table: "goal") { t in
             t.primaryKey("id", .blob)

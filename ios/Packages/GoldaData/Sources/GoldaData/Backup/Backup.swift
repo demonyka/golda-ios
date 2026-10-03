@@ -20,18 +20,23 @@ public struct Backup: Equatable, Sendable {
     /// needs it. A profile whose goals are not all here, or whose counters repeat, has no entries
     /// and its goals are created in the order they are listed.
     public var goalCreatedAt: [UUID: Int64]
+    /// The same for payments, by payment id: payments of one day are listed in creation order. The
+    /// same fallback applies.
+    public var obligationCreatedAt: [UUID: Int64]
     /// Official CBR rates, shared by all profiles; by code.
     public var rates: [RateRecord]
 
     public init(
         sourceVersion: Int = BackupFormat.version, exportedAt: Int64, device: BackupDevice = BackupDevice(),
-        profiles: [ProfileSnapshot], goalCreatedAt: [UUID: Int64] = [:], rates: [RateRecord] = []
+        profiles: [ProfileSnapshot], goalCreatedAt: [UUID: Int64] = [:], obligationCreatedAt: [UUID: Int64] = [:],
+        rates: [RateRecord] = []
     ) {
         self.sourceVersion = sourceVersion
         self.exportedAt = exportedAt
         self.device = device
         self.profiles = profiles
         self.goalCreatedAt = goalCreatedAt
+        self.obligationCreatedAt = obligationCreatedAt
         self.rates = rates
     }
 }

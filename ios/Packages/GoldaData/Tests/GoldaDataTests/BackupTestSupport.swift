@@ -48,6 +48,17 @@ final class BackupHarness {
         }
     }
 
+    /// Every payment's creation counter, by payment id, over all profiles.
+    func obligationCounters() async throws -> [UUID: Int64] {
+        try await database.read { store -> [UUID: Int64] in
+            var all: [UUID: Int64] = [:]
+            for profile in try store.profiles() {
+                all.merge(try store.obligationCreationCounters(profileId: profile.id)) { first, _ in first }
+            }
+            return all
+        }
+    }
+
     /// The goal names of [profileId] with the counters they hold, oldest first.
     func goalNamesByAge(_ profileId: UUID) async throws -> [String] {
         let goals = try await database.read { try $0.goals(profileId: profileId) }

@@ -63,13 +63,30 @@ import Testing
         #expect(hero(harness)?.setAside == "10\u{202F}500 ₽")
 
         let token = try await harness.model.deleteObligation(water, profileId: profileId)
-        #expect(token == ObligationUndoToken(profileId: profileId, obligation: water))
+        // The samples' two payments came first.
+        #expect(token == ObligationUndoToken(profileId: profileId, obligation: water, createdAt: 3))
         await eventually { harness.model.data?.obligations.contains(water) == false }
         #expect(hero(harness)?.setAside == "10\u{202F}000 ₽")
 
         try await harness.model.restoreObligation(token)
         await eventually { harness.model.data?.obligations.contains(water) == true }
         #expect(hero(harness)?.setAside == "10\u{202F}500 ₽")
+    }
+
+    /// Payments of one day are listed in the order they were created, as on Android; "Отменить"
+    /// puts a deleted one back in its place, not after the others.
+    @Test func anUndonePaymentComesBackToItsPlaceInItsDay() async throws {
+        let (harness, data) = try await samples()
+        let profileId = data.profile.id
+        #expect(data.obligations.map(\.name) == ["Аренда", "Подписки"])
+        let rent = try #require(data.obligations.first)
+
+        let token = try await harness.model.deleteObligation(rent, profileId: profileId)
+        await eventually { harness.model.data?.obligations.map(\.name) == ["Подписки"] }
+        try await harness.model.restoreObligation(token)
+        await eventually { harness.model.data?.obligations.count == 2 }
+        #expect(harness.model.data?.obligations.map(\.name) == ["Аренда", "Подписки"])
+        #expect(harness.model.data?.obligations.first == rent)
     }
 
     /// A profile that is not open is set up without touching the open one; its own books follow.

@@ -61,6 +61,61 @@ import Testing
         #expect(try await goals().isEmpty)
     }
 
+    func goalCounters() async throws -> [UUID: Int64] {
+        let profileId = profileId
+        return try await harness.database.read { try $0.goalCreationCounters(profileId: profileId) }
+    }
+
+    @Test func anUndoneDeleteTakesTheGoalsPlaceBackSoTheOldestStillStepsIn() async throws {
+        try await repository.saveGoal(goal(9, main: true), profileId: profileId)
+        try await repository.saveGoal(goal(1), profileId: profileId)
+        try await repository.saveGoal(goal(5), profileId: profileId)
+
+        let deleted = try #require(try await repository.deleteGoal(StoreFixture.id(1), profileId: profileId))
+        #expect(deleted.goal == goal(1) && deleted.createdAt == 2)
+        try await repository.saveGoal(deleted.goal, profileId: profileId, createdAt: deleted.createdAt)
+        #expect(try await goals().map(\.id) == [9, 1, 5].map(StoreFixture.id))
+
+        // The main goal goes: the oldest left is the one undone, not the one created after it.
+        try await repository.deleteGoal(StoreFixture.id(9), profileId: profileId)
+        #expect(try await mainGoals() == [StoreFixture.id(1)])
+        #expect(try await goals().map(\.id) == [1, 5].map(StoreFixture.id))
+    }
+
+    @Test func anUndoneDeleteOfTheMainGoalMakesItMainAgainInItsPlace() async throws {
+        try await repository.saveGoal(goal(9), profileId: profileId)
+        try await repository.saveGoal(goal(1, main: true), profileId: profileId)
+        try await repository.saveGoal(goal(5), profileId: profileId)
+
+        let deleted = try #require(try await repository.deleteGoal(StoreFixture.id(1), profileId: profileId))
+        #expect(deleted.goal.isMain && deleted.createdAt == 2)
+        #expect(try await mainGoals() == [StoreFixture.id(9)])
+        try await repository.saveGoal(deleted.goal, profileId: profileId, createdAt: deleted.createdAt)
+        #expect(try await mainGoals() == [StoreFixture.id(1)])
+        #expect(try await goalCounters() == [StoreFixture.id(9): 1, StoreFixture.id(1): 2, StoreFixture.id(5): 3])
+    }
+
+    @Test func aGoalCreatedWhileTheLastWasDeletedMakesWayForItsUndo() async throws {
+        try await repository.saveGoal(goal(9, main: true), profileId: profileId)
+        try await repository.saveGoal(goal(1), profileId: profileId)
+        let deleted = try #require(try await repository.deleteGoal(StoreFixture.id(1), profileId: profileId))
+        // The new goal takes the number the deleted one had; the undo puts it back before the new one.
+        try await repository.saveGoal(goal(5), profileId: profileId)
+        try await repository.saveGoal(deleted.goal, profileId: profileId, createdAt: deleted.createdAt)
+        #expect(try await goalCounters() == [StoreFixture.id(9): 1, StoreFixture.id(1): 2, StoreFixture.id(5): 3])
+
+        try await repository.deleteGoal(StoreFixture.id(9), profileId: profileId)
+        #expect(try await mainGoals() == [StoreFixture.id(1)])
+    }
+
+    @Test func deletingAGoalThatIsNotThereGivesNothingToUndo() async throws {
+        let family = try await harness.profile("Семья")
+        try await repository.saveGoal(goal(1), profileId: family)
+        #expect(try await repository.deleteGoal(StoreFixture.id(1), profileId: profileId) == nil)
+        #expect(try await repository.deleteGoal(StoreFixture.id(2), profileId: family) == nil)
+        #expect(try await goals(family).map(\.id) == [StoreFixture.id(1)])
+    }
+
     @Test func anotherProfilesMainGoalStaysMain() async throws {
         let family = try await harness.profile("Семья")
         try await repository.saveGoal(goal(1, main: true), profileId: family)
@@ -68,6 +123,72 @@ import Testing
         #expect(try await goals(family).map(\.isMain) == [true])
         try await repository.deleteGoal(StoreFixture.id(1), profileId: profileId)
         #expect(try await goals(family).map(\.id) == [StoreFixture.id(1)])
+    }
+
+    // MARK: Obligations
+
+    func payment(_ n: Int, day: Int, amount: Int64 = 100) -> Obligation {
+        Obligation(id: StoreFixture.id(n), name: "Платёж \(n)", amountMinor: amount, currency: "RUB", dayOfMonth: day)
+    }
+
+    func payments(_ profileId: UUID? = nil) async throws -> [UUID] {
+        let profileId = profileId ?? self.profileId
+        return try await harness.database.read { try $0.obligations(profileId: profileId) }.map(\.id)
+    }
+
+    /// Android listed payments by `dayOfMonth, id`, its ids counting up as they were created (O10).
+    @Test func paymentsOfOneDayKeepTheOrderTheyWereCreatedIn() async throws {
+        // Ids are deliberately out of creation order.
+        try await repository.saveObligation(payment(9, day: 5), profileId: profileId)
+        try await repository.saveObligation(payment(1, day: 5), profileId: profileId)
+        try await repository.saveObligation(payment(5, day: 1), profileId: profileId)
+        #expect(try await payments() == [5, 9, 1].map(StoreFixture.id))
+
+        // An edit keeps the place.
+        try await repository.saveObligation(payment(9, day: 5, amount: 300), profileId: profileId)
+        #expect(try await payments() == [5, 9, 1].map(StoreFixture.id))
+
+        // Deleted and undone: back before the payment created after it.
+        let deleted = try #require(try await repository.deleteObligation(StoreFixture.id(9), profileId: profileId))
+        #expect(deleted.obligation == payment(9, day: 5, amount: 300) && deleted.createdAt == 1)
+        #expect(try await payments() == [5, 1].map(StoreFixture.id))
+        try await repository.saveObligation(deleted.obligation, profileId: profileId, createdAt: deleted.createdAt)
+        #expect(try await payments() == [5, 9, 1].map(StoreFixture.id))
+
+        // A payment added later goes after them all.
+        try await repository.saveObligation(payment(2, day: 5), profileId: profileId)
+        #expect(try await payments() == [5, 9, 1, 2].map(StoreFixture.id))
+    }
+
+    @Test func aPaymentCreatedWhileTheLastWasDeletedMakesWayForItsUndo() async throws {
+        try await repository.saveObligation(payment(9, day: 5), profileId: profileId)
+        try await repository.saveObligation(payment(1, day: 5), profileId: profileId)
+        let deleted = try #require(try await repository.deleteObligation(StoreFixture.id(1), profileId: profileId))
+        // The new payment takes the number the deleted one had; the undo puts it back before the new one.
+        try await repository.saveObligation(payment(5, day: 5), profileId: profileId)
+        try await repository.saveObligation(deleted.obligation, profileId: profileId, createdAt: deleted.createdAt)
+        #expect(try await payments() == [9, 1, 5].map(StoreFixture.id))
+        let profileId = profileId
+        #expect(try await harness.database.read { try $0.obligationCreationCounters(profileId: profileId) } == [
+            StoreFixture.id(9): 1, StoreFixture.id(1): 2, StoreFixture.id(5): 3,
+        ])
+    }
+
+    @Test func deletingAPaymentOfAnotherProfileGivesNothingToUndo() async throws {
+        let family = try await harness.profile("Семья")
+        try await repository.saveObligation(payment(1, day: 5), profileId: family)
+        #expect(try await repository.deleteObligation(StoreFixture.id(1), profileId: profileId) == nil)
+        #expect(try await payments(family) == [StoreFixture.id(1)])
+        // Each profile counts on its own.
+        try await repository.saveObligation(payment(2, day: 5), profileId: profileId)
+        let personal = profileId
+        let counters = try await harness.database.read { store in
+            [
+                try store.createdAt(ofObligation: StoreFixture.id(1), profileId: family),
+                try store.createdAt(ofObligation: StoreFixture.id(2), profileId: personal),
+            ]
+        }
+        #expect(counters == [1, 1])
     }
 
     // MARK: Wishes

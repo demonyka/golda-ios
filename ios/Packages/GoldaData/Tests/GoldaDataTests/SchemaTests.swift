@@ -31,6 +31,34 @@ import Testing
         #expect(owners == [true, true, true, true, true, true, false])
     }
 
+    /// Android's autoincrement ids told the creation order of goals and payments; UUIDs do not, so a
+    /// counter is stored, always (D27, O10).
+    @Test func goalsAndPaymentsHoldTheirCreationOrder() async throws {
+        let database = try await StoreFixture.database(profiles: 1)
+        let schema = try await database.writer.read { db in
+            try ["obligation", "goal"].map { table in
+                try db.columns(in: table).first { $0.name == "createdAt" }.map { "\(table) \($0.type) \($0.isNotNull)" }
+            }
+        }
+        #expect(schema == ["obligation INTEGER true", "goal INTEGER true"])
+        // One day's payments are listed in creation order straight from the index.
+        let index = try await database.writer.read { db in
+            try db.indexes(on: "obligation").first { $0.name == "obligation_on_profileId_dayOfMonth_createdAt" }?.columns
+        }
+        #expect(index == ["profileId", "dayOfMonth", "createdAt"])
+
+        // A record that skips the store and its counter cannot be written.
+        let profileId = StoreFixture.id(1)
+        let payment = Obligation(id: StoreFixture.id(40), name: "Аренда", amountMinor: 1, currency: "RUB", dayOfMonth: 1)
+        let goal = Goal(id: StoreFixture.id(50), name: "Машина", targetMinor: 1, currency: "RUB")
+        await #expect(throws: DatabaseError.self) {
+            try await database.writer.write { db in try ObligationRecord(payment, profileId: profileId).insert(db) }
+        }
+        await #expect(throws: DatabaseError.self) {
+            try await database.writer.write { db in try GoalRecord(goal, profileId: profileId).insert(db) }
+        }
+    }
+
     @Test func idsAreSixteenByteBlobsAndEnumsTheirAndroidNames() async throws {
         let database = try await StoreFixture.database(profiles: 1)
         let profileId = StoreFixture.id(1)

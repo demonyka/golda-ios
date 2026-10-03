@@ -2,11 +2,14 @@ import Foundation
 import GoldaCore
 import GoldaData
 
-/// What "Отменить" needs after a goal was deleted: the goal as it was, and the profile it came from,
-/// so the undo lands there even when another profile has been opened since.
+/// What "Отменить" needs after a goal was deleted: the goal as it was, its place in the creation
+/// order, and the profile it came from, so the undo lands there even when another profile has been
+/// opened since.
 struct GoalUndoToken: Equatable, Sendable {
     let profileId: UUID
     let goal: Goal
+    /// Nil when the goal was gone already: it then comes back after the others.
+    let createdAt: Int64?
 }
 
 /// The same for a wish taken off the list.
@@ -39,14 +42,14 @@ extension AppModel {
     /// it back through `restoreGoal`.
     func deleteGoal(_ goal: Goal) async throws -> GoalUndoToken {
         let profileId = try goalsProfileId()
-        try await environment.repository.deleteGoal(goal.id, profileId: profileId)
-        return GoalUndoToken(profileId: profileId, goal: goal)
+        let deleted = try await environment.repository.deleteGoal(goal.id, profileId: profileId)
+        return GoalUndoToken(profileId: profileId, goal: deleted?.goal ?? goal, createdAt: deleted?.createdAt)
     }
 
-    /// Undo of `deleteGoal`: the goal comes back with its id, main again if it was. It goes after
-    /// the others in the creation order: the repository gives a new goal the next place.
+    /// Undo of `deleteGoal`: the goal comes back with its id, main again if it was, and to its
+    /// place in the creation order, so the oldest goal is still the one created first.
     func restoreGoal(_ token: GoalUndoToken) async throws {
-        try await environment.repository.saveGoal(token.goal, profileId: token.profileId)
+        try await environment.repository.saveGoal(token.goal, profileId: token.profileId, createdAt: token.createdAt)
     }
 
     /// "Купить" on a reached goal, as Android does it: the expense of the goal's amount from the
