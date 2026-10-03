@@ -186,6 +186,19 @@ final class AppModel {
         try await environment.repository.restoreOperation(token.deleted, profileId: token.profileId)
     }
 
+    /// Adds [account] with [openingMinor] booked as its opening balance, or updates the account with
+    /// its id (the opening balance is then ignored, and the reconcile stamp stays as stored).
+    func saveAccount(_ account: Account, openingMinor: Int64?) async throws {
+        let profileId = try profileOnScreen()
+        try await environment.repository.saveAccount(account, profileId: profileId, openingMinor: openingMinor)
+    }
+
+    /// Deletes the account with every operation that touches it, both sides of its transfers included.
+    func deleteAccount(_ id: UUID) async throws {
+        let profileId = try profileOnScreen()
+        try await environment.repository.deleteAccount(id, profileId: profileId)
+    }
+
     /// Brings the account to what the bank shows; returns the adjustment, if one was needed.
     @discardableResult
     func reconcile(accountId: UUID, actualMinor: Int64) async throws -> UUID? {

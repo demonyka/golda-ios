@@ -1,0 +1,1200 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%@ a month" : {
+      "comment" : "Early repayment: the lower monthly payment, “8 333 ₽ a month”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ a month"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ в месяц"
+          }
+        }
+      }
+    },
+    "%@ a year" : {
+      "comment" : "Debt details: a yearly interest rate, “24,9 % a year”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ a year"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ годовых"
+          }
+        }
+      }
+    },
+    "%lld months" : {
+      "comment" : "A number of months, “48 months”; used inside longer lines.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld month"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld months"
+                }
+              }
+            }
+          }
+        },
+        "ru" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld месяца"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld месяцев"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld месяц"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld месяца"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld months sooner" : {
+      "comment" : "Early repayment: how much sooner the loan is paid off, “12 months sooner”.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld month sooner"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld months sooner"
+                }
+              }
+            }
+          }
+        },
+        "ru" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "на %lld месяца раньше"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "на %lld месяцев раньше"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "на %lld месяц раньше"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "на %lld месяца раньше"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "A bank's accounts stand together." : {
+      "comment" : "Account form: what a group is for.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A bank's accounts stand together."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Счета одного банка стоят рядом."
+          }
+        }
+      }
+    },
+    "Account" : {
+      "comment" : "Title of the account form when editing one.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Счёт"
+          }
+        }
+      }
+    },
+    "Add" : {
+      "comment" : "Account form: the main action that creates the account.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить"
+          }
+        }
+      }
+    },
+    "All operations with this account go too, transfers included." : {
+      "comment" : "Account form: what deleting an account takes with it.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All operations with this account go too, transfers included."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалятся и все операции с этим счётом, включая переводы."
+          }
+        }
+      }
+    },
+    "An account keeps the currency it was opened in." : {
+      "comment" : "Account form, editing: why the currency cannot be changed.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An account keeps the currency it was opened in."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Валюта счёта не меняется после создания."
+          }
+        }
+      }
+    },
+    "Annuity estimate; the bank's schedule has the exact figures." : {
+      "comment" : "Early repayment: the figures are an estimate.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuity estimate; the bank's schedule has the exact figures."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Расчёт по аннуитетной схеме; точные цифры — в графике банка."
+          }
+        }
+      }
+    },
+    "Cancel" : {
+      "comment" : "Closes a form or a question without doing anything.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отмена"
+          }
+        }
+      }
+    },
+    "Card" : {
+      "comment" : "Account type tile: a bank card.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Card"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Карта"
+          }
+        }
+      }
+    },
+    "Cash" : {
+      "comment" : "Account type tile: cash.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cash"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Наличные"
+          }
+        }
+      }
+    },
+    "Count in “Safe to spend today”" : {
+      "comment" : "Account form: the switch that puts the account's money into today's budget.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Count in “Safe to spend today”"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Учитывать в «Можно сегодня»"
+          }
+        }
+      }
+    },
+    "Credit" : {
+      "comment" : "Account type tile: a credit card.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Credit"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кредитка"
+          }
+        }
+      }
+    },
+    "Currency" : {
+      "comment" : "Account form: the account's currency.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Currency"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Валюта"
+          }
+        }
+      }
+    },
+    "Delete" : {
+      "comment" : "Confirms deleting an account with its operations.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить"
+          }
+        }
+      }
+    },
+    "Delete account" : {
+      "comment" : "Account form: the trash button.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete account"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить счёт"
+          }
+        }
+      }
+    },
+    "Delete “%@”?" : {
+      "comment" : "Title of the confirmation before an account is deleted, with its name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete “%@”?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить «%@»?"
+          }
+        }
+      }
+    },
+    "Done" : {
+      "comment" : "Closes the early repayment calculator.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Готово"
+          }
+        }
+      }
+    },
+    "Early repayment" : {
+      "comment" : "Title of the early repayment calculator.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Early repayment"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Досрочное погашение"
+          }
+        }
+      }
+    },
+    "Group" : {
+      "comment" : "Account form: the group of a bank's accounts.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Group"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Группа"
+          }
+        }
+      }
+    },
+    "Group, like the bank's name" : {
+      "comment" : "Account form: the placeholder of a new group's name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Group, like the bank's name"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Группа, например название банка"
+          }
+        }
+      }
+    },
+    "How much is there now" : {
+      "comment" : "Account form: caption over the opening balance.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How much is there now"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сколько сейчас"
+          }
+        }
+      }
+    },
+    "How much to pay" : {
+      "comment" : "Early repayment: caption over the amount paid early.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How much to pay"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сколько внести"
+          }
+        }
+      }
+    },
+    "How much you owe now" : {
+      "comment" : "Account form: caption over the opening balance of a debt.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How much you owe now"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сколько должен сейчас"
+          }
+        }
+      }
+    },
+    "Interest left" : {
+      "comment" : "Debt details: the interest still to be paid on a loan.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interest left"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Переплата"
+          }
+        }
+      }
+    },
+    "Interest saved" : {
+      "comment" : "Early repayment: the interest an option saves.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interest saved"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Экономия на процентах"
+          }
+        }
+      }
+    },
+    "Interest-free period" : {
+      "comment" : "Account form: a credit card's grace period switch.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interest-free period"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Льготный период"
+          }
+        }
+      }
+    },
+    "Interest-free until" : {
+      "comment" : "The last day of a credit card's grace period.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interest-free until"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Льгота до"
+          }
+        }
+      }
+    },
+    "Keeping it saved is better by %@." : {
+      "comment" : "Early repayment: keeping the money on savings beats paying off, by this much.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keeping it saved is better by %@."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выгоднее оставить на счёте: +%@."
+          }
+        }
+      }
+    },
+    "Last payment" : {
+      "comment" : "Debt details: the month the loan's last payment falls in.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last payment"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Последний платёж"
+          }
+        }
+      }
+    },
+    "Left to pay" : {
+      "comment" : "Debt details: how many months of payments are left.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Left to pay"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Осталось платить"
+          }
+        }
+      }
+    },
+    "Loan" : {
+      "comment" : "Account type tile: a loan.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loan"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кредит"
+          }
+        }
+      }
+    },
+    "Lower the payment" : {
+      "comment" : "Early repayment: the option that keeps the term and lowers the payment.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lower the payment"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Уменьшить платёж"
+          }
+        }
+      }
+    },
+    "Minimum payment" : {
+      "comment" : "A credit card's monthly minimum payment.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minimum payment"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Минимальный платёж"
+          }
+        }
+      }
+    },
+    "Name" : {
+      "comment" : "Account form: the placeholder of the account's name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Название"
+          }
+        }
+      }
+    },
+    "New account" : {
+      "comment" : "Title of the account form when creating one.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New account"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новый счёт"
+          }
+        }
+      }
+    },
+    "New group…" : {
+      "comment" : "Account form: type the name of a new group.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New group…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новая группа…"
+          }
+        }
+      }
+    },
+    "New payment" : {
+      "comment" : "Early repayment: the monthly payment after paying early.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New payment"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новый платёж"
+          }
+        }
+      }
+    },
+    "Next payment" : {
+      "comment" : "Debt details: when the next monthly payment is due.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next payment"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Следующий платёж"
+          }
+        }
+      }
+    },
+    "No group" : {
+      "comment" : "Account form: the account stands on its own.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No group"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Без группы"
+          }
+        }
+      }
+    },
+    "Not set" : {
+      "comment" : "Account form: no payment day picked.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not set"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не задан"
+          }
+        }
+      }
+    },
+    "OK" : {
+      "comment" : "Closes the message that saving or deleting failed.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ОК"
+          }
+        }
+      }
+    },
+    "On “%@” the same money would earn %@ over that time." : {
+      "comment" : "Early repayment: what the savings account would pay on the same money. The account's name, then the amount.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On “%@” the same money would earn %@ over that time."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На «%@» эти деньги за то же время принесли бы %@."
+          }
+        }
+      }
+    },
+    "Or keep it saved" : {
+      "comment" : "Early repayment: the header over the comparison with a savings account.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Or keep it saved"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Или оставить на счёте"
+          }
+        }
+      }
+    },
+    "Owed %@ at %@, %@ a month." : {
+      "comment" : "Early repayment: the loan as it stands. What is owed, the yearly rate, the payment.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Owed %@ at %@, %@ a month."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Долг %@ под %@, платёж %@ в месяц."
+          }
+        }
+      }
+    },
+    "Paid off" : {
+      "comment" : "Early repayment: when the loan ends, “12 months sooner”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paid off"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закроешь"
+          }
+        }
+      }
+    },
+    "Pay off early…" : {
+      "comment" : "Debt details: opens the early repayment calculator.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pay off early…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Погасить досрочно…"
+          }
+        }
+      }
+    },
+    "Paying off is better by %@." : {
+      "comment" : "Early repayment: paying the loan off early beats saving, by this much.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paying off is better by %@."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Гасить выгоднее на %@."
+          }
+        }
+      }
+    },
+    "Payment" : {
+      "comment" : "A loan's monthly payment.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payment"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Платёж"
+          }
+        }
+      }
+    },
+    "Payment day" : {
+      "comment" : "Account form: the day of the month a debt's payment is due.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payment day"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "День платежа"
+          }
+        }
+      }
+    },
+    "Rate" : {
+      "comment" : "A debt's yearly interest rate.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rate"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ставка"
+          }
+        }
+      }
+    },
+    "Rate on balance" : {
+      "comment" : "Account form: the yearly rate a savings account pays.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rate on balance"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ставка на остаток"
+          }
+        }
+      }
+    },
+    "Save" : {
+      "comment" : "Account form: the main action that saves the changes.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранить"
+          }
+        }
+      }
+    },
+    "Savings" : {
+      "comment" : "Account type tile: a savings account.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Savings"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вклад"
+          }
+        }
+      }
+    },
+    "Savings and debts usually stay out." : {
+      "comment" : "Account form: why savings and debts start with the budget switch off.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Savings and debts usually stay out."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Накопления и долги обычно не учитываются."
+          }
+        }
+      }
+    },
+    "Shorten the term" : {
+      "comment" : "Early repayment: the option that keeps the payment and ends the loan sooner.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shorten the term"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сократить срок"
+          }
+        }
+      }
+    },
+    "Terms" : {
+      "comment" : "Debt details: the header over a debt's rate, payment and term.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terms"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Условия"
+          }
+        }
+      }
+    },
+    "The account was not deleted. Try again." : {
+      "comment" : "Account form: deleting failed.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The account was not deleted. Try again."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Счёт не удалился. Попробуй ещё раз."
+          }
+        }
+      }
+    },
+    "The account was not saved. Try again." : {
+      "comment" : "Account form: saving failed.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The account was not saved. Try again."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Счёт не сохранился. Попробуй ещё раз."
+          }
+        }
+      }
+    },
+    "The payment does not even cover the interest; the debt grows" : {
+      "comment" : "Debt details: the payment is smaller than the monthly interest.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The payment does not even cover the interest; the debt grows"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Платёж не покрывает даже проценты — долг растёт"
+          }
+        }
+      }
+    },
+    "Type" : {
+      "comment" : "Account form: the header over the account type tiles.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тип"
+          }
+        }
+      }
+    },
+    "Type an amount to see both options." : {
+      "comment" : "Early repayment: shown until an amount is typed.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type an amount to see both options."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введи сумму, чтобы увидеть оба варианта."
+          }
+        }
+      }
+    },
+    "about %@" : {
+      "comment" : "VoiceOver: an estimate, “about 48 months”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "about %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "примерно %@"
+          }
+        }
+      }
+    },
+    "p.a." : {
+      "comment" : "Account form: “per year” after a yearly interest rate, “24,9 % p.a.”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p.a."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "год."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

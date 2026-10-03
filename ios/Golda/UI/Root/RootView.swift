@@ -13,7 +13,16 @@ struct RootView: View {
         case .welcome:
             WelcomeView()
         case .main(let data):
+            #if DEBUG
+            // A screen asked for by a launch argument, for UI tests and screenshots (`DebugScreen`).
+            if DebugScreen.requested() == .accountForm {
+                AccountFormDebugHost(data: data)
+            } else {
+                MainTabs(data: data, mic: mic)
+            }
+            #else
             MainTabs(data: data, mic: mic)
+            #endif
         }
     }
 }
