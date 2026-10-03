@@ -246,7 +246,7 @@ final class AppModel {
         })
     }
 
-    private func applyDeviceSettings() {
+    func applyDeviceSettings() {
         let current = environment.deviceSettings.current
         guard current != device else { return }
         device = current
@@ -324,7 +324,7 @@ final class AppModel {
         }
     }
 
-    private func reloadRates() async {
+    func reloadRates() async {
         do {
             rateTable = try await environment.database.read { try $0.rates() }
             rebuild()
