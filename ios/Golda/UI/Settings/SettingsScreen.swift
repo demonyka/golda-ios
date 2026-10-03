@@ -56,7 +56,8 @@ struct SettingsScreen: View {
             .scrollContentBackground(.hidden)
             .background(Theme.Color.page)
             .navigationTitle(Text(verbatim: SettingsText.title.text(in: locale)))
-            .navigationBarTitleDisplayMode(.large)
+            // In the bar beside "Готово", like every other sheet, not as a large title under it.
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     ConfirmButton(title: SettingsText.done.text(in: locale)) { dismiss() }
