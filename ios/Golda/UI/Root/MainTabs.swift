@@ -25,13 +25,19 @@ enum AppTab: Hashable, CaseIterable {
     }
 }
 
-/// The tabs of the open profile, each with the floating mic.
+/// The tabs of the open profile, each with the floating mic. The screens over them (the operation
+/// form, settings, profiles) open through the `AppRouter` it puts in the environment, from any tab
+/// and over any page pushed on it.
+///
+/// The tabs set no tint: the accent is the system blue (D34). A tint here reaches every screen,
+/// sheet and alert under the tabs; the graphite one made their buttons read as grey, disabled text.
 struct MainTabs: View {
     let data: AppData
     let mic: any MicModel
     @State private var selection: AppTab
     /// Accounts in reconcile mode: the Sunday reminder (stage 4) opens the tab this way.
     @State private var isReconciling: Bool
+    @State private var router = AppRouter()
 
     init(data: AppData, mic: any MicModel, tab: AppTab = .home, reconciling: Bool = false) {
         self.data = data
@@ -60,8 +66,11 @@ struct MainTabs: View {
         // A half-hidden bar that a scroll up does not bring back reads as broken, and the mic
         // above it has no reason to move.
         .tabBarMinimizeBehavior(.never)
-        // Graphite is what is picked: the selected tab, toggles, the cursor (DESIGN.md, "Цвет").
-        .tint(Theme.Color.graphite)
+        // Over the whole TabView, so a screen opens the same from every tab and over pushed pages.
+        .sheet(item: $router.presented) { route in
+            RouteDestination(route: route, data: data)
+        }
+        .environment(router)
     }
 }
 
@@ -74,6 +83,7 @@ private struct TabRoot: View {
     @Binding var isReconciling: Bool
 
     @Environment(AppModel.self) private var model
+    @Environment(AppRouter.self) private var router
     @State private var toast: UndoToast?
     @State private var path = NavigationPath()
     @State private var accountForm: AccountFormRequest?
@@ -93,7 +103,7 @@ private struct TabRoot: View {
                 // On the screen, not around the stack, so its list ends above the mic (`MicPlacement`).
                 .modifier(MicPlacement(mic: mic))
                 .navigationTitle(Text(tab.title))
-                .toolbar { MainToolbar() }
+                .toolbar { MainToolbar(router: router) }
         }
         .sheet(item: $accountForm) { request in
             AccountFormSheet(
@@ -108,9 +118,7 @@ private struct TabRoot: View {
     @ViewBuilder private var screen: some View {
         switch tab {
         case .home:
-            HomeScreen(data: data, today: model.environment.today()) { _ in
-                // The operation form arrives in step 2c.
-            }
+            HomeScreen(data: data, today: model.environment.today(), onEdit: edit)
         case .accounts:
             AccountsScreen(
                 data: data,
@@ -118,14 +126,17 @@ private struct TabRoot: View {
                 reconcileMode: isReconciling,
                 onAddAccount: { accountForm = AccountFormRequest(account: nil) },
                 onEditAccount: { accountForm = AccountFormRequest(account: $0) },
-                onEditOperation: { _ in
-                    // The operation form arrives in step 2c.
-                },
+                onEditOperation: edit,
                 onAllReconciled: { isReconciling = false }
             )
         case .goals, .insights:
             TabPlaceholder(tab: tab, profileName: data.profile.name)
         }
+    }
+
+    /// An operation's row, on Home or an account's page, opens the form for it.
+    private func edit(_ operation: OperationFull) {
+        router.present(.entry(EntryRequest(editing: operation)))
     }
 }
 
@@ -145,17 +156,21 @@ extension EnvironmentValues {
 
 /// The same on every tab: the profile on the left, "+" and settings on the right.
 private struct MainToolbar: ToolbarContent {
+    let router: AppRouter
+
     var body: some ToolbarContent {
         ToolbarItem(placement: .topBarLeading) {
             ProfileMenu()
         }
         ToolbarItemGroup(placement: .topBarTrailing) {
-            // The operation form arrives in step 2c.
-            Button("Add by hand", systemImage: Symbols.add) {}
-                .accessibilityIdentifier("add")
-            // The settings arrive in step 2e.
-            Button("Settings", systemImage: Symbols.settings) {}
-                .accessibilityIdentifier("settings")
+            Button("Add by hand", systemImage: Symbols.add) {
+                router.present(.entry(EntryRequest()))
+            }
+            .accessibilityIdentifier("add")
+            Button("Settings", systemImage: Symbols.settings) {
+                router.present(.settings)
+            }
+            .accessibilityIdentifier("settings")
         }
     }
 }

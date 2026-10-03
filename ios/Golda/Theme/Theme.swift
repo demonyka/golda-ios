@@ -2,13 +2,15 @@ import SwiftUI
 
 /// The design tokens of Golda in one place (DESIGN.md, "Цвет" and "Списки и карточки").
 ///
-/// Colour has three jobs and nothing else: gold is the one main action, graphite is what is
-/// picked, red is bad news. Everything else is a white card on a light grey page.
+/// Colour has three jobs and nothing else (D34): the system blue confirms, graphite is what is
+/// picked, red is bad news. The blue is the app's accent, not a token: it comes from the system
+/// tint, so confirmations, alert buttons and the cursor look the way they do in every iOS app.
+/// Other buttons are plain Liquid Glass. Everything else is a white card on a light grey page.
 enum Theme {
     /// Colour tokens. Each name is a colour set in `Assets.xcassets/Theme` with a light and a dark
     /// value, so views never branch on the colour scheme.
     ///
-    /// The enum is called `Color` on purpose (`Theme.Color.gold`); inside it the system type is
+    /// The enum is called `Color` on purpose (`Theme.Color.card`); inside it the system type is
     /// spelled `SwiftUI.Color`.
     enum Color {
         /// Screen and sheet background.
@@ -27,10 +29,6 @@ enum Theme {
         static let graphite = token("graphite")
         /// Text on `graphite`.
         static let onGraphite = token("onGraphite")
-        /// The one main action. Only ever a fill, with `onGold` on it: gold text on white fails contrast.
-        static let gold = token("gold")
-        /// Ink on `gold`.
-        static let onGold = token("onGold")
         /// Bad news only: overspending, debts, erasing.
         static let danger = token("danger")
         /// Fill of the hero card when the budget is overspent.
@@ -41,7 +39,7 @@ enum Theme {
         /// Every colour-set name, so a test can check the catalog and this file agree.
         static let allNames = [
             "page", "card", "soft", "line", "muted", "text", "graphite", "onGraphite",
-            "gold", "onGold", "danger", "dangerSoft", "onDangerSoft",
+            "danger", "dangerSoft", "onDangerSoft",
         ]
 
         private static func token(_ name: String) -> SwiftUI.Color {

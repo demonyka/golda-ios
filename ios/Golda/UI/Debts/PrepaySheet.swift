@@ -3,8 +3,8 @@ import SwiftUI
 
 /// The early-repayment calculator of a loan, the port of Android's `PrepayDialog` as a sheet: an
 /// amount, then both options (finish sooner, or pay less each month) with the interest each saves,
-/// and how that compares with the best savings account. Nothing is saved; "Готово" closes it, so
-/// no action here is gold.
+/// and how that compares with the best savings account. Nothing is saved; "Готово", the sheet's
+/// confirmation in the system blue, closes it.
 struct PrepaySheet: View {
     let state: AccountState
     let data: AppData
@@ -32,14 +32,11 @@ struct PrepaySheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(action: onDismiss) {
-                        Text("Done", tableName: "AccountForm", comment: "Closes the early repayment calculator.")
-                    }
-                    .accessibilityIdentifier("prepay.done")
+                    ConfirmButton(title: Self.doneTitle.text(in: locale), action: onDismiss)
+                        .accessibilityIdentifier("prepay.done")
                 }
             }
         }
-        .tint(Theme.Color.graphite)
         .presentationDetents([.large])
         .presentationBackground(Theme.Color.page)
         .onAppear { isTyping = true }
@@ -108,6 +105,8 @@ struct PrepaySheet: View {
             }
         }
     }
+
+    static let doneTitle = LocalizedStringResource("Done", table: "AccountForm", comment: "Closes the early repayment calculator.")
 
     private func row(_ title: LocalizedStringResource, money: String, id: String) -> some View {
         row(title, value: money, spoken: SpokenAmount.text(money, locale: locale), id: id)

@@ -65,7 +65,6 @@ private struct GroupedAmountField: UIViewRepresentable {
         field.keyboardType = .decimalPad
         field.textAlignment = .center
         field.borderStyle = .none
-        field.tintColor = UIColor(named: "graphite")
         field.setContentHuggingPriority(.required, for: .horizontal)
         field.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         return field

@@ -118,7 +118,7 @@ struct ReconcileMark: View {
                     Text(verbatim: Self.matchTitle.text(in: locale))
                         .lineLimit(1)
                 }
-                .buttonStyle(ReconcileButtonStyle())
+                .reconcileActionStyle()
                 .accessibilityIdentifier("accounts.match")
                 .transition(.opacity)
             }
@@ -127,17 +127,12 @@ struct ReconcileMark: View {
     }
 }
 
-/// The tonal capsule of the reconcile actions ("Сходится", "Сверить"): `soft` with the text ink, a
-/// full 44 pt tall. Gold stays for the one main action of a screen.
-struct ReconcileButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.subheadline.weight(.semibold))
-            .foregroundStyle(Theme.Color.text)
-            .padding(.horizontal, Theme.Gap.m)
-            .frame(minHeight: Theme.minimumTarget)
-            .background(Theme.Color.soft, in: Capsule())
-            .contentShape(Capsule())
-            .opacity(configuration.isPressed ? 0.6 : 1)
+extension View {
+    /// The reconcile actions, "Сходится" and "Сверить": plain Liquid Glass in the text ink, at least
+    /// 44 pt tall, as every button that is not a modal's confirmation (D34).
+    func reconcileActionStyle() -> some View {
+        font(.subheadline.weight(.semibold))
+            .buttonStyle(.glass)
+            .controlSize(.large)
     }
 }

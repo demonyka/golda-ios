@@ -125,7 +125,7 @@ struct AccountPageHero: View {
                 Button(action: onReconcile) {
                     Text(verbatim: Self.reconcileTitle.text(in: locale))
                 }
-                .buttonStyle(ReconcileButtonStyle())
+                .reconcileActionStyle()
                 .padding(.top, Theme.Gap.m)
                 .accessibilityIdentifier("account.reconcile")
             }

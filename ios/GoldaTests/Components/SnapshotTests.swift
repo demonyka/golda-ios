@@ -216,7 +216,7 @@ import UIKit
             VStack(spacing: Theme.Gap.m) {
                 ForEach([0.0, 0.02, 0.08, 0.3], id: \.self) { level in
                     HStack(spacing: Theme.Gap.l) {
-                        LevelWaveform(level: level, ink: Theme.Color.gold, maxHeight: 40, barWidth: 5)
+                        LevelWaveform(level: level, ink: Theme.Color.text, maxHeight: 40, barWidth: 5)
                         MicFloatingButton(state: .recording, level: level) {}
                     }
                 }
