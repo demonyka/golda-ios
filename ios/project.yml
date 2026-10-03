@@ -47,6 +47,20 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
 
+  GoldaTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: GoldaTests
+    dependencies:
+      - target: Golda
+      - package: GoldaCore
+      - package: GoldaData
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.f4studio.golda.tests
+        GENERATE_INFOPLIST_FILE: YES
+
 schemes:
   Golda:
     build:
@@ -54,5 +68,8 @@ schemes:
         Golda: all
     run:
       config: Debug
+    test:
+      config: Debug
+      targets: [GoldaTests]
     archive:
       config: Release
