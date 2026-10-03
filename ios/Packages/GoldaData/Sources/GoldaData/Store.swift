@@ -67,7 +67,7 @@ public struct Store {
         let records = try OperationRecord.owned(by: profileId)
             // Equal timestamps (several expenses from one voice note) keep the order they were
             // written in, newest first, as Android's autoincrement ids did.
-            .order(Column("timestamp").desc, Column.rowID.desc)
+            .order(Column("timestamp").desc, Column("sequence").desc)
             .fetchAll(db)
         let postings = Dictionary(grouping: try postings(profileId: profileId), by: \.operationId)
         return records.map { OperationFull($0.operation, postings[$0.id] ?? []) }
@@ -83,9 +83,21 @@ public struct Store {
     }
 
     /// Writes the operation row alone; its postings are saved separately. [updatedAt] is epoch
-    /// milliseconds of this change.
+    /// milliseconds of this change. A new operation comes after every other one of the profile in
+    /// the order of writing; an edit keeps its place.
     public func save(_ operation: GoldaCore.Operation, profileId: UUID, updatedAt: Int64) throws {
-        try saveOwned(OperationRecord(operation, profileId: profileId, updatedAt: updatedAt))
+        try save(operation, profileId: profileId, updatedAt: updatedAt, sequence: nil)
+    }
+
+    /// As above, but at [sequence] in the order of writing when it is given (an undone delete).
+    func save(_ operation: GoldaCore.Operation, profileId: UUID, updatedAt: Int64, sequence: Int64?) throws {
+        var record = OperationRecord(operation, profileId: profileId, updatedAt: updatedAt, sequence: sequence)
+        if record.sequence == nil {
+            let stored = try Int64.fetchOne(db, OperationRecord.filter(id: operation.id).select(Column("sequence")))
+            let last = try Int64.fetchOne(db, OperationRecord.owned(by: profileId).select(max(Column("sequence"))))
+            record.sequence = stored ?? (last ?? 0) + 1
+        }
+        try saveOwned(record)
     }
 
     /// Deletes the operation and its postings.

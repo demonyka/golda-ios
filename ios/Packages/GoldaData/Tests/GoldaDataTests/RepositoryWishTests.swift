@@ -185,6 +185,26 @@ import Testing
         #expect(facts.waitHours == 72)
     }
 
+    @Test func impactIsWhatTheExpenseCostInRublesAndHours() async throws {
+        let income = ProfileSettings(from: Settings(incomeHourly: true, hourlyRate: 1000, taxPercent: 10, hoursPerWeek: 40))
+        try await repository.saveProfileSettings(income, profileId: profileId)
+        try await repository.save(Draft(type: .opening, timestamp: 0, accountId: rub.id, amountMinor: 13_000_000), profileId: profileId)
+        try await repository.save(Draft(type: .transfer, timestamp: 1, accountId: rub.id, amountMinor: 900_000, toAccountId: usd.id, toAmountMinor: 10_000), profileId: profileId)
+
+        // 50 $ bought at 90 ₽ cost 4 500 ₽, five hours at 900 ₽ an hour (not 50 × 83.2454 × 1.1).
+        let dinner = try await repository.save(Draft(type: .expense, timestamp: RepositoryHarness.start, accountId: usd.id, amountMinor: 5_000), profileId: profileId)
+        let impact = try #require(try await repository.impact(operationId: dinner, profileId: profileId))
+        #expect(impact.costRub == 450_000)
+        expectClose(try #require(impact.hoursOfWork), 5, 0.0001)
+        // Free money: 121 000 ₽ and 50 $ worth 4 500 ₽, plus today's 4 500 ₽, over 13 days, less today's.
+        #expect(impact.leftTodayRub == 13_000_000 / 13 - 450_000)
+
+        // Without an income there are no hours to show.
+        try await repository.saveProfileSettings(ProfileSettings(), profileId: profileId)
+        let again = try #require(try await repository.impact(operationId: dinner, profileId: profileId))
+        #expect(again.costRub == 450_000 && again.hoursOfWork == nil)
+    }
+
     @Test func impactIsOnlyForExpenses() async throws {
         let income = try await repository.save(Draft(type: .income, timestamp: 0, accountId: rub.id, amountMinor: 100), profileId: profileId)
         #expect(try await repository.impact(operationId: income, profileId: profileId) == nil)
@@ -193,9 +213,7 @@ import Testing
 
     @Test func todayIsTheInjectedZonesDay() async throws {
         // 23:30 UTC on Oct 1 is already Oct 2 in Tbilisi (UTC+4), where the morning expense counts.
-        let tbilisi = TimeZone(secondsFromGMT: 4 * 3600)!
-        let clock = harness.clock
-        let repository = Repository(database: harness.database, deviceSettings: harness.device, clock: { clock.now }, zone: { tbilisi })
+        let repository = harness.repository(zone: TimeZone(secondsFromGMT: 4 * 3600)!)
         try await repository.save(Draft(type: .opening, timestamp: 0, accountId: rub.id, amountMinor: 13_000_000), profileId: profileId)
         let lunch = try await repository.save(Draft(type: .expense, timestamp: LocalDate(2026, 10, 1).atTimeMillis(hour: 23, minute: 30, in: RepositoryHarness.utc), accountId: rub.id, amountMinor: 300_000), profileId: profileId)
         #expect(try await repository.impact(operationId: lunch, profileId: profileId)?.leftTodayRub == 700_000)

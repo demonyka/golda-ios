@@ -8,6 +8,14 @@ public enum RepositoryError: Error, Equatable, Sendable {
     case unknownAccount(UUID)
 }
 
+/// A deleted operation as "Отменить" needs it: the rows, and the place it had among operations with
+/// the same timestamp.
+public struct DeletedOperation: Equatable, Sendable {
+    public let full: OperationFull
+    /// The operation's place in its profile's order of writing.
+    let sequence: Int64
+}
+
 /// What an expense just recorded means: "≈ 2,6 ч работы · на сегодня осталось 503 ₽". Numbers only;
 /// the screen writes the sentence in the main currency.
 public struct Impact: Equatable, Sendable {

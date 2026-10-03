@@ -107,9 +107,11 @@ struct OperationRecord: ProfileOwnedRecord {
     var cbrTo: Double?
     /// Epoch milliseconds of the last change, for last-writer-wins between devices.
     var updatedAt: Int64
+    /// The operation's place in its profile's order of writing; the store fills it in when nil.
+    var sequence: Int64?
 
     // Qualified: Foundation has an `Operation` too.
-    init(_ operation: GoldaCore.Operation, profileId: UUID, updatedAt: Int64) {
+    init(_ operation: GoldaCore.Operation, profileId: UUID, updatedAt: Int64, sequence: Int64? = nil) {
         id = operation.id
         self.profileId = profileId
         type = operation.type
@@ -123,6 +125,7 @@ struct OperationRecord: ProfileOwnedRecord {
         cbrFrom = operation.cbrFrom
         cbrTo = operation.cbrTo
         self.updatedAt = updatedAt
+        self.sequence = sequence
     }
 
     var operation: GoldaCore.Operation {

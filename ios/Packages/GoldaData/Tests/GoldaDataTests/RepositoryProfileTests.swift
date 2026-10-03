@@ -126,8 +126,11 @@ import Testing
             $0.onboarded = true
             $0.activeProfileId = personal
         }
+        try harness.secrets.write("AIza-test-key", for: SecretKey.gemini)
 
         try await repository.resetAll()
+        // The key goes too, as Android's `settings.clear()` took it.
+        #expect(harness.secrets.read(SecretKey.gemini) == nil)
         #expect(try await harness.database.read { try $0.profiles() }.isEmpty)
         #expect(try await harness.database.read { try $0.rates() } == CbrRatesSource.fallback.map(RateRecord.init).sorted { $0.code < $1.code })
         #expect(harness.device.current == DeviceSettings())
