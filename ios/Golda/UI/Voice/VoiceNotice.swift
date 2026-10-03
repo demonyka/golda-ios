@@ -89,13 +89,10 @@ struct VoiceNotice: Equatable, Sendable {
         return title + " " + Fmt.amount(draft.purchaseAmountMinor ?? draft.amountMinor, code)
     }
 
-    /// "≈ 2,6 ч работы · на сегодня осталось 503 ₽" (Android's `Wishes.impact`).
+    /// "≈ 2,6 ч работы · на сегодня осталось 503 ₽" (Android's `Wishes.impact`), in the same words
+    /// as every other expense the app announces.
     static func comment(_ impact: Impact, base: Base, locale: Locale) -> String {
-        var parts: [String] = []
-        if let hours = impact.hoursOfWork { parts.append(Strings.hoursOfWork(Fmt.number(hours, decimals: 1)).text(in: locale)) }
-        let left = impact.leftTodayRub
-        parts.append((left >= 0 ? Strings.leftToday(base.approx(left)) : Strings.overBudget(base.approx(-left))).text(in: locale))
-        return parts.joined(separator: " · ")
+        EntryAnnouncement.impactLine(impact, base: base, in: locale)
     }
 
     static func failed(_ failure: VoiceOutcome.Failure) -> LocalizedStringResource {
@@ -147,18 +144,6 @@ struct VoiceNotice: Equatable, Sendable {
 
         static func profile(_ name: String) -> LocalizedStringResource {
             LocalizedStringResource("Profile: \(name)", table: "Voice", comment: "Voice toast: the profile a note was booked into, when there are several.")
-        }
-
-        static func hoursOfWork(_ hours: String) -> LocalizedStringResource {
-            LocalizedStringResource("≈ \(hours) h of work", table: "Voice", comment: "Voice toast: what an expense cost in hours of work, “≈ 2,6 h of work”.")
-        }
-
-        static func leftToday(_ amount: String) -> LocalizedStringResource {
-            LocalizedStringResource("left for today \(amount)", table: "Voice", comment: "Voice toast: what is left to spend today after the expense.")
-        }
-
-        static func overBudget(_ amount: String) -> LocalizedStringResource {
-            LocalizedStringResource("over budget by \(amount)", table: "Voice", comment: "Voice toast: how far today's budget is overspent after the expense.")
         }
 
         static func rejected(_ message: String) -> LocalizedStringResource {

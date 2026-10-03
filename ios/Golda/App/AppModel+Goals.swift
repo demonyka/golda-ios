@@ -35,13 +35,13 @@ extension AppModel {
     /// Adds [goal] or updates the goal with its id. A goal saved as main takes over from the one
     /// before it; with no main goal left, the oldest becomes main.
     func saveGoal(_ goal: Goal) async throws {
-        try await environment.repository.saveGoal(goal, profileId: try goalsProfileId())
+        try await environment.repository.saveGoal(goal, profileId: try profileOnScreen())
     }
 
     /// Deletes the goal; when it was the main one, the oldest left takes its place. The token brings
     /// it back through `restoreGoal`.
     func deleteGoal(_ goal: Goal) async throws -> GoalUndoToken {
-        let profileId = try goalsProfileId()
+        let profileId = try profileOnScreen()
         let deleted = try await environment.repository.deleteGoal(goal.id, profileId: profileId)
         return GoalUndoToken(profileId: profileId, goal: deleted?.goal ?? goal, createdAt: deleted?.createdAt)
     }
@@ -56,7 +56,7 @@ extension AppModel {
     /// account `VoiceMapper.buy` picks, then the goal closes. Nil, and the goal stays, when no
     /// account can pay.
     func buyGoal(_ goal: Goal) async throws -> GoalPurchaseOutcome? {
-        let profileId = try goalsProfileId()
+        let profileId = try profileOnScreen()
         let repository = environment.repository
         let consider = Consider(title: goal.name, amountMinor: goal.targetMinor, currency: goal.currency)
         guard let operationId = try await repository.buy(consider, profileId: profileId) else { return nil }
@@ -67,7 +67,7 @@ extension AppModel {
 
     /// Takes the wish off the list, waiting or decided; nil when there was no such wish.
     func deleteWish(_ id: UUID) async throws -> WishUndoToken? {
-        let profileId = try goalsProfileId()
+        let profileId = try profileOnScreen()
         let wish = try await environment.repository.deleteWish(id, profileId: profileId)
         return wish.map { WishUndoToken(profileId: profileId, wish: $0) }
     }
@@ -81,12 +81,5 @@ extension AppModel {
     func markGoalCelebrated(_ goalId: UUID) {
         guard let profileId = data?.profile.id else { return }
         environment.deviceSettings.update { $0.celebratedGoalId[profileId] = goalId }
-    }
-
-    /// `profileOnScreen` is private to `AppModel`; the rule is the same: the profile whose books
-    /// are on screen.
-    private func goalsProfileId() throws -> UUID {
-        guard let id = data?.profile.id else { throw AppModelError.noProfileOpen }
-        return id
     }
 }

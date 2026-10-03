@@ -151,7 +151,7 @@ final class GoalsUITests: XCTestCase {
         alert.buttons["Купить"].tap()
 
         // The toast says what was bought; the cushion is the main goal now.
-        let toast = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Велосипед · 100\u{00A0}₽")).firstMatch
+        let toast = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Велосипед · 100 ₽")).firstMatch
         XCTAssertTrue(toast.waitForExistence(timeout: 5))
         XCTAssertTrue(toast.label.contains("ч работы"), toast.label)
         XCTAssertTrue(eventually { hero.label.hasPrefix("Подушка. ") }, hero.label)

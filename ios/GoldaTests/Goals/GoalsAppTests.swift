@@ -96,7 +96,7 @@ import Testing
         #expect(after.goals.first?.isMain == true)
         #expect(outcome.impact?.costRub == 30_000_000)
         let report = GoalPurchaseReport(goal: cushion, impact: outcome.impact, base: after.base)
-        #expect(report.text(in: F.ru).hasPrefix("Подушка · 300\u{202F}000\u{00A0}₽\n≈ "))
+        #expect(report.text(in: F.ru).hasPrefix("Подушка · 300\u{202F}000 ₽\n≈ "))
         #expect(report.text(in: F.ru).contains("ч работы · перерасход "))
     }
 

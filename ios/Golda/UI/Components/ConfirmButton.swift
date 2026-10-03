@@ -25,9 +25,11 @@ private struct ConfirmLabel: View {
             Text(verbatim: title)
                 .foregroundStyle(.white)
         } else {
-            // The system's grey capsule and ink, so it reads as unavailable rather than as a
-            // second, plainer button.
+            // The system's grey capsule, so it reads as unavailable rather than as a second,
+            // plainer button. The ink is set too: left to the toolbar, it is black on the dark
+            // grey capsule in the dark theme and white on the light grey one in the light theme.
             Text(verbatim: title)
+                .foregroundStyle(Theme.Color.muted)
         }
     }
 }

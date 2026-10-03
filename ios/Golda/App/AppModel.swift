@@ -333,7 +333,8 @@ final class AppModel {
         }
     }
 
-    private func profileOnScreen() throws -> UUID {
+    /// The profile whose books are on screen: every change to the books goes there (D23).
+    func profileOnScreen() throws -> UUID {
         guard let id = data?.profile.id else { throw AppModelError.noProfileOpen }
         return id
     }

@@ -62,6 +62,14 @@ struct MainTabs: View {
         .onChange(of: selection) { _, tab in
             if tab != .accounts { isReconciling = false }
         }
+        // One toast at a time above the mic: what the voice says and what the screens report float
+        // in the same place, so the newer one replaces the other instead of covering it.
+        .onChange(of: toast?.id) { _, id in
+            if id != nil { mic.toast = nil }
+        }
+        .onChange(of: mic.toast?.id) { _, id in
+            if id != nil { toast = nil }
+        }
         // The bar stays whole. On iOS 26.2 `.onScrollDown` folds it on the way down but opens it
         // again only back at the very top or on a tap, never on a scroll up: a plain UIKit
         // `UITabBarController` with a table does the same, so it is the system, not this layout.

@@ -5,8 +5,7 @@ import SwiftUI
 struct ProfileMenu: View {
     @Environment(AppModel.self) private var model
     @Environment(AppRouter.self) private var router
-    @State private var isNaming = false
-    @State private var newName = ""
+    @State private var naming: ProfileNameRequest?
 
     var body: some View {
         Menu {
@@ -18,8 +17,7 @@ struct ProfileMenu: View {
             .pickerStyle(.inline)
             Section {
                 Button("New profile", systemImage: "plus") {
-                    newName = ""
-                    isNaming = true
+                    naming = .create
                 }
                 .accessibilityIdentifier("profileMenu.new")
                 Button("Manage profiles", systemImage: "person.crop.circle") {
@@ -45,23 +43,11 @@ struct ProfileMenu: View {
         .accessibilityLabel(Text("Profile: \(name)"))
         .accessibilityHint(Text("Switches the profile the whole app shows"))
         .accessibilityIdentifier("profileMenu")
-        .alert("New profile", isPresented: $isNaming) {
-            TextField("Name", text: $newName)
-                .textInputAutocapitalization(.sentences)
-            Button("Cancel", role: .cancel) {}
-            // The confirm role and the default shortcut make it the alert's preferred button, filled
-            // with the system blue (D34).
-            Button("Create", role: .confirm, action: create)
-                .keyboardShortcut(.defaultAction)
-                .disabled(trimmedName.isEmpty)
-        } message: {
-            Text("Each profile keeps its own accounts, goals and budget.")
-        }
+        // The same alert as "+ New profile" on the profiles screen; from here the profile opens at once.
+        .profileNameAlert($naming) { name in create(name) }
     }
 
     private var name: String { model.activeProfile?.name ?? "" }
-
-    private var trimmedName: String { newName.trimmingCharacters(in: .whitespacesAndNewlines) }
 
     private var activeProfile: Binding<UUID?> {
         Binding(
@@ -70,9 +56,7 @@ struct ProfileMenu: View {
         )
     }
 
-    private func create() {
-        let name = trimmedName
-        guard !name.isEmpty else { return }
+    private func create(_ name: String) {
         Task {
             // A failed write leaves the list as it was, and the menu offers the same again.
             _ = try? await model.createProfile(name: name)

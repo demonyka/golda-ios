@@ -222,9 +222,8 @@ final class SettingsUITests: XCTestCase {
         app.navigationBars["Licences"].buttons.element(boundBy: 0).tap()
         XCTAssertTrue(licences.waitForExistence(timeout: 5))
 
-        // The profiles screen takes the place of the settings.
-        app.swipeDown(velocity: .fast)
-        app.swipeDown(velocity: .fast)
+        // The profiles screen takes the place of the settings. `reveal` finds the row from where
+        // the licences left the list; a fast swipe down that reached the top pulled the sheet away.
         let profiles = app.buttons["settings.profiles"]
         reveal(profiles, in: app)
         XCTAssertTrue(profiles.label.contains("Personal"), profiles.label)

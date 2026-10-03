@@ -381,6 +381,23 @@
         }
       }
     },
+    "Done" : {
+      "comment" : "Closes the calendar of the operation form, keeping the day it shows.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Готово"
+          }
+        }
+      }
+    },
     "Entry" : {
       "comment" : "What a deleted operation with neither a note nor a category is called in the toast.",
       "localizations" : {

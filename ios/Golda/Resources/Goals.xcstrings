@@ -872,23 +872,6 @@
         }
       }
     },
-    "left for today %@" : {
-      "comment" : "After buying a goal: what is left of today’s budget.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "left for today %@"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "на сегодня осталось %@"
-          }
-        }
-      }
-    },
     "of %@" : {
       "comment" : "A goal’s row: the goal’s amount after its percent, “110 % · of 300 000 ₽”.",
       "localizations" : {
@@ -902,23 +885,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "из %@"
-          }
-        }
-      }
-    },
-    "over budget by %@" : {
-      "comment" : "After buying a goal: today’s budget is overspent by this much.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "over budget by %@"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "перерасход %@"
           }
         }
       }
@@ -987,23 +953,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "«%@» перестанет быть главной."
-          }
-        }
-      }
-    },
-    "≈ %@ h of work" : {
-      "comment" : "After buying a goal: what it cost in hours of work, “≈ 88,9 h of work”.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "≈ %@ h of work"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "≈ %@ ч работы"
           }
         }
       }

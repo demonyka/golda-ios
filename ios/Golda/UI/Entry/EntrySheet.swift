@@ -192,17 +192,23 @@ private struct EntryForm: View {
         .padding(.top, Theme.Gap.l)
     }
 
-    /// The account and the day side by side; at the accessibility sizes one under the other.
+    /// The account and the day side by side when both fit whole; otherwise, as with a long name
+    /// ("Мультивалютная GEL · ₾") or at the accessibility sizes, one under the other, so the
+    /// account is never cut to "Мультив…я GEL".
     private var pills: some View {
-        let layout = dynamicTypeSize.isAccessibilitySize
-            ? AnyLayout(VStackLayout(alignment: .leading, spacing: Theme.Gap.s))
-            : AnyLayout(HStackLayout(spacing: Theme.Gap.s))
-        return layout {
-            // The account's name gives way; the day is short and always whole.
-            EntryAccountPill(accounts: form.accounts, account: form.account) { form.pickAccount($0) }
-            EntryDatePill(date: $form.date, today: form.today, zone: data.zone)
-                .fixedSize(horizontal: !dynamicTypeSize.isAccessibilitySize, vertical: false)
-            if !dynamicTypeSize.isAccessibilitySize { Spacer(minLength: 0) }
+        let account = EntryAccountPill(accounts: form.accounts, account: form.account) { form.pickAccount($0) }
+        let day = EntryDatePill(date: $form.date, today: form.today, zone: data.zone)
+        return ViewThatFits(in: .horizontal) {
+            HStack(spacing: Theme.Gap.s) {
+                account.fixedSize(horizontal: true, vertical: false)
+                day.fixedSize(horizontal: true, vertical: false)
+                Spacer(minLength: 0)
+            }
+            VStack(alignment: .leading, spacing: Theme.Gap.s) {
+                // A name too long for a line of its own still gives way rather than overflow.
+                account
+                day.fixedSize(horizontal: !dynamicTypeSize.isAccessibilitySize, vertical: false)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
