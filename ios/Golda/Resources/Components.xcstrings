@@ -1,13 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Listening…" : {
-      "comment" : "Mic accessory while it records.",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Listening…" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Слушаю…" } }
-      }
-    },
     "Listening. Tap when done" : {
       "comment" : "VoiceOver label of the mic while it records.",
       "localizations" : {
@@ -16,7 +9,7 @@
       }
     },
     "Say it" : {
-      "comment" : "The label of the mic, the one main action of the app.",
+      "comment" : "VoiceOver label of the idle mic, the one main action of the app.",
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Say it" } },
         "ru" : { "stringUnit" : { "state" : "translated", "value" : "Сказать" } }
@@ -37,7 +30,7 @@
       }
     },
     "Working it out…" : {
-      "comment" : "Mic accessory and VoiceOver label while the note is being understood.",
+      "comment" : "VoiceOver label of the mic while the note is being understood.",
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Working it out…" } },
         "ru" : { "stringUnit" : { "state" : "translated", "value" : "Разбираю…" } }

@@ -25,10 +25,9 @@ enum AppTab: Hashable, CaseIterable {
     }
 }
 
-/// The tabs of the open profile, with the microphone in the layout under trial (O4).
+/// The tabs of the open profile, each with the floating mic.
 struct MainTabs: View {
     let data: AppData
-    let micLayout: MicLayout
     let mic: any MicModel
     @State private var selection = AppTab.home
 
@@ -36,24 +35,28 @@ struct MainTabs: View {
         TabView(selection: $selection) {
             ForEach(AppTab.allCases, id: \.self) { tab in
                 Tab(value: tab) {
-                    TabRoot(tab: tab, data: data, micLayout: micLayout, mic: mic)
+                    TabRoot(tab: tab, data: data, mic: mic)
                 } label: {
                     Label { Text(tab.title) } icon: { Image(systemName: tab.symbol) }
                 }
             }
         }
-        .modifier(MicAccessoryPlacement(layout: micLayout, mic: mic))
+        // The bar stays whole. On iOS 26.2 `.onScrollDown` folds it on the way down but opens it
+        // again only back at the very top or on a tap, never on a scroll up: a plain UIKit
+        // `UITabBarController` with a table does the same, so it is the system, not this layout.
+        // A half-hidden bar that a scroll up does not bring back reads as broken, and the mic
+        // above it has no reason to move.
+        .tabBarMinimizeBehavior(.never)
         // Graphite is what is picked: the selected tab, toggles, the cursor (DESIGN.md, "Цвет").
         .tint(Theme.Color.graphite)
     }
 }
 
-/// One tab: its own navigation stack with the shared toolbar, its own undo toast, and in the
-/// floating layout the mic. The screens replace the placeholders in steps 2a to 2d.
+/// One tab: its own navigation stack with the shared toolbar, and on its screen an undo toast and
+/// the mic. The screens replace the placeholders in steps 2a to 2d.
 private struct TabRoot: View {
     let tab: AppTab
     let data: AppData
-    let micLayout: MicLayout
     let mic: any MicModel
 
     @Environment(AppModel.self) private var model
@@ -62,14 +65,14 @@ private struct TabRoot: View {
     var body: some View {
         NavigationStack {
             screen
+                // Inside the mic's inset, so the toast floats above the mic and the tab bar.
+                .undoToast($toast)
+                .environment(\.showUndoToast, ShowUndoToastAction { toast = $0 })
+                // On the screen, not around the stack, so its list ends above the mic (`MicPlacement`).
+                .modifier(MicPlacement(mic: mic))
                 .navigationTitle(Text(tab.title))
                 .toolbar { MainToolbar() }
         }
-        // Inside the tab view, so the toast floats above the tab bar and the accessory; inside the
-        // floating mic's inset, so it floats above that too.
-        .undoToast($toast)
-        .environment(\.showUndoToast, ShowUndoToastAction { toast = $0 })
-        .modifier(MicFloatingPlacement(layout: micLayout, mic: mic))
     }
 
     @ViewBuilder private var screen: some View {
@@ -84,7 +87,7 @@ private struct TabRoot: View {
     }
 }
 
-/// Shows an undo toast over the current tab: `@Environment(\.showUndoToast) var showUndoToast`,
+/// Shows an undo toast over the current tab's screen: `@Environment(\.showUndoToast) var showUndoToast`,
 /// then `showUndoToast(UndoToast(...) { ... })`. A new toast replaces the one on screen.
 struct ShowUndoToastAction {
     let show: @MainActor (UndoToast) -> Void
@@ -93,7 +96,8 @@ struct ShowUndoToastAction {
 }
 
 extension EnvironmentValues {
-    /// Nothing happens outside a tab, where no toast host is.
+    /// Nothing happens where no toast host is above: a tab's screen has one, and a page pushed over
+    /// it brings its own, since the screen's toast would show under the page.
     @Entry var showUndoToast: ShowUndoToastAction = ShowUndoToastAction { _ in }
 }
 

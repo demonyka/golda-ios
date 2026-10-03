@@ -22,7 +22,7 @@ struct GoldaApp: App {
 
     var body: some Scene {
         WindowGroup {
-            RootView(micLayout: options.micLayout, mic: mic)
+            RootView(mic: mic)
                 .environment(model)
                 .task {
                     // A unit-test host stays idle: the tests build and drive their own models.

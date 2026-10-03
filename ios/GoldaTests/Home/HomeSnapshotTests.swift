@@ -9,7 +9,7 @@ import UIKit
 
 /// Home as the lead sees it in states the sample life never reaches on its own: today overspent,
 /// with a credit card's grace period running out. The whole shell is drawn in a real window of the
-/// hosting app (the tab bar, the accessory and the toolbar's glass need one) and saved to /tmp; the
+/// hosting app (the tab bar, the mic and the toolbar's glass need one) and saved to /tmp; the
 /// checks are only that the books are in that state and that the picture was taken.
 @MainActor @Suite(.timeLimit(.minutes(1))) struct HomeSnapshotTests {
     static let directory = URL(fileURLWithPath: "/tmp/golda-shots/H", isDirectory: true)
@@ -34,13 +34,11 @@ import UIKit
         #expect(hero.isOverspent)
         #expect(hero.graceWarnings.map(\.daysLeft) == [2])
 
-        for layout in [MicLayout.accessory, .floating] {
-            for style in [UIUserInterfaceStyle.light, .dark] {
-                try await windowImage("overspent-\(layout.rawValue)", style: style) {
-                    RootView(micLayout: layout, mic: StubMicModel())
-                        .environment(harness.model)
-                        .environment(\.locale, Locale(identifier: "ru"))
-                }
+        for style in [UIUserInterfaceStyle.light, .dark] {
+            try await windowImage("overspent", style: style) {
+                RootView(mic: StubMicModel())
+                    .environment(harness.model)
+                    .environment(\.locale, Locale(identifier: "ru"))
             }
         }
     }

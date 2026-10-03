@@ -106,9 +106,9 @@ struct UndoToastView: View {
 
 /// Shows the toast bound to `toast` above the bottom bar and hides it after its time.
 ///
-/// Apply it to the root view of a tab or screen *inside* the `TabView`: the tab bar and the bottom
-/// accessory are then part of that view's safe area, and the toast floats above both. Setting the
-/// binding to a new toast replaces the one on screen and restarts the time.
+/// Apply it to a screen *inside* the `TabView`, and on a tab's screen inside the mic's inset: the
+/// tab bar and the mic are then part of that view's safe area, and the toast floats above both.
+/// Setting the binding to a new toast replaces the one on screen and restarts the time.
 private struct UndoToastHost: ViewModifier {
     @Binding var toast: UndoToast?
 

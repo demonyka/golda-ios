@@ -10,7 +10,7 @@ import Testing
         LaunchOptions(arguments: ["Golda"] + arguments, environment: environment)
     }
 
-    @Test func noArgumentsMeanTheRealAppWithTheAccessoryMic() {
+    @Test func noArgumentsMeanTheRealApp() {
         #expect(options([]) == LaunchOptions())
     }
 
@@ -26,14 +26,6 @@ import Testing
         let parsed = options(["-golda.inMemory", "-golda.samples"])
         #expect(parsed.inMemory)
         #expect(parsed.command == .samples)
-    }
-
-    @Test func theMicLayoutComesWithAnEqualsSignOrAsAPair() {
-        #expect(options(["-golda.mic=floating"]).micLayout == .floating)
-        #expect(options(["-golda.mic", "floating"]).micLayout == .floating)
-        #expect(options(["-golda.mic=accessory"]).micLayout == .accessory)
-        #expect(options(["-golda.mic=sideways"]).micLayout == .accessory)
-        #expect(options(["-golda.mic"]).micLayout == .accessory)
     }
 
     @Test func theTestHostIsRecognised() {

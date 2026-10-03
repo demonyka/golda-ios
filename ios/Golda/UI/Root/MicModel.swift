@@ -13,7 +13,7 @@ protocol MicModel: AnyObject, Observable {
 }
 
 /// Stage 2a's stand-in: no audio, no network. Each tap moves the mic on, idle → recording →
-/// thinking → idle, so both layouts can be tried in every state.
+/// thinking → idle, so the mic can be tried in every state.
 @MainActor @Observable
 final class StubMicModel: MicModel {
     private(set) var state = MicState.idle

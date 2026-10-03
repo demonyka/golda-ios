@@ -205,11 +205,7 @@ import UIKit
         try shoot("mic") {
             VStack(spacing: Theme.Gap.l) {
                 ForEach([MicState.idle, .recording, .thinking], id: \.self) { state in
-                    VStack(spacing: Theme.Gap.m) {
-                        MicAccessoryContent(state: state, level: 0.1) {}
-                            .background(Theme.Color.card, in: .capsule)
-                        MicFloatingButton(state: state, level: 0.1) {}
-                    }
+                    MicFloatingButton(state: state, level: 0.1) {}
                 }
             }
         }

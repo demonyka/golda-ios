@@ -11,21 +11,12 @@ enum LaunchCommand: String, CaseIterable, Sendable {
     case reset
 }
 
-/// Where the microphone sits while stage 2a compares the two layouts (O4 in `DECISIONS.md`).
-enum MicLayout: String, CaseIterable, Sendable {
-    /// A wide button in the tab view's bottom accessory, above the tab bar.
-    case accessory
-    /// A round glass button floating above the tab bar.
-    case floating
-}
-
 /// What the process was launched with. Debug builds read the `-golda.*` arguments; a release
 /// build ignores them, so no argument can erase a real user's data.
 struct LaunchOptions: Equatable, Sendable {
     var command: LaunchCommand?
     /// A throwaway database and settings: UI tests start from nothing and leave nothing behind.
     var inMemory = false
-    var micLayout = MicLayout.accessory
     /// The process hosts the unit tests: the tests build their own models, so the app must neither
     /// touch the real database nor go to the network.
     var isHostingTests = false
@@ -34,15 +25,13 @@ struct LaunchOptions: Equatable, Sendable {
         LaunchOptions(arguments: ProcessInfo.processInfo.arguments, environment: ProcessInfo.processInfo.environment)
     }
 
-    init(command: LaunchCommand? = nil, inMemory: Bool = false, micLayout: MicLayout = .accessory, isHostingTests: Bool = false) {
+    init(command: LaunchCommand? = nil, inMemory: Bool = false, isHostingTests: Bool = false) {
         self.command = command
         self.inMemory = inMemory
-        self.micLayout = micLayout
         self.isHostingTests = isHostingTests
     }
 
-    /// Flags come alone (`-golda.samples`); the mic layout comes as `-golda.mic=floating` or as the
-    /// pair `-golda.mic floating`, the form Xcode's scheme editor and `simctl launch` pass.
+    /// Every argument is a flag on its own: `-golda.samples`, `-golda.inMemory`.
     init(arguments: [String], environment: [String: String]) {
         isHostingTests = environment["XCTestConfigurationFilePath"] != nil || environment["XCTestBundlePath"] != nil
         #if DEBUG
@@ -50,15 +39,6 @@ struct LaunchOptions: Equatable, Sendable {
         // One command per launch, checked in the order of Android's `when`.
         command = [LaunchCommand.samples, .demo, .reset].first { flags.contains("-golda.\($0.rawValue)") }
         inMemory = flags.contains("-golda.inMemory")
-        micLayout = Self.value(of: "-golda.mic", in: arguments).flatMap(MicLayout.init(rawValue:)) ?? .accessory
         #endif
-    }
-
-    private static func value(of name: String, in arguments: [String]) -> String? {
-        for (index, argument) in arguments.enumerated() {
-            if argument.hasPrefix(name + "=") { return String(argument.dropFirst(name.count + 1)) }
-            if argument == name, arguments.indices.contains(index + 1) { return arguments[index + 1] }
-        }
-        return nil
     }
 }

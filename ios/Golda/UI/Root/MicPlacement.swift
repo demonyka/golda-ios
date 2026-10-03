@@ -1,48 +1,21 @@
 import SwiftUI
 
-// Two places for the microphone, the app's main action, tried side by side in stage 2a (O4, S3).
-// Both draw the gold mic of the components and are driven by the same `MicModel`.
-
-/// The accessory layout: the wide mic in the tab view's bottom accessory, above the tab bar; it
-/// folds into the bar on scroll.
-struct MicAccessoryPlacement: ViewModifier {
-    let layout: MicLayout
+/// The microphone, the app's main action: the round gold button at the thumb, above the tab bar.
+///
+/// It goes on a tab's own screen, inside the navigation stack, as a bottom safe-area inset. There
+/// the system insets the screen's list by the button's real height, so the last rows scroll clear
+/// of it; an inset put around the stack instead never reaches the lists in it (iOS 26.2), and they
+/// end under the mic. Pushed pages carry no mic, as on Android, where a page covers the toolbar.
+struct MicPlacement: ViewModifier {
     let mic: any MicModel
 
     func body(content: Content) -> some View {
-        switch layout {
-        case .accessory:
-            content
-                .tabViewBottomAccessory {
-                    MicAccessoryContent(state: mic.state, level: mic.level) { mic.tap() }
-                        .accessibilityIdentifier("mic")
-                }
-                .tabBarMinimizeBehavior(.onScrollDown)
-        case .floating:
-            content
-        }
-    }
-}
-
-/// The floating layout: the round gold mic at the thumb, above the tab bar. It sits in the bottom
-/// safe area of each tab's stack, so lists stop short of it, an undo toast inside floats above it,
-/// and it stays put while screens are pushed.
-struct MicFloatingPlacement: ViewModifier {
-    let layout: MicLayout
-    let mic: any MicModel
-
-    func body(content: Content) -> some View {
-        switch layout {
-        case .accessory:
-            content
-        case .floating:
-            content
-                .safeAreaInset(edge: .bottom, alignment: .trailing, spacing: 0) {
-                    MicFloatingButton(state: mic.state, level: mic.level) { mic.tap() }
-                        .accessibilityIdentifier("mic")
-                        .padding(.trailing, Theme.Gap.m)
-                        .padding(.bottom, Theme.Gap.s)
-                }
-        }
+        content
+            .safeAreaInset(edge: .bottom, alignment: .trailing, spacing: 0) {
+                MicFloatingButton(state: mic.state, level: mic.level) { mic.tap() }
+                    .accessibilityIdentifier("mic")
+                    .padding(.trailing, Theme.Gap.m)
+                    .padding(.bottom, Theme.Gap.s)
+            }
     }
 }

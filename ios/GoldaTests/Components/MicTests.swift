@@ -63,11 +63,6 @@ import Testing
 }
 
 @Suite struct MicStateTests {
-    @Test func eachStateShowsItsOwnSymbolOrSpinner() {
-        #expect(MicState.idle.symbol == Symbols.mic)
-        #expect(MicState.recording.symbol == Symbols.stop)
-    }
-
     @Test func onlyAnIdleMicHasAHint() {
         #expect(MicState.idle.accessibilityHint != nil)
         #expect(MicState.recording.accessibilityHint == nil)

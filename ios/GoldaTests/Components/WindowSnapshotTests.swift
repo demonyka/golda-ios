@@ -4,9 +4,9 @@ import UIKit
 
 @testable import Golda
 
-/// `ImageRenderer` cannot draw UIKit-backed pieces (`ProgressView`, Liquid Glass, the tab bar and its
-/// accessory). These shots put the views in a real window of the hosting app and take its picture,
-/// so the lead sees them as they will look. The PNGs go to /tmp and are never committed.
+/// `ImageRenderer` cannot draw UIKit-backed pieces (`ProgressView`, Liquid Glass, the tab bar).
+/// These shots put the views in a real window of the hosting app and take its picture, so the lead
+/// sees them as they will look. The PNGs go to /tmp and are never committed.
 @Suite @MainActor struct WindowSnapshotTests {
     private func windowImage<V: View>(
         _ name: String,
@@ -37,11 +37,7 @@ import UIKit
             try await windowImage("mic", size: CGSize(width: 390, height: 640), style: style) {
                 VStack(spacing: Theme.Gap.l) {
                     ForEach([MicState.idle, .recording, .thinking], id: \.self) { state in
-                        VStack(spacing: Theme.Gap.m) {
-                            MicAccessoryContent(state: state, level: 0.1) {}
-                                .glassEffect(.regular, in: .capsule)
-                            MicFloatingButton(state: state, level: 0.1) {}
-                        }
+                        MicFloatingButton(state: state, level: 0.1) {}
                     }
                 }
                 .padding(Theme.Gap.m)
@@ -51,18 +47,20 @@ import UIKit
         }
     }
 
-    /// The accessory at home: a TabView with four tabs, the wide mic and a toast over a list.
-    @Test func tabViewWithAccessoryAndToast() async throws {
+    /// The mic at home: a TabView with four tabs, the floating mic and a toast above it over a list.
+    @Test func tabViewWithMicAndToast() async throws {
         for style in [UIUserInterfaceStyle.light, .dark] {
-            try await windowImage("tabs", style: style) { TabsHarness(state: .idle) }
-            try await windowImage("tabs-recording", style: style) { TabsHarness(state: .recording) }
+            try await windowImage("tabs", style: style) { TabsHarness(mic: StubMicModel()) }
+            let recording = StubMicModel()
+            recording.tap()
+            try await windowImage("tabs-recording", style: style) { TabsHarness(mic: recording) }
         }
     }
 }
 
 /// Stands in for the app shell in the window shots only.
 private struct TabsHarness: View {
-    var state: MicState
+    var mic: any MicModel
     @State private var toast: UndoToast? = UndoToast("Кофе −8 ₾\nИз отложенного", length: .long) {}
 
     var body: some View {
@@ -93,9 +91,10 @@ private struct TabsHarness: View {
                     }
                     .background(Theme.Color.page)
                     .undoToast($toast)
+                    .modifier(MicPlacement(mic: mic))
                 }
             }
         }
-        .tabViewBottomAccessory { MicAccessoryContent(state: state, level: 0.1) {} }
+        .tabBarMinimizeBehavior(.never)
     }
 }

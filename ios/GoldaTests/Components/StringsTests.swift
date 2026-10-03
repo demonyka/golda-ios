@@ -31,7 +31,7 @@ import Testing
 
     @Test func theKeysTheCodeAsksForAreInTheTable() throws {
         let english = try #require(table("en"))
-        let used = ["Say it", "Listening…", "Working it out…", "Listening. Tap when done", "Starts recording a note", "Undo"]
+        let used = ["Say it", "Working it out…", "Listening. Tap when done", "Starts recording a note", "Undo"]
         for key in used {
             #expect(english[key] != nil, "missing “\(key)”")
         }
@@ -41,7 +41,7 @@ import Testing
     @Test func theMicSaysItInBothLanguages() throws {
         let russian = try #require(table("ru"))
         #expect(russian["Say it"] == "Сказать")
-        #expect(russian["Listening…"] == "Слушаю…")
+        #expect(russian["Listening. Tap when done"] == "Слушаю. Нажми, когда закончишь")
         #expect(russian["Working it out…"] == "Разбираю…")
         #expect(russian["Undo"] == "Отменить")
     }

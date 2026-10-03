@@ -3,7 +3,6 @@ import SwiftUI
 /// The welcome screen until there is a profile and onboarding is done, then the tabs.
 struct RootView: View {
     @Environment(AppModel.self) private var model
-    let micLayout: MicLayout
     let mic: any MicModel
 
     var body: some View {
@@ -14,7 +13,7 @@ struct RootView: View {
         case .welcome:
             WelcomeView()
         case .main(let data):
-            MainTabs(data: data, micLayout: micLayout, mic: mic)
+            MainTabs(data: data, mic: mic)
         }
     }
 }
@@ -32,21 +31,14 @@ extension AppModel {
 
 #Preview("Samples") {
     @Previewable @State var model = AppModel.preview()
-    RootView(micLayout: .accessory, mic: StubMicModel())
-        .environment(model)
-        .task { await model.start(command: .samples) }
-}
-
-#Preview("Floating mic") {
-    @Previewable @State var model = AppModel.preview()
-    RootView(micLayout: .floating, mic: StubMicModel())
+    RootView(mic: StubMicModel())
         .environment(model)
         .task { await model.start(command: .samples) }
 }
 
 #Preview("Welcome") {
     @Previewable @State var model = AppModel.preview()
-    RootView(micLayout: .accessory, mic: StubMicModel())
+    RootView(mic: StubMicModel())
         .environment(model)
         .task { await model.start() }
 }
