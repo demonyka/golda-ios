@@ -163,6 +163,8 @@ struct MicBadge: View {
                 ProgressView()
                     .controlSize(.small)
                     .tint(Theme.Color.onGold)
+                    // The spinner is UIKit underneath; the tap belongs to the button around it.
+                    .allowsHitTesting(false)
             }
         }
         .frame(width: diameter, height: diameter)
@@ -191,6 +193,15 @@ struct MicFloatingButton: View {
                 .contentShape(.circle)
         }
         .buttonStyle(.plain)
+        .background {
+            // Under the button rather than in its label: the spinner is UIKit underneath and, in
+            // the label, it would take the tap that ends "thinking".
+            if state == .thinking {
+                ProgressView()
+                    .tint(Theme.Color.onGold)
+                    .allowsHitTesting(false)
+            }
+        }
         .modifier(GoldDisc(reduceTransparency: reduceTransparency))
         .accessibilityLabel(Text(state.accessibilityLabel))
         .accessibilityHint(state.accessibilityHint.map { Text($0) } ?? Text(verbatim: ""))
@@ -212,7 +223,8 @@ struct MicFloatingButton: View {
                     .frame(width: 13, height: 13)
             }
         case .thinking:
-            ProgressView().tint(Theme.Color.onGold)
+            // The spinner is drawn under the button, see `body`.
+            Color.clear
         }
     }
 }

@@ -1,4 +1,5 @@
 import Foundation
+import GoldaCore
 import GoldaData
 
 /// The composition root: every dependency the app runs on, built once at launch. Screens never
@@ -9,6 +10,9 @@ struct AppEnvironment: Sendable {
     let secrets: any SecretStore
     let repository: Repository
     let ratesSource: any RatesSource
+    /// Epoch milliseconds now, the same clock the repository stamps operations with, so "today" on
+    /// screen is the day the books were written on (and a test can stop it).
+    let clock: @Sendable () -> Int64
     /// Where "today" is; read on each use, since the phone travels.
     let zone: @Sendable () -> TimeZone
 
@@ -25,11 +29,14 @@ struct AppEnvironment: Sendable {
         self.secrets = secrets
         self.ratesSource = ratesSource
         self.zone = zone
-        if let clock {
-            repository = Repository(database: database, deviceSettings: deviceSettings, secrets: secrets, clock: clock, zone: zone)
-        } else {
-            repository = Repository(database: database, deviceSettings: deviceSettings, secrets: secrets, zone: zone)
-        }
+        let clock = clock ?? { Int64(Date().timeIntervalSince1970 * 1000) }
+        self.clock = clock
+        repository = Repository(database: database, deviceSettings: deviceSettings, secrets: secrets, clock: clock, zone: zone)
+    }
+
+    /// The day it is now where the phone is.
+    func today() -> LocalDate {
+        LocalDate(epochMillis: clock(), in: zone())
     }
 
     /// The real thing: the database in Application Support, the settings in the standard defaults,

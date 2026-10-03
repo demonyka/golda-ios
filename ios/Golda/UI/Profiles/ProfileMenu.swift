@@ -26,15 +26,22 @@ struct ProfileMenu: View {
                     .accessibilityIdentifier("profileMenu.manage")
             }
         } label: {
-            HStack(spacing: 4) {
+            // The name in the text ink and the chevron quieter, the way the toolbar's other glyphs
+            // sit: graphite and gold stay for what is picked and for the mic.
+            HStack(spacing: Theme.Gap.xs) {
                 Text(verbatim: name)
-                    .fontWeight(.semibold)
-                Image(systemName: "chevron.down")
+                    .font(.headline)
+                    .foregroundStyle(Theme.Color.text)
+                    .lineLimit(1)
+                Image(systemName: Symbols.profileMenu)
                     .font(.footnote.weight(.semibold))
+                    .foregroundStyle(Theme.Color.muted)
                     .accessibilityHidden(true)
             }
+            .padding(.horizontal, Theme.Gap.xs)
         }
         .accessibilityLabel(Text("Profile: \(name)"))
+        .accessibilityHint(Text("Switches the profile the whole app shows"))
         .accessibilityIdentifier("profileMenu")
         .alert("New profile", isPresented: $isNaming) {
             TextField("Name", text: $newName)

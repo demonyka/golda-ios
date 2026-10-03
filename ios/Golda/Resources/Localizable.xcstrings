@@ -1,6 +1,129 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%@ a day" : {
+      "comment" : "Home hero: today's budget share, “2 648 ₽ a day”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ a day"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ в день"
+          }
+        }
+      }
+    },
+    "%lld days" : {
+      "comment" : "A number of days, “3 days”; used inside longer sentences.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld day"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld days"
+                }
+              }
+            }
+          }
+        },
+        "ru" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld дня"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld дней"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld день"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld дня"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld days to payday" : {
+      "comment" : "Home hero: days until the next salary, “8 days to payday”.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld day to payday"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld days to payday"
+                }
+              }
+            }
+          }
+        },
+        "ru" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld дня до зарплаты"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld дней до зарплаты"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld день до зарплаты"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld дня до зарплаты"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "A voice-first money tracker for people who earn in one currency and live in another." : {
       "comment" : "Welcome screen: what the app is, under its name.",
       "localizations" : {
@@ -52,6 +175,40 @@
         }
       }
     },
+    "Ahead of plan by %@" : {
+      "comment" : "VoiceOver, Home hero: today's share is bigger than the pay period started with (▲).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ahead of plan by %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Лучше плана на %@"
+          }
+        }
+      }
+    },
+    "Behind plan by %@" : {
+      "comment" : "VoiceOver, Home hero: today's share is smaller than the pay period started with (▼).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Behind plan by %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Хуже плана на %@"
+          }
+        }
+      }
+    },
     "Cancel" : {
       "comment" : "Button that closes a dialog without changes.",
       "localizations" : {
@@ -65,6 +222,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Отмена"
+          }
+        }
+      }
+    },
+    "Clothes" : {
+      "comment" : "Category.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clothes"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Одежда"
           }
         }
       }
@@ -103,6 +277,74 @@
         }
       }
     },
+    "Eating out" : {
+      "comment" : "Category: cafés and restaurants.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eating out"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кафе"
+          }
+        }
+      }
+    },
+    "Fees" : {
+      "comment" : "Category: bank and ATM fees.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fees"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Комиссии"
+          }
+        }
+      }
+    },
+    "Fun" : {
+      "comment" : "Category: entertainment.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fun"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Развлечения"
+          }
+        }
+      }
+    },
+    "Gift" : {
+      "comment" : "Income category.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gift"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подарок"
+          }
+        }
+      }
+    },
     "Goals" : {
       "comment" : "Tab and screen title: savings goals and the wishlist.",
       "localizations" : {
@@ -116,6 +358,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Цели"
+          }
+        }
+      }
+    },
+    "Groceries" : {
+      "comment" : "Category.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Groceries"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Продукты"
+          }
+        }
+      }
+    },
+    "Health" : {
+      "comment" : "Category.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Health"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Здоровье"
           }
         }
       }
@@ -137,6 +413,23 @@
         }
       }
     },
+    "Housing" : {
+      "comment" : "Category: rent and utilities.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Housing"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Жильё"
+          }
+        }
+      }
+    },
     "Insights" : {
       "comment" : "Tab and screen title: spending analytics.",
       "localizations" : {
@@ -150,6 +443,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Аналитика"
+          }
+        }
+      }
+    },
+    "Interest" : {
+      "comment" : "Income category: interest earned.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interest"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проценты"
           }
         }
       }
@@ -205,6 +515,57 @@
         }
       }
     },
+    "No category" : {
+      "comment" : "Row title of an operation with neither a note nor a category.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No category"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Без категории"
+          }
+        }
+      }
+    },
+    "Nothing yet. Tap the mic and name a purchase, like “shawarma 15 lari”. Or “+” to type it." : {
+      "comment" : "Home with no operations yet: how to record the first one.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing yet. Tap the mic and name a purchase, like “shawarma 15 lari”. Or “+” to type it."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пока пусто. Нажми микрофон и назови трату: «шаурма 15 лари». Или «+», чтобы ввести руками."
+          }
+        }
+      }
+    },
+    "Other" : {
+      "comment" : "Category: anything else, spent or earned.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Прочее"
+          }
+        }
+      }
+    },
     "Personal" : {
       "comment" : "Name of the first profile, created on the first launch.",
       "localizations" : {
@@ -218,6 +579,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Личный"
+          }
+        }
+      }
+    },
+    "Phone" : {
+      "comment" : "Category: phone and internet.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phone"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Связь"
           }
         }
       }
@@ -256,19 +634,70 @@
         }
       }
     },
-    "Say it" : {
-      "comment" : "The microphone button: record a voice note.",
+    "Reconciliation" : {
+      "comment" : "Row title of an operation that brought an account to the bank's balance.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Say it"
+            "value" : "Reconciliation"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Сказать"
+            "value" : "Сверка"
+          }
+        }
+      }
+    },
+    "Safe to spend today" : {
+      "comment" : "Home hero caption over the big number: what can be spent today.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Safe to spend today"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Можно сегодня"
+          }
+        }
+      }
+    },
+    "Salary" : {
+      "comment" : "Income category.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salary"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Зарплата"
+          }
+        }
+      }
+    },
+    "Set aside for payments: %@" : {
+      "comment" : "Home hero: money kept back for payments due before payday.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set aside for payments: %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отложено на платежи: %@"
           }
         }
       }
@@ -303,6 +732,176 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Начать"
+          }
+        }
+      }
+    },
+    "Subscriptions" : {
+      "comment" : "Category.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subscriptions"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подписки"
+          }
+        }
+      }
+    },
+    "Switches the profile the whole app shows" : {
+      "comment" : "VoiceOver hint of the profile menu in the toolbar.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switches the profile the whole app shows"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Переключает профиль во всём приложении"
+          }
+        }
+      }
+    },
+    "Today" : {
+      "comment" : "Heading of today's operations.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сегодня"
+          }
+        }
+      }
+    },
+    "Transfer" : {
+      "comment" : "Row title of a transfer between accounts that has no note.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transfer"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перевод"
+          }
+        }
+      }
+    },
+    "Transport" : {
+      "comment" : "Category.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transport"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Транспорт"
+          }
+        }
+      }
+    },
+    "Travel" : {
+      "comment" : "Category.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Travel"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Путешествия"
+          }
+        }
+      }
+    },
+    "Yesterday" : {
+      "comment" : "Heading of yesterday's operations.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yesterday"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вчера"
+          }
+        }
+      }
+    },
+    "about %@" : {
+      "comment" : "VoiceOver: an approximate amount, “about 1849 Russian rubles”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "about %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "около %@"
+          }
+        }
+      }
+    },
+    "“%@”: the interest-free period ends in %@; pay %@" : {
+      "comment" : "Home hero: a credit card's grace period ends soon. The card's name, “3 days”, then what is owed.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%1$@”: the interest-free period ends in %2$@; pay %3$@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«%1$@»: льготный период кончается через %2$@ — погаси %3$@"
+          }
+        }
+      }
+    },
+    "“%@”: the interest-free period ends today; pay %@" : {
+      "comment" : "Home hero: a credit card's grace period ends today. The card's name, then what is owed.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%1$@”: the interest-free period ends today; pay %2$@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«%1$@»: льготный период кончается сегодня — погаси %2$@"
           }
         }
       }

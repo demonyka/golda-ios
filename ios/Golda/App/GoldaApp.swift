@@ -4,6 +4,8 @@ import SwiftUI
 struct GoldaApp: App {
     private let options: LaunchOptions
     @State private var model: AppModel
+    /// Stage 3 puts the recorder here; until then taps only cycle the states.
+    @State private var mic: any MicModel = StubMicModel()
 
     init() {
         let options = LaunchOptions.current
@@ -20,7 +22,7 @@ struct GoldaApp: App {
 
     var body: some Scene {
         WindowGroup {
-            RootView(micLayout: options.micLayout)
+            RootView(micLayout: options.micLayout, mic: mic)
                 .environment(model)
                 .task {
                     // A unit-test host stays idle: the tests build and drive their own models.

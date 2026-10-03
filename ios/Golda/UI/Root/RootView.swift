@@ -4,17 +4,17 @@ import SwiftUI
 struct RootView: View {
     @Environment(AppModel.self) private var model
     let micLayout: MicLayout
+    let mic: any MicModel
 
     var body: some View {
         switch model.phase {
         case .loading:
-            // A few milliseconds at launch: the launch screen's blank page carries on, where a
-            // spinner would only flash.
-            Color(uiColor: .systemBackground).ignoresSafeArea()
+            // A few milliseconds at launch: a blank page carries on, where a spinner would only flash.
+            Theme.Color.page.ignoresSafeArea()
         case .welcome:
             WelcomeView()
         case .main(let data):
-            MainTabs(data: data, micLayout: micLayout)
+            MainTabs(data: data, micLayout: micLayout, mic: mic)
         }
     }
 }
@@ -32,21 +32,21 @@ extension AppModel {
 
 #Preview("Samples") {
     @Previewable @State var model = AppModel.preview()
-    RootView(micLayout: .accessory)
+    RootView(micLayout: .accessory, mic: StubMicModel())
         .environment(model)
         .task { await model.start(command: .samples) }
 }
 
 #Preview("Floating mic") {
     @Previewable @State var model = AppModel.preview()
-    RootView(micLayout: .floating)
+    RootView(micLayout: .floating, mic: StubMicModel())
         .environment(model)
         .task { await model.start(command: .samples) }
 }
 
 #Preview("Welcome") {
     @Previewable @State var model = AppModel.preview()
-    RootView(micLayout: .accessory)
+    RootView(micLayout: .accessory, mic: StubMicModel())
         .environment(model)
         .task { await model.start() }
 }
