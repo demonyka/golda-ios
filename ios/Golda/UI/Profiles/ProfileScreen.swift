@@ -387,14 +387,16 @@ struct ProfileScreen: View {
         }
     }
 
-    /// Deletes the payment at once and offers "Отменить", which puts it back with the same id.
+    /// Deletes the payment at once and offers "Отменить", which puts it back with the same id. The
+    /// toast stays 10 s, as Android's does for a payment, a goal or an operation: a deletion is
+    /// worth more than the 4 s of a confirmation.
     private func delete(_ obligation: Obligation) {
         let model = model, profileId = profileId
         let message = ObligationForm.deletedMessage(obligation.name, in: locale)
         Task {
             do {
                 let token = try await model.deleteObligation(obligation, profileId: profileId)
-                toast = UndoToast(message) {
+                toast = UndoToast(message, length: .long) {
                     Task {
                         do {
                             try await model.restoreObligation(token)

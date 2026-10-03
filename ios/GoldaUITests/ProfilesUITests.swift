@@ -194,6 +194,10 @@ final class ProfilesUITests: XCTestCase {
         XCTAssertTrue(payment.waitForNonExistence(timeout: 5))
         let undo = app.buttons["Undo"]
         XCTAssertTrue(undo.waitForExistence(timeout: 5))
+        // A deleted payment's toast stays 10 s, as on Android, not the 4 s of a confirmation: still
+        // there after 6, so a slow runner has time to reach it (it did not, at 4).
+        Thread.sleep(forTimeInterval: 6)
+        XCTAssertTrue(undo.exists, "the toast of a deletion is gone after 6 s")
         undo.tap()
         XCTAssertTrue(payment.waitForExistence(timeout: 5))
         XCTAssertTrue(payment.label.hasPrefix("Rent, 500 "), payment.label)

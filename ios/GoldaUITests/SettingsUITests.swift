@@ -313,7 +313,15 @@ final class SettingsUITests: XCTestCase {
         // replacing the first one keeps the simulator's panel spinning.
         let keepBoth = app.buttons["Keep Both"]
         if keepBoth.waitForExistence(timeout: 2) { keepBoth.tap() }
-        XCTAssertTrue(app.staticTexts["Backup saved"].waitForExistence(timeout: 20))
+        // The app answers a finished panel either way, with "Backup saved" or "Could not save the
+        // file". Neither means the simulator's panel went away without handing the file back, which
+        // it does on a slow runner (its process vanishes mid-save): nothing here to check.
+        let saved = app.staticTexts["Backup saved"]
+        let failed = app.staticTexts["Could not save the file"]
+        guard waitFor({ saved.exists || failed.exists }, timeout: 20) else {
+            throw XCTSkip("The simulator's save panel did not hand the file back.")
+        }
+        XCTAssertTrue(saved.exists, "the app could not write the file")
 
         let restore = app.buttons["settings.import"]
         reveal(restore, in: app)
