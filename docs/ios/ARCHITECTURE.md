@@ -73,9 +73,9 @@ app/ …                     Android, эталон; удаляется на эт
 |---|---|
 | `profile` | id, name, sort, incomeHourly, hourlyRate, monthlySalary, taxPercent, hoursPerWeek, payday, markup |
 | `account` | id, profileId, name, currency, type, groupName?, includeInFree, sort, interestRate?, paymentDay?, paymentMinor?, graceUntil?, reconciledAt? |
-| `operation` | id, profileId, type, timestamp, categoryKey?, note, voiceText?, purchaseAmountMinor?, purchaseCurrency?, isEstimate, cbrFrom?, cbrTo?, updatedAt |
+| `operation` | id, profileId, sequence, type, timestamp, categoryKey?, note, voiceText?, purchaseAmountMinor?, purchaseCurrency?, isEstimate, cbrFrom?, cbrTo?, updatedAt |
 | `posting` | id, profileId, operationId, accountId, amountMinor, rubMinor |
-| `obligation`, `goal`, `wish` | как на Android, плюс profileId; id — UUID |
+| `obligation`, `goal`, `wish` | как на Android, плюс profileId; id — UUID. У `goal` ещё `createdAt` — счётчик порядка создания внутри профиля (не время) |
 | `rate` | code, rubPerUnit, date — общие курсы, не синхронизируются |
 
 Категории встроенные (на Android их нельзя изменить): задаются перечислением с ключом, иконкой и названиями в String Catalog. В операции хранится `categoryKey`.
@@ -84,9 +84,11 @@ app/ …                     Android, эталон; удаляется на эт
 
 **Профили.** Первый запуск создаёт профиль «Личный». Профилей может быть сколько угодно; последний профиль удалить нельзя. Удаление профиля стирает его счета, операции, цели, вишлист и платежи (с подтверждением).
 
-**Записи.** Все изменения идут через репозиторий (актор), в транзакции, и завершаются, даже когда экран ушёл. Удаление операции возвращается «Отменить» теми же id. Правка операции обновляет её проводки на месте (id проводок стабильны), чтобы синхронизация видела правку, а не удаление с созданием.
+**Репозиторий.** Все изменения идут через актор `Repository`, каждое в одной транзакции и в границах профиля: проводки привязаны к профилю составными внешними ключами (D26), так что база сама откажет в проводке на чужой счёт. Запись выполняется в неструктурной `Task`, поэтому отмена вызывающего экрана не обрывает сохранение. Правка операции обновляет её проводки на месте (id проводок стабильны), чтобы синхронизация видела правку, а не удаление с созданием. `deleteOperation` возвращает `DeletedOperation`, и «Отменить» через `restoreOperation` возвращает операцию с теми же id и на то же место среди записей с одинаковым временем (для этого и нужен `sequence`, D27). `saveAccount` не трогает `reconciledAt`: его пишет только `reconcile`. `refreshRates` и `ensureSeed` переоценивают проводки со стоимостью 0 ₽ во всех профилях, каждый по своей наценке. `Repository` получает `SecretStore`: «Стереть всё» (`resetAll`) удаляет и ключи API, как `settings.clear()` на Android (D28).
 
-**Бэкап.** JSON `version: 2` со всеми профилями (Codable, `ignoreUnknownKeys`). Импорт читает `version: 1` Android: Int-id → UUID, `categoryId` → `categoryKey`, всё содержимое попадает в новый профиль «Личный», доход, день зарплаты и наценка уходят в него, настройки устройства — в UserDefaults. Файл читается целиком до изменения данных; битый файл ничего не меняет. Ключи API в бэкап не входят.
+Читающие модели отдают данные, не строки: `impact` (часы работы, стоимость, остаток на сегодня), `consider` (`Facts` с `waitHours`), составной `Settings(profile:device:profileId:)`.
+
+**Бэкап.** JSON `version: 2` со всеми профилями (Codable, `ignoreUnknownKeys`, ключи отсортированы, чтобы файлы хорошо сравнивались; проводки вложены в свои операции; порядок создания целей едет отдельным полем `goalCreatedAt`; экспорт пустой базы отклоняется как `nothingToExport`; повторный экспорт после импорта совпадает побайтно). Импорт читает `version: 1` Android: Int-id → UUID, `categoryId` → `categoryKey`, всё содержимое попадает в новый профиль «Личный», доход, день зарплаты и наценка уходят в него, настройки устройства — в UserDefaults. Файл читается целиком до изменения данных; битый файл ничего не меняет. Ключи API в бэкап не входят.
 
 **Файлы.** Голосовая очередь — `Application Support/voice/<epochMillis>.wav` с `isExcludedFromBackup`.
 
