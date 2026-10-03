@@ -1,0 +1,1308 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%@ h/wk" : {
+      "comment" : "Profile screen: hours of work a week, “40 h/wk”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ h/wk"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ ч/нед"
+          }
+        }
+      }
+    },
+    "%@ ≈ %@" : {
+      "comment" : "Profile screen, under “An hour after tax”: last month by name and what its work brought, “September ≈ 158 400 ₽”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ ≈ %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "за %@ ≈ %@"
+          }
+        }
+      }
+    },
+    "%@, active" : {
+      "comment" : "VoiceOver: a profile in the list that is the active one.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@, active"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@, активный"
+          }
+        }
+      }
+    },
+    "%@/h" : {
+      "comment" : "Profile screen: an hourly rate, “1 000 ₽/h”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/h"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/ч"
+          }
+        }
+      }
+    },
+    "%@/mo" : {
+      "comment" : "Profile screen: a monthly salary, “150 000 ₽/mo”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/mo"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/мес"
+          }
+        }
+      }
+    },
+    "%lld accounts" : {
+      "comment" : "A number of accounts, inside the question before a profile is deleted.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld account"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld accounts"
+                }
+              }
+            }
+          }
+        },
+        "ru" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld счёта"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld счетов"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld счёт"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld счёта"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld goals" : {
+      "comment" : "A number of goals, inside the question before a profile is deleted.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld goal"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld goals"
+                }
+              }
+            }
+          }
+        },
+        "ru" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld цели"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld целей"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld цель"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld цели"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld operations" : {
+      "comment" : "A number of operations, inside the question before a profile is deleted.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld operation"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld operations"
+                }
+              }
+            }
+          }
+        },
+        "ru" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld операции"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld операций"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld операция"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld операции"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld payments" : {
+      "comment" : "A number of monthly payments, inside the question before a profile is deleted.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld payment"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld payments"
+                }
+              }
+            }
+          }
+        },
+        "ru" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld платежа"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld платежей"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld платёж"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld платежа"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld wishlist items" : {
+      "comment" : "A number of purchases in the wishlist, inside the question before a profile is deleted.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld wishlist item"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld wishlist items"
+                }
+              }
+            }
+          }
+        },
+        "ru" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld покупки в вишлисте"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld покупок в вишлисте"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld покупка в вишлисте"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld покупки в вишлисте"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "A month without that day pays on its last day." : {
+      "comment" : "Payday sheet: what happens to the 31st in a shorter month.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A month without that day pays on its last day."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В месяце без этого числа зарплата приходит в последний день."
+          }
+        }
+      }
+    },
+    "Active on this phone" : {
+      "comment" : "Profile screen: this profile is the one the whole app shows.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Active on this phone"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Активный на этом телефоне"
+          }
+        }
+      }
+    },
+    "Add" : {
+      "comment" : "Payment form: the main action that adds the payment.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить"
+          }
+        }
+      }
+    },
+    "Add payment" : {
+      "comment" : "VoiceOver: the “+ Payment” row.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add payment"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить платёж"
+          }
+        }
+      }
+    },
+    "Amount" : {
+      "comment" : "Payment form: what VoiceOver calls the amount field.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amount"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сумма"
+          }
+        }
+      }
+    },
+    "An hour after tax" : {
+      "comment" : "Profile screen, income: what one hour of work brings after tax.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An hour after tax"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Час на руки"
+          }
+        }
+      }
+    },
+    "Cancel" : {
+      "comment" : "Closes an alert or a sheet without changes.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отмена"
+          }
+        }
+      }
+    },
+    "Create" : {
+      "comment" : "Name alert: creates the profile.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Создать"
+          }
+        }
+      }
+    },
+    "Currency" : {
+      "comment" : "Payment form: the payment's currency.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Currency"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Валюта"
+          }
+        }
+      }
+    },
+    "Day of the month" : {
+      "comment" : "Payment form: the header over the grid of days.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Day of the month"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Какого числа"
+          }
+        }
+      }
+    },
+    "Delete" : {
+      "comment" : "Confirms deleting a profile with everything in it.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить"
+          }
+        }
+      }
+    },
+    "Delete payment" : {
+      "comment" : "Payment form and row: deletes the payment (it can be undone).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete payment"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить платёж"
+          }
+        }
+      }
+    },
+    "Delete profile" : {
+      "comment" : "Profile screen and list: the action that deletes a profile.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete profile"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить профиль"
+          }
+        }
+      }
+    },
+    "Delete “%@”?" : {
+      "comment" : "Title of the question before a profile is deleted, with its name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete “%@”?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить «%@»?"
+          }
+        }
+      }
+    },
+    "Done" : {
+      "comment" : "Closes the profiles screen, whose changes are already kept.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Готово"
+          }
+        }
+      }
+    },
+    "Each profile keeps its own accounts, goals, payments and budget." : {
+      "comment" : "New profile alert: what a profile is.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Each profile keeps its own accounts, goals, payments and budget."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У каждого профиля свои счета, цели, платежи и бюджет."
+          }
+        }
+      }
+    },
+    "Each profile keeps its own accounts, goals, payments and budget. The menu at the top of every tab switches between them." : {
+      "comment" : "Profiles list: what profiles are and where to switch them.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Each profile keeps its own accounts, goals, payments and budget. The menu at the top of every tab switches between them."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У каждого профиля свои счета, цели, платежи и бюджет. Переключаются они меню вверху каждой вкладки."
+          }
+        }
+      }
+    },
+    "Everything in it goes too: %@. This can’t be undone." : {
+      "comment" : "Question before a profile is deleted: what goes with it, “7 accounts, 25 operations and 2 payments”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Everything in it goes too: %@. This can’t be undone."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вместе с профилем удалится всё, что в нём есть: %@. Это не отменить."
+          }
+        }
+      }
+    },
+    "Exchange" : {
+      "comment" : "Profile screen: the header over the markup over the CBR rate.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exchange"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обмен"
+          }
+        }
+      }
+    },
+    "Hourly" : {
+      "comment" : "Rate sheet: the segment for pay by the hour.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hourly"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В час"
+          }
+        }
+      }
+    },
+    "Hours a week" : {
+      "comment" : "Tax and hours sheet: hours of work a week.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hours a week"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Часов в неделю"
+          }
+        }
+      }
+    },
+    "Income" : {
+      "comment" : "Profile screen: the header of the income group.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Income"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Доход"
+          }
+        }
+      }
+    },
+    "Its accounts, operations, goals, wishlist and payments go too. This can’t be undone." : {
+      "comment" : "Question before a profile is deleted, when its contents could not be counted.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Its accounts, operations, goals, wishlist and payments go too. This can’t be undone."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вместе с профилем удалятся его счета, операции, цели, вишлист и платежи. Это не отменить."
+          }
+        }
+      }
+    },
+    "Make active" : {
+      "comment" : "Profile screen and list: opens this profile in the whole app.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Make active"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сделать активным"
+          }
+        }
+      }
+    },
+    "Markup over the CBR" : {
+      "comment" : "Profile screen: the row with the markup over the Bank of Russia rate.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Markup over the CBR"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Наценка к ЦБ"
+          }
+        }
+      }
+    },
+    "Markup over the CBR rate" : {
+      "comment" : "Markup sheet: the caption over the number.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Markup over the CBR rate"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Наценка к курсу ЦБ"
+          }
+        }
+      }
+    },
+    "Monthly" : {
+      "comment" : "Rate sheet: the segment for a monthly salary.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monthly"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В месяц"
+          }
+        }
+      }
+    },
+    "Name" : {
+      "comment" : "Name alert: the profile's name field.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Название"
+          }
+        }
+      }
+    },
+    "New payment" : {
+      "comment" : "Title of the payment form when adding one.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New payment"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новый платёж"
+          }
+        }
+      }
+    },
+    "New profile" : {
+      "comment" : "Title of the alert that names a new profile.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New profile"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новый профиль"
+          }
+        }
+      }
+    },
+    "OK" : {
+      "comment" : "Closes the message that a change was not saved.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ОК"
+          }
+        }
+      }
+    },
+    "Payday" : {
+      "comment" : "Profile screen, income: the day of the month the salary comes.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payday"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "День зарплаты"
+          }
+        }
+      }
+    },
+    "Payment" : {
+      "comment" : "A payment: the title of the payment form when changing one, and the last row of the payments, “+ Payment”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payment"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Платёж"
+          }
+        }
+      }
+    },
+    "Payment “%@” deleted" : {
+      "comment" : "Toast after a payment was deleted, with its name; “Undo” follows.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payment “%@” deleted"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Платёж «%@» удалён"
+          }
+        }
+      }
+    },
+    "Payments" : {
+      "comment" : "Profile screen: the header over the monthly payments.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payments"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Платежи"
+          }
+        }
+      }
+    },
+    "Payments due before payday are set aside from “Safe to spend today”. Loan and credit card payments are added by themselves." : {
+      "comment" : "Profile screen: what the monthly payments do.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payments due before payday are set aside from “Safe to spend today”. Loan and credit card payments are added by themselves."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Платежи до зарплаты откладываются из «Можно сегодня». Платежи по кредитам и кредиткам добавляются сами."
+          }
+        }
+      }
+    },
+    "Profiles" : {
+      "comment" : "Title of the screen that lists, creates, renames and deletes profiles.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profiles"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Профили"
+          }
+        }
+      }
+    },
+    "Rate" : {
+      "comment" : "Profile screen, income: the hourly rate row.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rate"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ставка"
+          }
+        }
+      }
+    },
+    "Rename" : {
+      "comment" : "Profiles list: the action that renames a profile.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Переименовать"
+          }
+        }
+      }
+    },
+    "Rename profile" : {
+      "comment" : "Title of the alert that renames a profile.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename profile"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Переименовать профиль"
+          }
+        }
+      }
+    },
+    "Salary" : {
+      "comment" : "Profile screen, income: the monthly salary row.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salary"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Зарплата"
+          }
+        }
+      }
+    },
+    "Save" : {
+      "comment" : "Sheets of the profile screen: the main action that saves the change.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранить"
+          }
+        }
+      }
+    },
+    "Sharing" : {
+      "comment" : "Profile screen: sharing the profile with other people (not yet available).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sharing"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Общий доступ"
+          }
+        }
+      }
+    },
+    "Tax" : {
+      "comment" : "Tax and hours sheet: the income tax in percent.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tax"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Налог"
+          }
+        }
+      }
+    },
+    "Tax and hours" : {
+      "comment" : "Profile screen, income: the tax and hours a week row.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tax and hours"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Налог и часы"
+          }
+        }
+      }
+    },
+    "The change was not saved. Try again." : {
+      "comment" : "Profile screens: saving or deleting failed.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The change was not saved. Try again."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изменение не сохранилось. Попробуй ещё раз."
+          }
+        }
+      }
+    },
+    "The last profile can’t be deleted. Create another one first." : {
+      "comment" : "Why the only profile has no delete action.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The last profile can’t be deleted. Create another one first."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Последний профиль удалить нельзя — сначала создай другой."
+          }
+        }
+      }
+    },
+    "There is nothing in it yet." : {
+      "comment" : "Question before an empty profile is deleted.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There is nothing in it yet."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В профиле пока ничего нет."
+          }
+        }
+      }
+    },
+    "Updates itself after each ruble exchange" : {
+      "comment" : "Under the markup: it is learned from every exchange of rubles into another currency.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Updates itself after each ruble exchange"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновляется сама после обмена рублей"
+          }
+        }
+      }
+    },
+    "What is it" : {
+      "comment" : "Payment form: the placeholder of the payment's name, like rent.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What is it"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Что это"
+          }
+        }
+      }
+    },
+    "What you record by hand or by voice goes to the active profile. The menu at the top of every tab switches it." : {
+      "comment" : "Profile screen: what the active profile is.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What you record by hand or by voice goes to the active profile. The menu at the top of every tab switches it."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Записи руками и голосом попадают в активный профиль. Переключает его меню вверху каждой вкладки."
+          }
+        }
+      }
+    },
+    "a month, before tax" : {
+      "comment" : "Rate sheet: under the amount when paid by the month.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "a month, before tax"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "в месяц, до налога"
+          }
+        }
+      }
+    },
+    "an hour, before tax" : {
+      "comment" : "Rate sheet: under the amount when paid by the hour.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "an hour, before tax"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "в час, до налога"
+          }
+        }
+      }
+    },
+    "day %lld" : {
+      "comment" : "A day of the month: payday or a payment's day, “day 15”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "day %lld"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld-го"
+          }
+        }
+      }
+    },
+    "h" : {
+      "comment" : "Tax and hours sheet: the unit after the hours, “40 h”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "h"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ч"
+          }
+        }
+      }
+    },
+    "soon" : {
+      "comment" : "Profile screen: a feature that is not there yet.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "soon"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "скоро"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
