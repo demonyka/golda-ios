@@ -1,0 +1,27 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Couldn’t open your data" : {
+      "comment" : "Title of the screen shown when the app’s data cannot be opened or read.",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Couldn’t open your data" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Не удалось открыть данные" } }
+      }
+    },
+    "Try again" : {
+      "comment" : "Button that opens the data once more after it failed.",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Try again" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Повторить" } }
+      }
+    },
+    "Your records couldn’t be read. Nothing was deleted." : {
+      "comment" : "Under the title of the failure screen: the records could not be read, and they are still there.",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your records couldn’t be read. Nothing was deleted." } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Записи не удалось прочитать. Ничего не удалено." } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

@@ -33,8 +33,8 @@ extension AppModel {
     }
 
     /// One profile's books, again after each change, until the profile is deleted: the profile's
-    /// screen follows any profile this way, the active one or not.
-    func profileSnapshots(_ profileId: UUID) -> AsyncStream<ProfileSnapshot> {
+    /// screen follows any profile this way, the active one or not. Throws when the database fails.
+    func profileSnapshots(_ profileId: UUID) -> AsyncThrowingStream<ProfileSnapshot, any Error> {
         environment.database.snapshots(profileId: profileId)
     }
 

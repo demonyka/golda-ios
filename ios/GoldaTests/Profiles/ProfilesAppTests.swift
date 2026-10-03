@@ -95,7 +95,7 @@ import Testing
         let trip = try await harness.model.addProfile(name: "Поездка")
         var first: ProfileSnapshot?
         var latest: ProfileSnapshot?
-        for await snapshot in harness.model.profileSnapshots(trip.id) {
+        for try await snapshot in harness.model.profileSnapshots(trip.id) {
             if first == nil {
                 first = snapshot
                 var settings = trip.settings
@@ -134,7 +134,7 @@ import Testing
         let trip = try await harness.model.addProfile(name: "Поездка")
         var received = 0
         // The loop ends only when the stream does; the suite's time limit catches one that never ends.
-        for await _ in harness.model.profileSnapshots(trip.id) {
+        for try await _ in harness.model.profileSnapshots(trip.id) {
             received += 1
             if received == 1 { try await harness.model.deleteProfile(trip.id) }
         }

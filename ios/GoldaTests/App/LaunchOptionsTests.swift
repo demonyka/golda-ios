@@ -28,6 +28,14 @@ import Testing
         #expect(parsed.command == .samples)
     }
 
+    @Test func aUITestCanAskForTheDataToFail() throws {
+        #expect(options(["-golda.inMemory", "-golda.failDatabase"]).failsDatabase)
+        #expect(!options(["-golda.inMemory"]).failsDatabase)
+        #expect(throws: DebugDatabaseFailure.self) {
+            try AppEnvironment.make(for: LaunchOptions(inMemory: true, failsDatabase: true))
+        }
+    }
+
     @Test func theTestHostIsRecognised() {
         #expect(options([], environment: ["XCTestConfigurationFilePath": "/tmp/x.xctestconfiguration"]).isHostingTests)
         #expect(!options([]).isHostingTests)

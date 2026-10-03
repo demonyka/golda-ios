@@ -65,7 +65,10 @@ struct AppEnvironment: Sendable {
     /// the keys in the Keychain and the rates from the Bank of Russia.
     static func live(voiceProvider: (any VoiceProvider)? = nil, voiceSecrets: (any SecretStore)? = nil) throws -> AppEnvironment {
         AppEnvironment(
-            database: try GoldaDatabase.open(at: URL.applicationSupportDirectory.appending(path: "golda.sqlite")),
+            database: try GoldaDatabase.open(
+                at: URL.applicationSupportDirectory.appending(path: "golda.sqlite"),
+                eraseDatabaseOnSchemaChange: erasesStaleDatabase
+            ),
             deviceSettings: DeviceSettingsStore(defaults: .standard),
             secrets: KeychainSecretStore(),
             ratesSource: CbrRatesSource(transport: URLSessionTransport()),
@@ -108,11 +111,26 @@ struct AppEnvironment: Sendable {
         )
     }
 
+    /// Whether a database file whose recorded migrations now build a different schema is wiped and
+    /// built afresh. Schema v1 is unreleased and still edited in place, which leaves the files of
+    /// earlier builds with its old shape: the migrator counts v1 as applied and every read of a
+    /// changed table fails. Only the simulator wipes, as no real data can live there; a debug build
+    /// on a real iPhone, let alone a release, never erases anything.
+    static var erasesStaleDatabase: Bool {
+        #if DEBUG && targetEnvironment(simulator)
+        true
+        #else
+        false
+        #endif
+    }
+
     /// The environment [options] ask for: in memory for UI tests and for the unit-test host, the
     /// real one otherwise. A debug build launched with `-golda.voiceStub=<script>` answers voice
-    /// notes with the stub's script instead of Gemini.
+    /// notes with the stub's script instead of Gemini, and one launched with `-golda.failDatabase`
+    /// fails to open its data.
     static func make(for options: LaunchOptions) throws -> AppEnvironment {
         #if DEBUG
+        if options.failsDatabase { throw DebugDatabaseFailure() }
         let stub = VoiceStubOptions.current
         let provider = stub?.provider, secrets = stub?.secrets
         #else
@@ -123,3 +141,10 @@ struct AppEnvironment: Sendable {
             : try live(voiceProvider: provider, voiceSecrets: secrets)
     }
 }
+
+#if DEBUG
+/// What `-golda.failDatabase` makes opening the data throw.
+struct DebugDatabaseFailure: Error, CustomStringConvertible {
+    var description: String { "-golda.failDatabase: the data failed to open on purpose" }
+}
+#endif

@@ -333,10 +333,16 @@ struct ProfileScreen: View {
 
     // MARK: Actions
 
-    /// Follows the profile's books until the profile is gone; then its screen closes.
+    /// Follows the profile's books until the profile is gone; then its screen closes. Books that
+    /// cannot be read put the app's failure screen up rather than a spinner that never ends.
     private func follow() async {
-        for await snapshot in model.profileSnapshots(profileId) {
-            self.snapshot = snapshot
+        do {
+            for try await snapshot in model.profileSnapshots(profileId) {
+                self.snapshot = snapshot
+            }
+        } catch {
+            if !Task.isCancelled { model.fail(error) }
+            return
         }
         // Leaving the screen ends the loop too; only a deleted profile closes it.
         if !Task.isCancelled { dismiss() }

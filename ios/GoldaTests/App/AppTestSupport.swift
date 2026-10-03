@@ -90,6 +90,12 @@ extension AppModel.Phase {
         if case .main(let data) = self { return data }
         return nil
     }
+
+    /// The failure screen's technical message.
+    var failure: String? {
+        if case .failed(let reason) = self { return reason }
+        return nil
+    }
 }
 
 extension Account {

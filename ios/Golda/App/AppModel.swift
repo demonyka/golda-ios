@@ -31,6 +31,9 @@ final class AppModel {
         /// No profile or not onboarded: the welcome screen.
         case welcome
         case main(AppData)
+        /// The data could not be read: the failure screen, with "Try again". [reason] is the
+        /// technical message, which only debug builds show.
+        case failed(reason: String)
     }
 
     @ObservationIgnored let environment: AppEnvironment
@@ -46,6 +49,8 @@ final class AppModel {
     private(set) var data: AppData?
     /// The profiles have been read once.
     private(set) var isLoaded = false
+    /// Why the data could not be read, until "Try again" reads it.
+    private(set) var failureReason: String?
 
     @ObservationIgnored private var snapshot: ProfileSnapshot?
     @ObservationIgnored private var rateTable: [RateRecord] = []
@@ -68,6 +73,7 @@ final class AppModel {
     var activeProfile: Profile? { profiles.first { $0.id == activeProfileId } }
 
     var phase: Phase {
+        if let failureReason { return .failed(reason: failureReason) }
         guard isLoaded else { return .loading }
         guard device.onboarded, !profiles.isEmpty else { return .welcome }
         return data.map(Phase.main) ?? .loading
@@ -80,9 +86,8 @@ final class AppModel {
 
     // MARK: Launch
 
-    /// Launch work, done once: the debug [command], the seed rates, then the observers, and fresh
-    /// rates in the background. Returns once the profiles are known; the rates never hold it up,
-    /// and failing to get them is silent.
+    /// Launch work, done once: the debug [command], then `load`. Returns once the profiles are
+    /// known, or once reading them failed.
     func start(command: LaunchCommand? = nil, profileName: String = AppModel.firstProfileName) async {
         guard !started else { return }
         started = true
@@ -90,13 +95,51 @@ final class AppModel {
         // Before anything is read, so the screens open on the data the command builds.
         if let command { await run(command, profileName: profileName) }
         #endif
+        await load()
+    }
+
+    /// "Try again" on the failure screen: the launch reads once more, on the same database. The
+    /// debug command does not run again.
+    func retry() async {
+        guard started, failureReason != nil else { return }
+        failureReason = nil
+        await load()
+    }
+
+    /// The data could not be read: following the database stops, and the failure screen replaces
+    /// whatever was on screen, since none of it can be trusted to be current any more.
+    func fail(_ error: any Error) {
+        log.error("The data could not be read: \(String(describing: error))")
+        tasks.forEach { $0.cancel() }
+        tasks.removeAll()
+        snapshotTask?.cancel()
+        snapshotTask = nil
+        // Forgotten, so the next `load` opens the profile afresh and follows its books again.
+        activeProfileId = nil
+        snapshot = nil
+        data = nil
+        isLoaded = false
+        failureReason = String(describing: error)
+    }
+
+    /// The seed rates, the rates and the profiles, then the observers, and fresh rates in the
+    /// background. The rates from the network never hold it up, and failing to get them is silent;
+    /// failing to read the database is not.
+    private func load() async {
         do {
             try await environment.repository.ensureSeed()
         } catch {
+            // A full disk refuses the seed but may still read: whether the books can be read decides.
             log.error("Seeding the rates failed: \(String(describing: error))")
         }
-        await reloadRates()
-        await reloadProfiles()
+        do {
+            rateTable = try await environment.database.read { try $0.rates() }
+            let fresh = try await environment.database.read { try $0.profiles() }
+            if fresh != profiles { profiles = fresh }
+        } catch {
+            fail(error)
+            return
+        }
         device = environment.deviceSettings.current
         isLoaded = true
         resolveActiveProfile()
@@ -230,10 +273,15 @@ final class AppModel {
         let profileUpdates = environment.database.profiles()
         let deviceUpdates = environment.deviceSettings.changes()
         tasks.append(Task { [weak self] in
-            for await profiles in profileUpdates {
-                guard let self else { return }
-                if self.profiles != profiles { self.profiles = profiles }
-                self.resolveActiveProfile()
+            do {
+                for try await profiles in profileUpdates {
+                    guard let self else { return }
+                    if self.profiles != profiles { self.profiles = profiles }
+                    self.resolveActiveProfile()
+                }
+            } catch {
+                guard !Task.isCancelled else { return }
+                self?.fail(error)
             }
         })
         tasks.append(Task { [weak self] in
@@ -289,7 +337,9 @@ final class AppModel {
 
     /// The old profile stays on screen until the new one's first snapshot arrives, so a switch
     /// does not flash an empty screen. The stream ends when the profile is deleted; the profile
-    /// list then moves the app to another one.
+    /// list then moves the app to another one. A stream that fails, the first snapshot included,
+    /// puts the failure screen up: waiting for books that cannot be read would be a blank screen
+    /// forever.
     private func observeSnapshots(of profileId: UUID?) {
         snapshotTask?.cancel()
         guard let profileId else {
@@ -299,10 +349,15 @@ final class AppModel {
         }
         let snapshots = environment.database.snapshots(profileId: profileId)
         snapshotTask = Task { [weak self] in
-            for await snapshot in snapshots {
-                guard let self, self.activeProfileId == profileId else { return }
-                self.snapshot = snapshot
-                self.rebuild()
+            do {
+                for try await snapshot in snapshots {
+                    guard let self, self.activeProfileId == profileId else { return }
+                    self.snapshot = snapshot
+                    self.rebuild()
+                }
+            } catch {
+                guard !Task.isCancelled, let self, self.activeProfileId == profileId else { return }
+                self.fail(error)
             }
         }
     }

@@ -20,18 +20,21 @@ struct LaunchOptions: Equatable, Sendable {
     /// The process hosts the unit tests: the tests build their own models, so the app must neither
     /// touch the real database nor go to the network.
     var isHostingTests = false
+    /// Opening the data fails, so a UI test can see the failure screen; "Try again" clears it.
+    var failsDatabase = false
 
     static var current: LaunchOptions {
         LaunchOptions(arguments: ProcessInfo.processInfo.arguments, environment: ProcessInfo.processInfo.environment)
     }
 
-    init(command: LaunchCommand? = nil, inMemory: Bool = false, isHostingTests: Bool = false) {
+    init(command: LaunchCommand? = nil, inMemory: Bool = false, isHostingTests: Bool = false, failsDatabase: Bool = false) {
         self.command = command
         self.inMemory = inMemory
         self.isHostingTests = isHostingTests
+        self.failsDatabase = failsDatabase
     }
 
-    /// Every argument is a flag on its own: `-golda.samples`, `-golda.inMemory`.
+    /// Every argument is a flag on its own: `-golda.samples`, `-golda.inMemory`, `-golda.failDatabase`.
     init(arguments: [String], environment: [String: String]) {
         isHostingTests = environment["XCTestConfigurationFilePath"] != nil || environment["XCTestBundlePath"] != nil
         #if DEBUG
@@ -39,6 +42,7 @@ struct LaunchOptions: Equatable, Sendable {
         // One command per launch, checked in the order of Android's `when`.
         command = [LaunchCommand.samples, .demo, .reset].first { flags.contains("-golda.\($0.rawValue)") }
         inMemory = flags.contains("-golda.inMemory")
+        failsDatabase = flags.contains("-golda.failDatabase")
         #endif
     }
 }
