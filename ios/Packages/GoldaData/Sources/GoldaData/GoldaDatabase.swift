@@ -6,16 +6,27 @@ import GRDB
 public final class GoldaDatabase: Sendable {
     let writer: any DatabaseWriter
 
-    private init(_ writer: any DatabaseWriter) throws {
-        try Schema.migrator.migrate(writer)
+    private init(_ writer: any DatabaseWriter, eraseDatabaseOnSchemaChange: Bool = false) throws {
+        var migrator = Schema.migrator
+        migrator.eraseDatabaseOnSchemaChange = eraseDatabaseOnSchemaChange
+        try migrator.migrate(writer)
         self.writer = writer
     }
 
     /// The database file at [url], created with its folder when missing. A pool in WAL mode, so
     /// observations read while a write is in progress.
-    public static func open(at url: URL) throws -> GoldaDatabase {
+    ///
+    /// [eraseDatabaseOnSchemaChange] wipes the file and builds it afresh when the migrations it
+    /// recorded now create a different schema. Only for builds where no real data can exist: an
+    /// unreleased migration edited in place leaves older files with its old shape, which the
+    /// migrator counts as applied, and every read of the changed tables then fails. Off, such a
+    /// file is left exactly as it is.
+    public static func open(at url: URL, eraseDatabaseOnSchemaChange: Bool = false) throws -> GoldaDatabase {
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-        return try GoldaDatabase(DatabasePool(path: url.path, configuration: configuration))
+        return try GoldaDatabase(
+            DatabasePool(path: url.path, configuration: configuration),
+            eraseDatabaseOnSchemaChange: eraseDatabaseOnSchemaChange
+        )
     }
 
     /// A private database that lives as long as this value: tests and UI test runs.
@@ -41,7 +52,7 @@ public final class GoldaDatabase: Sendable {
     }
 
     /// Every profile, again after each change to the table.
-    public func profiles() -> AsyncStream<[Profile]> {
+    public func profiles() -> AsyncThrowingStream<[Profile], any Error> {
         let observation = ValueObservation
             .tracking { db -> [Profile]? in try Store(db: db).profiles() }
             .removeDuplicates()
@@ -51,7 +62,7 @@ public final class GoldaDatabase: Sendable {
     /// The profile's books, again after each change to them. Writes to other profiles touch the same
     /// tables and refetch, but an unchanged snapshot is not sent twice. The stream ends when the
     /// profile is deleted (here or by sync), so the app can switch to another one.
-    public func snapshots(profileId: UUID) -> AsyncStream<ProfileSnapshot> {
+    public func snapshots(profileId: UUID) -> AsyncThrowingStream<ProfileSnapshot, any Error> {
         let observation = ValueObservation
             .tracking { db in try Store(db: db).snapshot(profileId: profileId) }
             .removeDuplicates()
@@ -61,28 +72,31 @@ public final class GoldaDatabase: Sendable {
     /// The rate table by code, again after each change to it (a refresh, a reset), so the app
     /// revalues what it shows without rereading after its own refresh. Rates are shared by every
     /// profile; each applies its own markup.
-    public func rates() -> AsyncStream<[RateRecord]> {
+    public func rates() -> AsyncThrowingStream<[RateRecord], any Error> {
         let observation = ValueObservation
             .tracking { db -> [RateRecord]? in try Store(db: db).rates() }
             .removeDuplicates()
         return stream(observation.values(in: writer, bufferingPolicy: .bufferingNewest(1)))
     }
 
-    /// Bridges an observation to a stream that keeps only the latest value for a slow reader, and
-    /// ends on nil, on a database error, or when the reader stops listening.
-    private func stream<Element: Sendable>(_ values: AsyncValueObservation<Element?>) -> AsyncStream<Element> {
-        AsyncStream(bufferingPolicy: .bufferingNewest(1)) { continuation in
+    /// Bridges an observation to a stream that keeps only the latest value for a slow reader, ends
+    /// on nil or when the reader stops listening, and throws when the database fails: a stream that
+    /// merely ended would look like a deleted profile, and the app would wait for books that never
+    /// come.
+    private func stream<Element: Sendable>(
+        _ values: AsyncValueObservation<Element?>
+    ) -> AsyncThrowingStream<Element, any Error> {
+        AsyncThrowingStream(bufferingPolicy: .bufferingNewest(1)) { continuation in
             let task = Task {
                 do {
                     for try await value in values {
                         guard let value else { break }
                         continuation.yield(value)
                     }
+                    continuation.finish()
                 } catch {
-                    // The observation only fails when the database does; ending the stream is all a
-                    // screen could do about it.
+                    continuation.finish(throwing: error)
                 }
-                continuation.finish()
             }
             continuation.onTermination = { _ in task.cancel() }
         }

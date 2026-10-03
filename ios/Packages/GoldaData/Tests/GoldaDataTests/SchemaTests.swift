@@ -97,5 +97,67 @@ import Testing
         let reopened = try GoldaDatabase.open(at: url)
         let profiles = try await reopened.read { try $0.profiles() }
         #expect(profiles == [StoreFixture.profile(1)])
+
+        // The development flag erases a changed schema only, never a current one.
+        let development = try GoldaDatabase.open(at: url, eraseDatabaseOnSchemaChange: true)
+        #expect(try await development.read { try $0.profiles() } == [StoreFixture.profile(1)])
+    }
+
+    // MARK: A schema edited in place
+
+    /// A file from a build before v1 gained the payments' `createdAt`: the old shape of the table,
+    /// v1 recorded as applied, and a profile in it. Returns its URL once it is closed.
+    private func staleDatabase() async throws -> URL {
+        let url = FileManager.default.temporaryDirectory.appending(path: "golda-stale-\(UUID().uuidString)/golda.sqlite")
+        let database = try GoldaDatabase.open(at: url)
+        try await database.write { try $0.save(StoreFixture.profile(1)) }
+        try await database.writer.write { db in
+            try db.drop(index: "obligation_on_profileId_dayOfMonth_createdAt")
+            try db.alter(table: "obligation") { t in t.drop(column: "createdAt") }
+        }
+        return url
+    }
+
+    /// Without the flag (release builds, and debug builds on a real iPhone) the file is the user's:
+    /// nothing is touched, and what no longer fits fails loudly, as a read and as a stream, rather
+    /// than leaving the app waiting.
+    @Test func aStaleSchemaIsLeftAloneAndFailsLoudly() async throws {
+        let url = try await staleDatabase()
+        defer { try? FileManager.default.removeItem(at: url.deletingLastPathComponent()) }
+
+        let database = try GoldaDatabase.open(at: url)
+
+        #expect(try await database.read { try $0.profiles() } == [StoreFixture.profile(1)])
+        let columns = try await database.writer.read { db in try db.columns(in: "obligation").map(\.name) }
+        #expect(!columns.contains("createdAt"))
+        let error = await #expect(throws: DatabaseError.self) {
+            try await database.read { try $0.snapshot(profileId: StoreFixture.id(1)) }
+        }
+        #expect(error?.message?.contains("createdAt") == true, "\(String(describing: error))")
+        var snapshots = database.snapshots(profileId: StoreFixture.id(1)).makeAsyncIterator()
+        await #expect(throws: DatabaseError.self) { _ = try await snapshots.next() }
+    }
+
+    /// With the flag (debug builds in the simulator) the stale file is wiped and built afresh:
+    /// empty, on the current schema, and working.
+    @Test func aStaleSchemaIsErasedAndRebuiltWhenAsked() async throws {
+        let url = try await staleDatabase()
+        defer { try? FileManager.default.removeItem(at: url.deletingLastPathComponent()) }
+
+        let database = try GoldaDatabase.open(at: url, eraseDatabaseOnSchemaChange: true)
+
+        #expect(try await database.read { try $0.profiles() }.isEmpty)
+        let schema = try await database.writer.read { db in
+            (try db.columns(in: "obligation").map(\.name), try Schema.migrator.appliedMigrations(db))
+        }
+        #expect(schema.0.contains("createdAt"))
+        #expect(schema.1 == ["v1"])
+        let profileId = StoreFixture.id(1)
+        try await database.write { store in
+            try store.save(StoreFixture.profile(1))
+            try store.save(Obligation(name: "Аренда", amountMinor: 1, currency: "RUB", dayOfMonth: 1), profileId: profileId)
+        }
+        let snapshot = try #require(try await database.read { try $0.snapshot(profileId: profileId) })
+        #expect(snapshot.obligations.map(\.name) == ["Аренда"])
     }
 }

@@ -65,7 +65,7 @@ import Testing
     @Test func snapshotsFollowWrites() async throws {
         let database = try await StoreFixture.database(profiles: 1)
         var snapshots = database.snapshots(profileId: personal).makeAsyncIterator()
-        let initial = try #require(await snapshots.next())
+        let initial = try #require(try await snapshots.next())
         #expect(initial.profile.id == personal)
         #expect(initial.accounts.isEmpty && initial.operations.isEmpty)
 
@@ -73,7 +73,7 @@ import Testing
             try store.save(StoreFixture.account(10), profileId: personal)
             try store.book(StoreFixture.operation(20), [StoreFixture.posting(30, operation: 20, account: 10, amount: -500)], profileId: personal)
         }
-        let next = try #require(await snapshots.next())
+        let next = try #require(try await snapshots.next())
         #expect(next.accounts == [StoreFixture.account(10)])
         #expect(next.operations == [OperationFull(StoreFixture.operation(20), [StoreFixture.posting(30, operation: 20, account: 10, amount: -500)])])
     }
@@ -81,7 +81,7 @@ import Testing
     @Test func anotherProfilesWritesNeverReachTheSnapshot() async throws {
         let database = try await StoreFixture.database(profiles: 1, 2)
         var snapshots = database.snapshots(profileId: personal).makeAsyncIterator()
-        let initial = try #require(await snapshots.next())
+        let initial = try #require(try await snapshots.next())
 
         try await database.write { store in
             try store.save(StoreFixture.account(12), profileId: family)
@@ -91,7 +91,7 @@ import Testing
         try await database.write { try $0.save(StoreFixture.account(10), profileId: personal) }
 
         // The family write changed nothing here, so the next snapshot is the personal write.
-        let next = try #require(await snapshots.next())
+        let next = try #require(try await snapshots.next())
         #expect(next.accounts.map(\.id) == [StoreFixture.id(10)])
         #expect(next.operations.isEmpty && next.goals.isEmpty)
         #expect(next.profile == initial.profile)
@@ -104,38 +104,38 @@ import Testing
     @Test func snapshotsEndWhenTheProfileIsDeleted() async throws {
         let database = try await StoreFixture.database(profiles: 1)
         var snapshots = database.snapshots(profileId: personal).makeAsyncIterator()
-        _ = try #require(await snapshots.next())
+        _ = try #require(try await snapshots.next())
         try await database.write { try $0.deleteProfile(personal) }
-        #expect(await snapshots.next() == nil)
+        #expect(try await snapshots.next() == nil)
     }
 
     @Test func ratesFollowWrites() async throws {
         let database = try await StoreFixture.database(profiles: 1)
         var rates = database.rates().makeAsyncIterator()
-        #expect(await rates.next() == [])
+        #expect(try await rates.next() == [])
 
         let usd = RateRecord(code: "USD", rubPerUnit: 83.2454, date: "2026-10-02")
         let gel = RateRecord(code: "GEL", rubPerUnit: 31.9597, date: "2026-10-02")
         try await database.write { try $0.save([usd, gel]) }
-        #expect(await rates.next() == [gel, usd])
+        #expect(try await rates.next() == [gel, usd])
 
         // A write to the books leaves the rates as they were, so the next value is the next refresh.
         try await database.write { try $0.save(StoreFixture.account(10), profileId: personal) }
         let fresh = RateRecord(code: "USD", rubPerUnit: 83.4839, date: "2026-10-03")
         try await database.write { try $0.save([fresh]) }
-        #expect(await rates.next() == [gel, fresh])
+        #expect(try await rates.next() == [gel, fresh])
     }
 
     @Test func profilesFollowWrites() async throws {
         let database = try GoldaDatabase.inMemory()
         var profiles = database.profiles().makeAsyncIterator()
-        #expect(await profiles.next() == [])
+        #expect(try await profiles.next() == [])
 
         try await database.write { try $0.save(StoreFixture.profile(1)) }
-        #expect(await profiles.next() == [StoreFixture.profile(1)])
+        #expect(try await profiles.next() == [StoreFixture.profile(1)])
 
         let renamed = StoreFixture.profile(1, name: "Семья")
         try await database.write { try $0.save(renamed) }
-        #expect(await profiles.next() == [renamed])
+        #expect(try await profiles.next() == [renamed])
     }
 }
