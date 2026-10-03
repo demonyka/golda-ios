@@ -18,6 +18,6 @@ let package = Package(
                 .product(name: "GRDB", package: "GRDB.swift"),
             ]
         ),
-        .testTarget(name: "GoldaDataTests", dependencies: ["GoldaData"]),
+        .testTarget(name: "GoldaDataTests", dependencies: ["GoldaData"], resources: [.copy("Fixtures")]),
     ]
 )
