@@ -1197,6 +1197,23 @@
         }
       }
     },
+    "The markup was not saved. Try again." : {
+      "comment" : "Message when the profile's markup could not be saved.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The markup was not saved. Try again."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Наценка не сохранилась. Попробуй ещё раз."
+          }
+        }
+      }
+    },
     "The key was not saved. Try again." : {
       "comment" : "Message when the Keychain refused the key.",
       "localizations" : {

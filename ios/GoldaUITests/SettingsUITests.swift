@@ -206,6 +206,26 @@ final class SettingsUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Didn't work. No network?"].waitForExistence(timeout: 15))
     }
 
+    /// The markup is the profile's, but Android kept it with the rates and so people look for it
+    /// here: the row shows it and a change reaches the row at once.
+    @MainActor
+    func testTheMarkupCanBeChangedFromTheRates() {
+        let app = launch()
+        openSettings(app)
+        let row = app.buttons["settings.markup"]
+        reveal(row, in: app)
+        XCTAssertTrue(row.label.contains("%"), row.label)
+        row.tap()
+
+        let field = app.textFields["markupSheet.amount"]
+        XCTAssertTrue(field.waitForExistence(timeout: 5))
+        field.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: 8))
+        field.typeText("12")
+        app.buttons["markupSheet.save"].tap()
+        XCTAssertTrue(app.buttons["markupSheet.save"].waitForNonExistence(timeout: 5))
+        XCTAssertTrue(row.label.contains("12 %"), row.label)
+    }
+
     @MainActor
     func testTheRowsLeadWhereTheySay() {
         let app = launch()

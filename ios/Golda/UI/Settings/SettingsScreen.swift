@@ -28,7 +28,7 @@ struct SettingsScreen: View {
     @State private var backup: BackupDocument?
 
     private enum Sheet: String, Identifiable {
-        case local, main, shown, key, model
+        case local, main, shown, key, model, markup
 
         var id: String { rawValue }
     }
@@ -147,6 +147,14 @@ struct SettingsScreen: View {
                 }
                 .padding(.vertical, Theme.Gap.xs)
             }
+            // The markup belongs to the profile on screen; it is here too because Android kept it with the rates.
+            Button { sheet = .markup } label: {
+                SettingRow(
+                    title: MarkupForm.title.text(in: locale), symbol: ProfileSymbols.markup,
+                    value: ProfileIncome.markupText(current.profile.settings.markup), trailingSymbol: SettingsSymbols.opens
+                )
+            }
+            .accessibilityIdentifier("settings.markup")
             Button(action: refreshRates) {
                 HStack {
                     SettingRow(
@@ -325,6 +333,7 @@ struct SettingsScreen: View {
                 show(message)
             }, onDismiss: close)
         case .model: GeminiModelSheet(current: model.device.geminiModel, onDismiss: close)
+        case .markup: MarkupSheet(markup: current.profile.settings.markup, onSave: saveMarkup)
         }
     }
 
@@ -379,6 +388,21 @@ struct SettingsScreen: View {
 
     private func show(_ message: String) {
         notice = SettingsNotice(message: message)
+    }
+
+    /// Saves the profile's markup as it is now, so one learned from an exchange while the sheet was
+    /// open is kept; a failure says so.
+    private func saveMarkup(_ change: @escaping ProfileSettingsChange) {
+        let settings = current.profile.settings
+        guard let changed = change(settings), changed != settings else { return }
+        let model = model, profileId = current.profile.id
+        Task {
+            do {
+                try await model.saveProfileSettings(changed, profileId: profileId)
+            } catch {
+                prompt = .failure(SettingsText.markupFailed)
+            }
+        }
     }
 
     private func refreshRates() {

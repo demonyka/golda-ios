@@ -22,13 +22,13 @@ struct EntryAmountField: View {
 
     var body: some View {
         let font = UIFont.monospacedDigitSystemFont(ofSize: size, weight: .semibold)
-        HStack(alignment: .firstTextBaseline, spacing: Theme.Gap.s) {
+        // Centred, not on a shared baseline: the symbol is a glass button of its own size, and on the
+        // baseline its circle would sit lower than the middle of the digits.
+        HStack(alignment: .center, spacing: Theme.Gap.s) {
             Spacer(minLength: 0)
             GroupedAmountField(
                 text: $text, isFocused: $isFocused, font: font, isInvalid: isInvalid, label: label, identifier: "entry.amount"
             )
-            // A UIKit field has no baseline SwiftUI can see; the text sits centred in its height.
-            .alignmentGuide(.firstTextBaseline) { d in (d.height - font.lineHeight) / 2 + font.ascender }
             symbol(font)
             Spacer(minLength: 0)
         }

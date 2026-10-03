@@ -40,6 +40,7 @@ enum SettingsText {
     static let updateRates = resource("Update rates", "Settings: fetches fresh rates from the Bank of Russia.")
     static let ratesUpdated = resource("Rates updated", "Message after fresh rates arrived.")
     static let ratesFailed = resource("Didn't work. No network?", "Message when fresh rates could not be fetched.")
+    static let markupFailed = resource("The markup was not saved. Try again.", "Message when the profile's markup could not be saved.")
 
     // MARK: Profiles
 
@@ -184,7 +185,7 @@ enum SettingsText {
         title, done, cancel, save, ok,
         whereIAm, localCurrency, localCurrencyRole, localCurrencyFooter, mainCurrency, mainCurrencyRole, mainCurrencyFooter,
         shownCurrencies, shownCurrenciesRole, shownCurrenciesFooter,
-        rates, updateRates, ratesUpdated, ratesFailed,
+        rates, updateRates, ratesUpdated, ratesFailed, markupFailed,
         profiles, profilesFooter,
         voice, geminiKey, keySaved, keyMissing, pasteKey, keyFooter, removeKey, keyStored, keyRemoved, keyFailed,
         model, modelTitle, modelFooter, voiceConsent, voiceFooter,
