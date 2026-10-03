@@ -66,7 +66,7 @@ struct MainTabs: View {
 }
 
 /// One tab: its own navigation stack with the shared toolbar, and on its screen an undo toast and
-/// the mic. The screens replace the placeholders in steps 2a to 2d.
+/// the mic; the account form opens over it. The screens replace the placeholders in steps 2a to 2d.
 private struct TabRoot: View {
     let tab: AppTab
     let data: AppData
@@ -75,9 +75,17 @@ private struct TabRoot: View {
 
     @Environment(AppModel.self) private var model
     @State private var toast: UndoToast?
+    @State private var path = NavigationPath()
+    @State private var accountForm: AccountFormRequest?
+
+    /// The account form over the tab: empty from "+ Счёт", or for an account from its page.
+    private struct AccountFormRequest: Identifiable {
+        let account: Account?
+        let id = UUID()
+    }
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             screen
                 // Inside the mic's inset, so the toast floats above the mic and the tab bar.
                 .undoToast($toast)
@@ -86,6 +94,14 @@ private struct TabRoot: View {
                 .modifier(MicPlacement(mic: mic))
                 .navigationTitle(Text(tab.title))
                 .toolbar { MainToolbar() }
+        }
+        .sheet(item: $accountForm) { request in
+            AccountFormSheet(
+                data: data, editing: request.account,
+                onDismiss: { accountForm = nil },
+                // Only an account's page edits an account, so the page on top is the deleted one's.
+                onDeleted: { if !path.isEmpty { path.removeLast() } }
+            )
         }
     }
 
@@ -100,12 +116,8 @@ private struct TabRoot: View {
                 data: data,
                 today: model.environment.today(),
                 reconcileMode: isReconciling,
-                onAddAccount: {
-                    // The account form (step 2b, `UI/AccountForm`) opens here, empty.
-                },
-                onEditAccount: { _ in
-                    // The account form (step 2b, `UI/AccountForm`) opens here for the account.
-                },
+                onAddAccount: { accountForm = AccountFormRequest(account: nil) },
+                onEditAccount: { accountForm = AccountFormRequest(account: $0) },
                 onEditOperation: { _ in
                     // The operation form arrives in step 2c.
                 },
