@@ -51,7 +51,8 @@ struct BigAmountInput: View {
 /// A `UITextField` that groups thousands as the amount is typed, the way Android's `Grouping` shows
 /// it. The grouping happens inside the keystroke, so the caret keeps its place among the digits and
 /// a fast typist loses nothing; a SwiftUI field rewritten from outside drops keys typed meanwhile.
-private struct GroupedAmountField: UIViewRepresentable {
+/// The operation form builds its own big amount around it (`EntryAmountField`).
+struct GroupedAmountField: UIViewRepresentable {
     @Binding var text: String
     @Binding var isFocused: Bool
     let font: UIFont
