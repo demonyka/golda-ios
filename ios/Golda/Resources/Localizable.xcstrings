@@ -396,23 +396,6 @@
         }
       }
     },
-    "Create" : {
-      "comment" : "New profile dialog: creates the profile.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Create"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Создать"
-          }
-        }
-      }
-    },
     "Credit card" : {
       "comment" : "Account type: a credit card; a negative balance is a debt.",
       "localizations" : {
@@ -443,40 +426,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Разница %@ запишется корректировкой"
-          }
-        }
-      }
-    },
-    "Done" : {
-      "comment" : "Closes a screen whose changes are already kept.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Done"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Готово"
-          }
-        }
-      }
-    },
-    "Each profile keeps its own accounts, goals and budget." : {
-      "comment" : "New profile dialog: what a profile is.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Each profile keeps its own accounts, goals and budget."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "У каждого профиля свои счета, цели и бюджет."
           }
         }
       }
@@ -787,40 +736,6 @@
         }
       }
     },
-    "Name" : {
-      "comment" : "New profile dialog: placeholder of the name field.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Name"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Название"
-          }
-        }
-      }
-    },
-    "New operation" : {
-      "comment" : "Operation form: the title for a new operation.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "New operation"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Новая операция"
-          }
-        }
-      }
-    },
     "New profile" : {
       "comment" : "Profile menu item and the title of the dialog it opens.",
       "localizations" : {
@@ -885,23 +800,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ОК"
-          }
-        }
-      }
-    },
-    "Operation" : {
-      "comment" : "Operation form: the title when an operation is open for editing.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Operation"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Операция"
           }
         }
       }
@@ -1004,23 +902,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Профиль: %@"
-          }
-        }
-      }
-    },
-    "Profiles" : {
-      "comment" : "Title of the screen that lists, creates, renames and deletes profiles.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Profiles"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Профили"
           }
         }
       }
@@ -1327,23 +1208,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Введи, сколько показывает банк"
-          }
-        }
-      }
-    },
-    "Voice notes" : {
-      "comment" : "Title of the screen that asks before a recording is sent to the voice provider.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Voice notes"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Голосовые заметки"
           }
         }
       }

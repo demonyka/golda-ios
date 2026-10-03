@@ -39,8 +39,7 @@ import UIKit
         typealias S = VoiceNotice.Strings
         let lines: [LocalizedStringResource] = [
             S.settings, S.add, S.ok, S.saved, S.noKey, S.offline, S.lost, S.profileGone, S.malformedAnswer, S.storage,
-            S.micBusy, S.micDenied, S.misunderstood("x"), S.late("x"), S.profile("x"), S.hoursOfWork("1"), S.leftToday("1 ₽"),
-            S.overBudget("1 ₽"),
+            S.micBusy, S.micDenied, S.misunderstood("x"), S.late("x"), S.profile("x"),
             VoiceConsentScreen.title, VoiceConsentScreen.headline, VoiceConsentScreen.intro, VoiceConsentScreen.agreeTitle,
             VoiceConsentScreen.notNowTitle,
             LocalizedStringResource("Purchase", table: "Voice"),

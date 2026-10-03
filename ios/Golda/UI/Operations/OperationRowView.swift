@@ -33,11 +33,13 @@ struct OperationRowView: View {
 
     private var texts: some View {
         VStack(alignment: .leading, spacing: 2) {
-            // Two lines, not Android's one: a transfer's "A → B" would otherwise lose where it went.
+            // Up to three lines, not Android's one: a transfer's "A → B" would otherwise lose where
+            // it went. Two cut "Карта ₽ → Мультивалютная USD" to "Мультивалютная…" beside a
+            // two-line amount.
             Text(verbatim: row.title(in: locale))
                 .font(.body)
                 .foregroundStyle(Theme.Color.text)
-                .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
+                .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 3)
             if let supporting = row.supporting {
                 Text(verbatim: supporting)
                     .font(.subheadline)

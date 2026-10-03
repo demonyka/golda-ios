@@ -23,6 +23,7 @@ enum EntryText {
     static let cancel = LocalizedStringResource("Cancel", table: "Entry", comment: "Closes the operation form without saving.")
     static let back = LocalizedStringResource("Back", table: "Entry", comment: "Operation form, “Not sure”: back to the form.")
     static let close = LocalizedStringResource("Close", table: "Entry", comment: "Closes the read-only sheet of an opening balance or a reconciliation adjustment.")
+    static let done = LocalizedStringResource("Done", table: "Entry", comment: "Closes the calendar of the operation form, keeping the day it shows.")
     /// "Записать": a new operation.
     static let record = LocalizedStringResource("Save.new", defaultValue: "Save", table: "Entry", comment: "Operation form: the confirmation that records a new operation. Russian “Записать”.")
     /// "Сохранить": the changes to an existing one.
@@ -150,12 +151,20 @@ enum EntryAnnouncement {
         let code = draft.purchaseCurrency ?? data.accountById[draft.accountId]?.currency ?? "RUB"
         let shown = draft.purchaseAmountMinor ?? draft.amountMinor
         let title = title(note: draft.note, categoryKey: draft.categoryKey, fallback: savedTitle, in: locale)
-        let first = title + " · " + Fmt.amount(shown, code)
-        guard let impact else { return first }
-        return first + "\n" + impactLine(impact, base: data.base, in: locale)
+        return spent(title: title, amount: Fmt.amount(shown, code), impact: impact, base: data.base, in: locale)
     }
 
-    /// "≈ 2,6 ч работы · на сегодня осталось 503 ₽", or "перерасход 120 ₽" once today is spent past.
+    /// "Велосипед · 80 000 ₽" and, under it, the impact line: the one toast for money spent, whether
+    /// the form recorded it ("Записать", "Беру") or a goal was bought ("Купить"), as Android's
+    /// `announce` and its goal snackbar both write it.
+    static func spent(title: String, amount: String, impact: Impact?, base: Base, in locale: Locale) -> String {
+        let first = title + " · " + amount
+        guard let impact else { return first }
+        return first + "\n" + impactLine(impact, base: base, in: locale)
+    }
+
+    /// "≈ 2,6 ч работы · на сегодня осталось 503 ₽", or "перерасход 120 ₽" once today is spent past:
+    /// Android's `Wishes.impact`, under every expense the app announces (the form, goals, voice).
     static func impactLine(_ impact: Impact, base: Base, in locale: Locale) -> String {
         var parts: [String] = []
         if let hours = impact.hoursOfWork {

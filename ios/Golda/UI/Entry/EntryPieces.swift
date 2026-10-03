@@ -181,6 +181,13 @@ struct EntryDatePill: View {
                 .scrollBounceBehavior(.basedOnSize)
                 .navigationTitle(Text(verbatim: EntryText.date.text(in: locale)))
                 .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    // A picked day closes the calendar; keeping the day shown needs a way back too.
+                    ToolbarItem(placement: .confirmationAction) {
+                        ConfirmButton(title: EntryText.done.text(in: locale)) { isPicking = false }
+                            .accessibilityIdentifier("entry.date.done")
+                    }
+                }
             }
             .presentationDetents([.medium, .large])
             .presentationBackground(Theme.Color.page)

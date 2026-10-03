@@ -331,15 +331,27 @@ import Testing
         let over = GoalPurchaseReport(
             goal: fixture.cushion, impact: Impact(costRub: 30_000_000, hoursOfWork: 333.333, leftTodayRub: -29_000_000), base: base
         )
-        // The symbol never wraps away from its digits.
-        #expect(over.text(in: F.ru) == "Подушка · 300\u{202F}000\u{00A0}₽\n≈ 333,3 ч работы · перерасход 290\u{202F}000\u{00A0}₽")
-        #expect(over.text(in: F.en) == "Подушка · 300\u{202F}000\u{00A0}₽\n≈ 333,3 h of work · over budget by 290\u{202F}000\u{00A0}₽")
+        // The same words as after an expense from the form, as Android's goal snackbar has them.
+        #expect(over.text(in: F.ru) == "Подушка · 300\u{202F}000 ₽\n≈ 333,3 ч работы · перерасход 290\u{202F}000 ₽")
+        #expect(over.text(in: F.en) == "Подушка · 300\u{202F}000 ₽\n≈ 333,3 h of work · over budget by 290\u{202F}000 ₽")
 
         let left = GoalPurchaseReport(goal: fixture.bike, impact: Impact(costRub: 8_000_000, hoursOfWork: nil, leftTodayRub: 50_300), base: base)
-        #expect(left.text(in: F.ru) == "Велосипед · 80\u{202F}000\u{00A0}₽\nна сегодня осталось 503\u{00A0}₽")
-        #expect(left.text(in: F.en) == "Велосипед · 80\u{202F}000\u{00A0}₽\nleft for today 503\u{00A0}₽")
+        #expect(left.text(in: F.ru) == "Велосипед · 80\u{202F}000 ₽\nна сегодня осталось 503 ₽")
+        #expect(left.text(in: F.en) == "Велосипед · 80\u{202F}000 ₽\nleft for today 503 ₽")
 
-        #expect(GoalPurchaseReport(goal: fixture.bike, impact: nil, base: base).text(in: F.ru) == "Велосипед · 80\u{202F}000\u{00A0}₽")
+        #expect(GoalPurchaseReport(goal: fixture.bike, impact: nil, base: base).text(in: F.ru) == "Велосипед · 80\u{202F}000 ₽")
+    }
+
+    /// "Купить" on a goal and "Беру" in the form spend money the same way, and one helper says so.
+    @Test func buyingAGoalIsAnnouncedAsAnExpenseFromTheForm() {
+        let fixture = GoalsFixture()
+        let base = fixture.data.base
+        let impact = Impact(costRub: 8_000_000, hoursOfWork: 88.9, leftTodayRub: -7_949_700)
+        for locale in [F.ru, F.en] {
+            let goal = GoalPurchaseReport(goal: fixture.bike, impact: impact, base: base).text(in: locale)
+            let form = EntryAnnouncement.spent(title: "Велосипед", amount: "80\u{202F}000 ₽", impact: impact, base: base, in: locale)
+            #expect(goal == form)
+        }
     }
 
     // MARK: Toasts

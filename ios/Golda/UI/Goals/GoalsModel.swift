@@ -378,46 +378,22 @@ struct GoalPurchasePlan: Equatable, Sendable {
 }
 
 /// What buying a goal did, for the toast: "Велосипед · 80 000 ₽" and, under it, the hours of work
-/// and what is left for today, as Android's line after an expense.
-struct GoalPurchaseReport: Equatable, Sendable {
+/// and what is left for today. The words are the operation form's (`EntryAnnouncement.spent`):
+/// "Купить" and "Беру" both spend, and Android announces them the same way.
+struct GoalPurchaseReport: Sendable {
     let name: String
     let amount: String
-    /// "≈ 88,9"; nil while no income is set.
-    let hours: String?
-    /// "503 ₽" left today, or the overspend.
-    let leftToday: String
-    let isOverspent: Bool
+    let impact: Impact?
+    let base: Base
 
     init(goal: Goal, impact: Impact?, base: Base) {
         name = goal.name
-        amount = Self.unbroken(Fmt.amount(goal.targetMinor, goal.currency))
-        hours = impact?.hoursOfWork.map { Fmt.number($0, decimals: 1) }
-        let left = impact?.leftTodayRub ?? 0
-        isOverspent = left < 0
-        leftToday = Self.unbroken(base.approx(abs(left)))
-        hasImpact = impact != nil
+        amount = Fmt.amount(goal.targetMinor, goal.currency)
+        self.impact = impact
+        self.base = base
     }
-
-    /// The toast wraps its lines: a no-break space keeps "₽" with its digits.
-    private static func unbroken(_ amount: String) -> String {
-        amount.replacingOccurrences(of: " ", with: "\u{00A0}")
-    }
-
-    private let hasImpact: Bool
 
     func text(in locale: Locale) -> String {
-        let head = name + " · " + amount
-        guard hasImpact else { return head }
-        var facts: [String] = []
-        if let hours {
-            facts.append(LocalizedStringResource("≈ \(hours) h of work", table: "Goals", comment: "After buying a goal: what it cost in hours of work, “≈ 88,9 h of work”.").text(in: locale))
-        }
-        let left = leftToday
-        facts.append(
-            isOverspent
-                ? LocalizedStringResource("over budget by \(left)", table: "Goals", comment: "After buying a goal: today’s budget is overspent by this much.").text(in: locale)
-                : LocalizedStringResource("left for today \(left)", table: "Goals", comment: "After buying a goal: what is left of today’s budget.").text(in: locale)
-        )
-        return head + "\n" + facts.joined(separator: " · ")
+        EntryAnnouncement.spent(title: name, amount: amount, impact: impact, base: base, in: locale)
     }
 }

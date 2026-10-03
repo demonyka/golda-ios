@@ -510,57 +510,6 @@
           }
         }
       }
-    },
-    "left for today %@" : {
-      "comment" : "Voice toast: what is left to spend today after the expense.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "left for today %@"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "на сегодня осталось %@"
-          }
-        }
-      }
-    },
-    "over budget by %@" : {
-      "comment" : "Voice toast: how far today's budget is overspent after the expense.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "over budget by %@"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "перерасход %@"
-          }
-        }
-      }
-    },
-    "≈ %@ h of work" : {
-      "comment" : "Voice toast: what an expense cost in hours of work, “≈ 2,6 h of work”.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "≈ %@ h of work"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "≈ %@ ч работы"
-          }
-        }
-      }
     }
   },
   "version" : "1.0"
