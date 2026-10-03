@@ -129,7 +129,9 @@ private struct TabRoot: View {
                 onEditOperation: edit,
                 onAllReconciled: { isReconciling = false }
             )
-        case .goals, .insights:
+        case .goals:
+            GoalsScreen(data: data)
+        case .insights:
             TabPlaceholder(tab: tab, profileName: data.profile.name)
         }
     }
