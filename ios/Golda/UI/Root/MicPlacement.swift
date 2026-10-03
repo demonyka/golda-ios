@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The microphone, the app's main action: the round gold button at the thumb, above the tab bar.
+/// The microphone, the app's main action: the round glass button at the thumb, above the tab bar.
 ///
 /// It goes on a tab's own screen, inside the navigation stack, as a bottom safe-area inset. There
 /// the system insets the screen's list by the button's real height, so the last rows scroll clear

@@ -18,12 +18,10 @@ struct WelcomeView: View {
             Button(action: start) {
                 Text("Start")
                     .font(.headline)
-                    .foregroundStyle(Theme.Color.onGold)
                     .frame(maxWidth: .infinity)
             }
+            // The screen's one way on: prominent glass in the system blue, as an iOS "Continue" (D34).
             .buttonStyle(.glassProminent)
-            // The screen's one main action: gold, with the ink made for it.
-            .tint(Theme.Color.gold)
             .controlSize(.large)
             .disabled(isStarting)
             .accessibilityIdentifier("welcome.start")

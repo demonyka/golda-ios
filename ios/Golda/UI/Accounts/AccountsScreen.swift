@@ -126,16 +126,15 @@ struct AccountsScreen: View {
         }
     }
 
+    /// "+ Счёт" in the system blue, as an action row of an iOS list reads (D34).
     private var addRow: some View {
         Button(action: onAddAccount) {
             HStack(spacing: Theme.Gap.m) {
                 Image(systemName: Symbols.add)
-                    .font(.body.weight(.medium))
-                    .foregroundStyle(Theme.Color.muted)
                 Text(verbatim: Self.addTitle.text(in: locale))
-                    .font(.body.weight(.medium))
-                    .foregroundStyle(Theme.Color.text)
             }
+            .font(.body.weight(.medium))
+            .foregroundStyle(.tint)
             .frame(maxWidth: .infinity, minHeight: Theme.minimumTarget, alignment: .leading)
             .contentShape(.rect)
         }

@@ -2,10 +2,10 @@ import GoldaCore
 import SwiftUI
 
 /// The account form, for a new account or for [editing] one: the port of Android's `AccountSheet`
-/// as an iOS form sheet. "Отмена" on the left, the trash on the right when editing, the gold main
-/// action pinned at the bottom (the keyboard lifts it). The name and currency come first, then the
-/// type, how much is there for a new account, what a savings account or a debt needs, the group and
-/// whether it counts in "Можно сегодня". The rules live in `AccountFormModel`.
+/// as an iOS form sheet. "Отмена" on the left; on the right the trash when editing and the
+/// confirmation, "Добавить" or "Сохранить", in the system blue (D34). The name and currency come
+/// first, then the type, how much is there for a new account, what a savings account or a debt
+/// needs, the group and whether it counts in "Можно сегодня". The rules live in `AccountFormModel`.
 ///
 /// Present it with `.sheet`; it sets its own detent. Saving and deleting go through the `AppModel`
 /// in the environment, to the profile on screen; [onDismiss] closes the sheet after either, and
@@ -57,11 +57,7 @@ struct AccountFormSheet: View {
             .navigationTitle(Text(verbatim: form.title.text(in: locale)))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { toolbar }
-            // A bar rather than a plain inset: the form fades under it as it scrolls (iOS 26).
-            .safeAreaBar(edge: .bottom) { saveBar }
         }
-        // A sheet does not inherit the tabs' tint: picks and switches are graphite here too.
-        .tint(Theme.Color.graphite)
         .presentationDetents([.large])
         .presentationBackground(Theme.Color.page)
         .alert(
@@ -310,24 +306,11 @@ struct AccountFormSheet: View {
                 }
             }
         }
-    }
-
-    /// The screen's one main action, gold, above the keyboard when it is up.
-    private var saveBar: some View {
-        Button(action: save) {
-            Text(verbatim: form.saveTitle.text(in: locale))
-                .font(.headline)
-                // The gold's own ink only on gold: on the grey of a disabled button it would vanish in the dark.
-                .foregroundStyle(canSave ? Theme.Color.onGold : Theme.Color.muted)
-                .frame(maxWidth: .infinity)
+        ToolbarItem(placement: .confirmationAction) {
+            ConfirmButton(title: form.saveTitle.text(in: locale), action: save)
+                .disabled(!canSave)
+                .accessibilityIdentifier("accountForm.save")
         }
-        .buttonStyle(.glassProminent)
-        .tint(Theme.Color.gold)
-        .controlSize(.large)
-        .disabled(!canSave)
-        .padding(.horizontal, Theme.Gap.m)
-        .padding(.bottom, Theme.Gap.s)
-        .accessibilityIdentifier("accountForm.save")
     }
 
     private var canSave: Bool { form.canSave && !isBusy }

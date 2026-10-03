@@ -65,14 +65,16 @@ enum UndoToastTiming {
 
 // MARK: - View
 
-/// The capsule itself: the message, and the action as a button of at least 44 pt. Dark ink on a
-/// light fill in the dark theme and the other way round in the light one: it stands out from the
-/// cards it floats over, the way the Android snackbar does.
+/// The capsule itself: the message, and the action as a button of at least 44 pt in the system
+/// blue, so it reads as something to tap (D34). Dark ink on a light fill in the dark theme and the
+/// other way round in the light one: it stands out from the cards it floats over, the way the
+/// Android snackbar does.
 struct UndoToastView: View {
     var toast: UndoToast
     var onAction: () -> Void
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         let layout = dynamicTypeSize.isAccessibilitySize
@@ -88,11 +90,14 @@ struct UndoToastView: View {
             Button(action: onAction) {
                 Text(toast.actionTitle)
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(Theme.Color.line)
+                    .foregroundStyle(.tint)
                     .frame(minWidth: Theme.minimumTarget, minHeight: Theme.minimumTarget, alignment: .center)
                     .contentShape(.rect)
             }
             .buttonStyle(.plain)
+            // The fill is the other theme's, so the blue is too: the brighter dark-theme blue on
+            // the dark capsule, the deeper light-theme one on the light capsule.
+            .environment(\.colorScheme, colorScheme == .dark ? .light : .dark)
         }
         // More room at the rounded ends than at the action, which is a tap target in its own right.
         .padding(.leading, Theme.Gap.l - Theme.Gap.xs)

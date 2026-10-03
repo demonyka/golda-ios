@@ -47,6 +47,34 @@ import UIKit
         }
     }
 
+    /// A sheet's toolbar: "Отмена" in plain glass and the confirmation in the system blue, enabled
+    /// and disabled. The confirmation's text must be light on the blue in both themes.
+    @Test func sheetToolbarsInAWindow() async throws {
+        for style in [UIUserInterfaceStyle.light, .dark] {
+            try await windowImage("sheet-toolbars", size: CGSize(width: 390, height: 300), style: style) {
+                VStack(spacing: 0) {
+                    ForEach([true, false], id: \.self) { enabled in
+                        NavigationStack {
+                            Theme.Color.page
+                                .navigationTitle(Text(verbatim: enabled ? "Новый счёт" : "Без названия"))
+                                .navigationBarTitleDisplayMode(.inline)
+                                .toolbar {
+                                    ToolbarItem(placement: .cancellationAction) {
+                                        Button {} label: { Text(verbatim: "Отмена") }
+                                    }
+                                    ToolbarItem(placement: .confirmationAction) {
+                                        ConfirmButton(title: "Добавить") {}
+                                            .disabled(!enabled)
+                                    }
+                                }
+                        }
+                        .frame(height: 120)
+                    }
+                }
+            }
+        }
+    }
+
     /// The mic at home: a TabView with four tabs, the floating mic and a toast above it over a list.
     @Test func tabViewWithMicAndToast() async throws {
         for style in [UIUserInterfaceStyle.light, .dark] {

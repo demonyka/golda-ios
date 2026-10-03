@@ -111,7 +111,7 @@ final class AccountFormUITests: XCTestCase {
         XCTAssertFalse(app.textFields["accountForm.opening"].exists, "an existing account books no opening balance")
         XCTAssertFalse(app.buttons["accountForm.currency"].exists, "the currency is not a picker once the account exists")
         XCTAssertEqual(name.value as? String, "Alfa savings")
-        // Return puts the keyboard away; while it is up, the pinned action above it covers the rate.
+        // Return puts the keyboard away; while it is up, it covers the rate.
         replaceText(of: name, with: "Alfa deposit\n")
         replaceText(of: rate, with: "13")
         scrollTo(budget, in: app)
@@ -333,8 +333,7 @@ final class AccountFormUITests: XCTestCase {
 
     /// Swipes until [element] can be tapped, down the list first and, when [orBack], then back up;
     /// a list keeps rows out of sight unloaded. Only a plain screen may swipe back: in a sheet at its
-    /// top that swipe closes the sheet. The keyboard goes away first, since the pinned action riding
-    /// on it covers the rows it passes.
+    /// top that swipe closes the sheet. The keyboard goes away first, since it covers the rows it passes.
     @MainActor
     private func scrollTo(_ element: XCUIElement, in app: XCUIApplication, orBack: Bool = false) {
         dismissKeyboard(app)
@@ -347,7 +346,7 @@ final class AccountFormUITests: XCTestCase {
         }
     }
 
-    /// A short drag on the upper part of the form, where no pinned action or keyboard is: the forms
+    /// A short drag on the upper part of the form, where the keyboard is not: the forms
     /// put the keyboard away as soon as they are dragged, even when there is nothing to scroll.
     @MainActor
     private func dismissKeyboard(_ app: XCUIApplication) {

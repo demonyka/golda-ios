@@ -85,9 +85,10 @@ struct LevelWaveform: View {
 
 // MARK: - Round floating mic
 
-/// The mic: a 64 pt gold button that floats over the content. On iOS 26 it is Liquid Glass tinted
-/// gold; with Reduce Transparency it is a plain gold disc. Recording shows the waveform above a stop
-/// square, thinking a spinner. Gold is the one main-action colour and appears only here.
+/// The mic: a 64 pt round button that floats over the content. On iOS 26 it is plain Liquid Glass,
+/// with no accent colour (D34); with Reduce Transparency it is a solid card-coloured disc. The
+/// glyphs are in the primary label colour: the mic, the waveform above a stop square while
+/// recording, and the spinner while thinking.
 struct MicFloatingButton: View {
     var state: MicState
     /// Raw loudness, 0...1, while recording.
@@ -95,6 +96,10 @@ struct MicFloatingButton: View {
     var action: () -> Void
 
     static let diameter: CGFloat = 64
+
+    /// The label colour as a plain colour. Glass draws shapes filled with the semantic `.primary`
+    /// as a faint vibrant grey (symbols stay solid), so the waveform and the stop square take this.
+    private static let shapeInk = Color(uiColor: .label)
 
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
@@ -110,11 +115,11 @@ struct MicFloatingButton: View {
             // the label, it would take the tap that ends "thinking".
             if state == .thinking {
                 ProgressView()
-                    .tint(Theme.Color.onGold)
+                    .tint(.primary)
                     .allowsHitTesting(false)
             }
         }
-        .modifier(GoldDisc(reduceTransparency: reduceTransparency))
+        .modifier(GlassDisc(reduceTransparency: reduceTransparency))
         .accessibilityLabel(Text(state.accessibilityLabel))
         .accessibilityHint(state.accessibilityHint.map { Text($0) } ?? Text(verbatim: ""))
         .animation(.snappy, value: state)
@@ -125,13 +130,13 @@ struct MicFloatingButton: View {
         case .idle:
             Image(systemName: Symbols.mic)
                 .font(.system(size: 28, weight: .semibold))
-                .foregroundStyle(Theme.Color.onGold)
+                .foregroundStyle(.primary)
                 .contentTransition(.symbolEffect(.replace))
         case .recording:
             VStack(spacing: 6) {
-                LevelWaveform(level: level, ink: Theme.Color.onGold, maxHeight: 20)
+                LevelWaveform(level: level, ink: Self.shapeInk, maxHeight: 20)
                 RoundedRectangle(cornerRadius: 3, style: .continuous)
-                    .fill(Theme.Color.onGold)
+                    .fill(Self.shapeInk)
                     .frame(width: 13, height: 13)
             }
         case .thinking:
@@ -141,18 +146,18 @@ struct MicFloatingButton: View {
     }
 }
 
-/// Gold glass on iOS 26, a plain gold disc when transparency is reduced.
-private struct GoldDisc: ViewModifier {
+/// Plain glass on iOS 26, a solid disc in the card's colour when transparency is reduced.
+private struct GlassDisc: ViewModifier {
     var reduceTransparency: Bool
 
     func body(content: Content) -> some View {
         if reduceTransparency {
             content
-                .background(Theme.Color.gold, in: .circle)
+                .background(Theme.Color.card, in: .circle)
                 .shadow(color: .black.opacity(0.18), radius: 8, y: 3)
         } else {
             content
-                .glassEffect(.regular.tint(Theme.Color.gold).interactive(), in: .circle)
+                .glassEffect(.regular.interactive(), in: .circle)
         }
     }
 }

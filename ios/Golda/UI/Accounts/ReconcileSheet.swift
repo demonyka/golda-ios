@@ -2,8 +2,11 @@ import GoldaCore
 import SwiftUI
 
 /// "Сколько на самом деле?" as a small sheet. The balance stands in the field as the big number,
-/// and the gold button says "Сходится" until a different number is typed; then the difference shows
+/// and the blue button says "Сходится" until a different number is typed; then the difference shows
 /// underneath and the button says what will be recorded. [onReconcile] gets the real balance.
+///
+/// The confirmation is pinned at the bottom rather than in the toolbar: it names the amount it will
+/// record ("Записать −101 ₽"), which a toolbar button has no room for.
 ///
 /// The field is not focused on opening: a glance and "Сходится" is the common case.
 struct ReconcileSheet: View {
@@ -39,6 +42,7 @@ struct ReconcileSheet: View {
                     } label: {
                         Text(verbatim: Self.cancelTitle.text(in: locale))
                     }
+                    .accessibilityIdentifier("reconcile.cancel")
                 }
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
@@ -110,7 +114,7 @@ struct ReconcileSheet: View {
         .frame(maxWidth: .infinity)
     }
 
-    /// The sheet's one main action, gold, above the keyboard.
+    /// The sheet's confirmation, prominent glass in the system blue, above the keyboard.
     private var action: some View {
         Button {
             guard let actual = entry.actualMinor, entry.canSave else { return }
@@ -120,7 +124,6 @@ struct ReconcileSheet: View {
             Text(verbatim: entry.actionTitle(in: locale))
                 .font(.headline)
                 .tabularDigits()
-                .foregroundStyle(Theme.Color.onGold)
                 // The amount must show whole, even at the largest text sizes.
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
@@ -129,7 +132,6 @@ struct ReconcileSheet: View {
                 .contentTransition(.opacity)
         }
         .buttonStyle(.glassProminent)
-        .tint(Theme.Color.gold)
         .controlSize(.large)
         .disabled(!entry.canSave)
         .padding(.horizontal, Theme.Gap.m)

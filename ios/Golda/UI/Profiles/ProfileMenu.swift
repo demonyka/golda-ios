@@ -4,6 +4,7 @@ import SwiftUI
 /// whole app; the menu also creates one and leads to the profiles screen (D23).
 struct ProfileMenu: View {
     @Environment(AppModel.self) private var model
+    @Environment(AppRouter.self) private var router
     @State private var isNaming = false
     @State private var newName = ""
 
@@ -21,13 +22,14 @@ struct ProfileMenu: View {
                     isNaming = true
                 }
                 .accessibilityIdentifier("profileMenu.new")
-                // The profiles screen arrives in step 2e.
-                Button("Manage profiles", systemImage: "person.crop.circle") {}
-                    .accessibilityIdentifier("profileMenu.manage")
+                Button("Manage profiles", systemImage: "person.crop.circle") {
+                    router.present(.profiles)
+                }
+                .accessibilityIdentifier("profileMenu.manage")
             }
         } label: {
             // The name in the text ink and the chevron quieter, the way the toolbar's other glyphs
-            // sit: graphite and gold stay for what is picked and for the mic.
+            // sit: no accent colour on a toolbar control (D34).
             HStack(spacing: Theme.Gap.xs) {
                 Text(verbatim: name)
                     .font(.headline)
@@ -47,7 +49,10 @@ struct ProfileMenu: View {
             TextField("Name", text: $newName)
                 .textInputAutocapitalization(.sentences)
             Button("Cancel", role: .cancel) {}
-            Button("Create", action: create)
+            // The confirm role and the default shortcut make it the alert's preferred button, filled
+            // with the system blue (D34).
+            Button("Create", role: .confirm, action: create)
+                .keyboardShortcut(.defaultAction)
                 .disabled(trimmedName.isEmpty)
         } message: {
             Text("Each profile keeps its own accounts, goals and budget.")
