@@ -61,6 +61,18 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.f4studio.golda.tests
         GENERATE_INFOPLIST_FILE: YES
 
+  GoldaUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: GoldaUITests
+    dependencies:
+      - target: Golda
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.f4studio.golda.uitests
+        GENERATE_INFOPLIST_FILE: YES
+
 schemes:
   Golda:
     build:
@@ -70,6 +82,6 @@ schemes:
       config: Debug
     test:
       config: Debug
-      targets: [GoldaTests]
+      targets: [GoldaTests, GoldaUITests]
     archive:
       config: Release

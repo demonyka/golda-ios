@@ -37,11 +37,12 @@ jobs:
           brew install xcodegen
           xcodegen generate
 
-      # Unsigned: CI has no certificates, and the simulator does not need them.
-      - name: Build the app
+      # Unsigned: CI has no certificates, and the simulator does not need them. Runs the hosted
+      # unit tests and the UI scenarios.
+      - name: Test the app
         working-directory: ios
         run: |
-          xcodebuild build \
+          xcodebuild test \
             -project Golda.xcodeproj -scheme Golda \
-            -destination 'generic/platform=iOS Simulator' \
+            -destination 'platform=iOS Simulator,name=iPhone 17' \
             CODE_SIGNING_ALLOWED=NO
