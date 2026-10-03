@@ -29,7 +29,9 @@ struct AccountPage: View {
                         .listRowBackground(Color.clear)
                         .listRowSeparator(.hidden)
                 }
-                DebtSectionSlot(state: page.state)
+                // A credit card's or a loan's terms and the early-repayment calculator; nothing for
+                // other accounts.
+                DebtDetailsView(state: page.state, data: data, today: today)
                 OperationDaySections(days: page.days, rowIdentifier: "account.operation", onSelect: onEditOperation)
             }
             .listStyle(.insetGrouped)
@@ -52,7 +54,8 @@ struct AccountPage: View {
                 ReconcileSheet(state: page.state) { actual in reconcile(actualMinor: actual) }
             }
         } else {
-            // The account went (deleted from its form, or by another device): back to the list.
+            // The account went without its form saying so (deleted on another device, later through
+            // sync): back to the list. A delete from the form pops the page by itself.
             Theme.Color.page
                 .ignoresSafeArea()
                 .onAppear { dismiss() }
@@ -94,7 +97,7 @@ struct AccountPageHero: View {
                     )
                     .padding(.top, Theme.Gap.xs)
                     if !page.others.isEmpty {
-                        Text(verbatim: "≈ " + page.others.keepingDotsOnTheLine)
+                        Text(verbatim: ("≈ " + page.others).keepingMarksOnTheLine)
                             .font(.body)
                             .tabularDigits()
                             .foregroundStyle(.secondary)

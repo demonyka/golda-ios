@@ -56,7 +56,7 @@ struct AccountRowView: View {
                         .alignmentGuide(.firstTextBaseline) { $0[VerticalAlignment.center] + lift }
                 }
             }
-            Text(verbatim: row.subline.text(in: locale).keepingDotsOnTheLine)
+            Text(verbatim: row.subline.text(in: locale).keepingMarksOnTheLine)
                 .font(.subheadline)
                 .tabularDigits()
                 .foregroundStyle(Theme.Color.muted)

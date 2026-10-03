@@ -1,9 +1,9 @@
 import XCTest
 
-/// The account form and the debt screens on the made-up person's books, reached through the debug
-/// host (`-golda.screen=accountForm`) until the Accounts tab brings the real entry points. Each row
-/// of the host reads back everything the form saved, so a change can be seen landing in the model.
-/// The interface runs in English; the sample names stay Russian, as they are data.
+/// The account form and the debt screens on the made-up person's books, the way a person reaches
+/// them: "+ Account" at the end of the Accounts tab, "Edit" on an account's page, and a debt's page
+/// with its terms and the early-repayment calculator. The list and the page read the saved account
+/// back. The interface runs in English; the sample names stay Russian, as they are data.
 final class AccountFormUITests: XCTestCase {
     override func setUp() {
         continueAfterFailure = false
@@ -16,27 +16,50 @@ final class AccountFormUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = [
             "-AppleLanguages", "(\(language))", "-AppleLocale", language == "ru" ? "ru_RU" : "en_US",
-            "-golda.inMemory", "-golda.samples", "-golda.screen=accountForm",
+            "-golda.inMemory", "-golda.samples",
         ]
         app.launch()
         return app
     }
 
+    /// The Accounts tab, once its hero is there.
+    @MainActor
+    private func openAccounts(_ app: XCUIApplication, language: String = "en") {
+        let tab = app.tabBars.buttons[language == "ru" ? "Счета" : "Accounts"]
+        XCTAssertTrue(tab.waitForExistence(timeout: 30))
+        tab.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["accounts.hero"].waitForExistence(timeout: 10))
+    }
+
+    /// An account's row on the Accounts tab: its VoiceOver label starts with the name.
     @MainActor
     private func row(_ app: XCUIApplication, _ name: String) -> XCUIElement {
-        app.buttons["debugHost.account.\(name)"]
+        app.buttons.matching(identifier: "accounts.account").matching(NSPredicate(format: "label BEGINSWITH %@", name + ",")).firstMatch
+    }
+
+    /// "+ Account", at the end of the list.
+    @MainActor
+    private func openNewAccountForm(_ app: XCUIApplication) -> XCUIElement {
+        let add = app.buttons["accounts.add"]
+        scrollTo(add, in: app)
+        add.tap()
+        let name = app.textFields["accountForm.name"]
+        XCTAssertTrue(name.waitForExistence(timeout: 5))
+        return name
     }
 
     @MainActor
-    func testCreateAnAccountThenEditItThenDeleteIt() {
+    private func page(_ app: XCUIApplication) -> XCUIElement {
+        app.descendants(matching: .any)["account.hero"]
+    }
+
+    @MainActor
+    func testAddAnAccountThenEditAndDeleteItFromItsPage() {
         let app = launch()
-        let add = app.buttons["debugHost.new"]
-        XCTAssertTrue(add.waitForExistence(timeout: 30))
-        add.tap()
+        openAccounts(app)
 
         // A new savings account in lari (the local currency), outside the budget by default.
-        let name = app.textFields["accountForm.name"]
-        XCTAssertTrue(name.waitForExistence(timeout: 5))
+        let name = openNewAccountForm(app)
         XCTAssertTrue(app.navigationBars["New account"].exists)
         let save = app.buttons["accountForm.save"]
         XCTAssertFalse(save.isEnabled, "no name yet")
@@ -66,14 +89,23 @@ final class AccountFormUITests: XCTestCase {
         group.typeText("Alfa")
         XCTAssertEqual(save.label, "Add")
         save.tap()
+        XCTAssertTrue(eventually { !name.exists }, "the form closes")
 
+        // In the list with its opening balance and the month's interest; a group of one is no group.
         let created = row(app, "Alfa savings")
-        XCTAssertTrue(created.waitForExistence(timeout: 5))
-        XCTAssertEqual(created.label, "Alfa savings · SAVINGS · GEL · 150\u{202F}000 ₾ · outside · Alfa · 12.5 %")
+        scrollTo(created, in: app)
+        XCTAssertTrue(created.label.hasSuffix(", 150000 Georgian laris"), created.label)
+        XCTAssertTrue(created.label.contains("Georgian laris for "), created.label)
+        XCTAssertFalse(created.label.contains("Counts in"), created.label)
+        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@ AND label CONTAINS %@", "Alfa", "·")).firstMatch.exists)
 
-        // Edited: a new name, a new rate and into the budget. The balance stays, and the currency
-        // is shown but cannot change.
+        // Its page, then the form from there: a new name, a new rate and into the budget. The
+        // balance stays, and the currency is shown but cannot change.
         created.tap()
+        XCTAssertTrue(page(app).waitForExistence(timeout: 5))
+        XCTAssertTrue(app.navigationBars["Alfa savings"].exists)
+        XCTAssertTrue(page(app).label.hasPrefix("Savings · Alfa. 150000 Georgian laris."), page(app).label)
+        app.buttons["account.edit"].tap()
         XCTAssertTrue(name.waitForExistence(timeout: 5))
         XCTAssertTrue(app.navigationBars["Account"].exists)
         XCTAssertFalse(app.textFields["accountForm.opening"].exists, "an existing account books no opening balance")
@@ -87,14 +119,12 @@ final class AccountFormUITests: XCTestCase {
         XCTAssertEqual(budget.value as? String, "1")
         XCTAssertEqual(save.label, "Save")
         save.tap()
+        XCTAssertTrue(eventually { !name.exists }, "the form closes")
+        XCTAssertTrue(eventually { app.navigationBars["Alfa deposit"].exists }, "the page follows the new name")
+        XCTAssertTrue(page(app).label.hasPrefix("Savings · Alfa. 150000 Georgian laris."), page(app).label)
 
-        let edited = row(app, "Alfa deposit")
-        XCTAssertTrue(edited.waitForExistence(timeout: 5))
-        XCTAssertEqual(edited.label, "Alfa deposit · SAVINGS · GEL · 150\u{202F}000 ₾ · in budget · Alfa · 13.0 %")
-        XCTAssertFalse(row(app, "Alfa savings").exists)
-
-        // Deleted, after the question that warns its operations go too.
-        edited.tap()
+        // Deleted after the question that warns its operations go too: the page goes with it.
+        app.buttons["account.edit"].tap()
         let delete = app.buttons["accountForm.delete"]
         XCTAssertTrue(delete.waitForExistence(timeout: 5))
         delete.tap()
@@ -102,19 +132,19 @@ final class AccountFormUITests: XCTestCase {
         XCTAssertTrue(question.waitForExistence(timeout: 5))
         XCTAssertTrue(question.staticTexts["All operations with this account go too, transfers included."].exists)
         question.buttons["Delete"].tap()
-        XCTAssertTrue(eventually { !self.row(app, "Alfa deposit").exists })
+        XCTAssertTrue(eventually { !self.page(app).exists && !app.navigationBars["Alfa deposit"].exists }, "the page pops")
+        XCTAssertTrue(eventually { app.buttons["accounts.add"].exists }, "back on the list")
+        XCTAssertFalse(row(app, "Alfa deposit").exists)
+        XCTAssertFalse(row(app, "Alfa savings").exists)
         XCTAssertTrue(row(app, "Кредит").exists, "the other accounts stay")
     }
 
     @MainActor
     func testANewDebtIsOwedAndCancelSavesNothing() {
         let app = launch()
-        let add = app.buttons["debugHost.new"]
-        XCTAssertTrue(add.waitForExistence(timeout: 30))
+        openAccounts(app)
 
-        add.tap()
-        let name = app.textFields["accountForm.name"]
-        XCTAssertTrue(name.waitForExistence(timeout: 5))
+        let name = openNewAccountForm(app)
         name.tap()
         name.typeText("Car loan")
         app.buttons["accountForm.type.loan"].tap()
@@ -125,14 +155,21 @@ final class AccountFormUITests: XCTestCase {
         payment.tap()
         payment.typeText("100")
         app.buttons["accountForm.save"].tap()
+        XCTAssertTrue(eventually { !name.exists }, "the form closes")
 
+        // What is owed is typed as is and kept as a negative balance; the page shows the terms.
         let loan = row(app, "Car loan")
-        XCTAssertTrue(loan.waitForExistence(timeout: 5))
-        // What is owed is typed as is and kept as a negative balance.
-        XCTAssertTrue(loan.label.hasPrefix("Car loan · LOAN · GEL · −1\u{202F}000 ₾ · outside · 100 ₾ on -"), loan.label)
+        scrollTo(loan, in: app)
+        XCTAssertTrue(loan.label.hasPrefix("Car loan, Loan, about "), loan.label)
+        XCTAssertTrue(loan.label.hasSuffix("-1000 Georgian laris") || loan.label.hasSuffix("−1000 Georgian laris"), loan.label)
+        loan.tap()
+        XCTAssertTrue(page(app).waitForExistence(timeout: 5))
+        let terms = app.descendants(matching: .any)["debt.payment"]
+        XCTAssertTrue(terms.waitForExistence(timeout: 5))
+        XCTAssertEqual(terms.value as? String, "100 Georgian laris")
+        app.navigationBars.buttons.element(boundBy: 0).tap()
 
-        add.tap()
-        XCTAssertTrue(name.waitForExistence(timeout: 5))
+        _ = openNewAccountForm(app)
         name.tap()
         name.typeText("Never saved")
         app.buttons["accountForm.cancel"].tap()
@@ -141,19 +178,23 @@ final class AccountFormUITests: XCTestCase {
     }
 
     @MainActor
-    func testTheLoanPageOpensTheEarlyRepaymentCalculator() {
+    func testTheLoanPageShowsItsTermsAndOpensTheEarlyRepaymentCalculator() {
         let app = launch()
-        let loan = app.buttons["debugHost.debt.Кредит"]
-        XCTAssertTrue(loan.waitForExistence(timeout: 30))
+        openAccounts(app)
+        let loan = row(app, "Кредит")
+        scrollTo(loan, in: app)
         loan.tap()
 
         // 200 000 ₽ at 19,9 % paid 10 000 ₽ a month: 24,5 payments.
+        XCTAssertTrue(page(app).waitForExistence(timeout: 5))
         let months = app.descendants(matching: .any)["debt.monthsLeft"]
         XCTAssertTrue(months.waitForExistence(timeout: 5))
         XCTAssertEqual(months.label, "Left to pay")
         XCTAssertEqual(months.value as? String, "about 25 months")
 
-        app.buttons["debt.prepay"].tap()
+        let prepay = app.buttons["debt.prepay"]
+        scrollTo(prepay, in: app)
+        prepay.tap()
         let amount = app.textFields["prepay.amount"]
         XCTAssertTrue(amount.waitForExistence(timeout: 5))
         amount.tap()
@@ -165,96 +206,106 @@ final class AccountFormUITests: XCTestCase {
         XCTAssertTrue(app.descendants(matching: .any)["prepay.comparison"].exists, "the samples have savings at 12 %")
         app.buttons["prepay.done"].tap()
         XCTAssertTrue(eventually { !amount.exists })
+        XCTAssertTrue(page(app).exists, "back on the loan's page")
+    }
+
+    @MainActor
+    func testTheCreditCardPageShowsItsTermsWithoutTheCalculator() {
+        let app = launch()
+        openAccounts(app)
+        let card = row(app, "Кредитка")
+        scrollTo(card, in: app)
+        card.tap()
+
+        XCTAssertTrue(page(app).waitForExistence(timeout: 5))
+        let rate = app.descendants(matching: .any)["debt.rate"]
+        XCTAssertTrue(rate.waitForExistence(timeout: 5))
+        XCTAssertEqual(rate.value as? String, "29,9 % a year")
+        XCTAssertTrue(app.descendants(matching: .any)["debt.payment"].exists)
+        XCTAssertEqual(app.descendants(matching: .any)["debt.payment"].label, "Minimum payment")
+        XCTAssertTrue(app.descendants(matching: .any)["debt.grace"].exists, "the samples' card is interest-free for 40 days")
+        // A card's minimum payment has no annuity to work out.
+        XCTAssertFalse(app.buttons["debt.prepay"].exists)
     }
 
     // MARK: Screenshots
 
-    /// Not a check: pictures for a human. Runs only when `GOLDA_SHOTS_DIR` is set for the runner
-    /// (`TEST_RUNNER_GOLDA_SHOTS_DIR=/tmp/golda-shots/B2 xcodebuild test ...`); `GOLDA_SHOTS_LANG`
-    /// chooses the language and `GOLDA_SHOTS_NAME` prefixes the files. Appearance and text size are
-    /// the simulator's (`simctl ui`).
+    /// Not a check: pictures of the whole flow for a human. Runs only when `GOLDA_SHOTS_DIR` is set
+    /// for the runner (`TEST_RUNNER_GOLDA_SHOTS_DIR=/tmp/golda-shots/B1b xcodebuild test ...`);
+    /// `GOLDA_SHOTS_LANG` chooses the language and `GOLDA_SHOTS_NAME` prefixes the files.
+    /// Appearance and text size are the simulator's (`simctl ui`).
     @MainActor
     func testScreenshotsForTheLead() throws {
         let environment = ProcessInfo.processInfo.environment
         guard let directory = environment["GOLDA_SHOTS_DIR"] else { throw XCTSkip("Screenshots are taken on request only.") }
         let language = environment["GOLDA_SHOTS_LANG"] ?? "en"
+        let russian = language == "ru"
         let prefix = environment["GOLDA_SHOTS_NAME"] ?? language
         try FileManager.default.createDirectory(atPath: directory, withIntermediateDirectories: true)
         let app = launch(language: language)
+        var step = 0
         func shoot(_ name: String) throws {
             Thread.sleep(forTimeInterval: 0.8)
-            let path = (directory as NSString).appendingPathComponent("\(prefix)-\(name).png")
+            step += 1
+            let path = (directory as NSString).appendingPathComponent(String(format: "%@-%02d-%@.png", prefix, step, name))
             try XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: path))
         }
 
-        let add = app.buttons["debugHost.new"]
-        XCTAssertTrue(add.waitForExistence(timeout: 30))
-        let cancel = app.buttons["accountForm.cancel"]
+        // "+ Счёт" at the end of the list, and the form it opens.
+        openAccounts(app, language: language)
+        scrollTo(app.buttons["accounts.add"], in: app)
+        try shoot("list-add-row")
+        let name = openNewAccountForm(app)
+        try shoot("form-new")
+        name.typeText(russian ? "Альфа вклад" : "Alfa savings")
+        app.buttons["accountForm.type.savings"].tap()
+        let opening = app.textFields["accountForm.opening"]
+        opening.tap()
+        opening.typeText("150000")
+        let rate = app.textFields["accountForm.rate"]
+        rate.tap()
+        rate.typeText("12")
+        dismissKeyboard(app)
+        try shoot("form-filled")
+        app.buttons["accountForm.save"].tap()
+        XCTAssertTrue(eventually { !name.exists })
 
-        for type in ["card", "cash", "savings", "credit", "loan"] {
-            add.tap()
-            let name = app.textFields["accountForm.name"]
-            XCTAssertTrue(name.waitForExistence(timeout: 5))
-            // Off the keyboard, which would cover half the form.
-            name.typeText("\n")
-            app.buttons["accountForm.type.\(type)"].tap()
-            try shoot("new-\(type)")
-            if type == "loan" || type == "credit" {
-                let opening = app.textFields["accountForm.opening"]
-                scrollTo(opening, in: app)
-                // Clear of the pinned action, which the largest text sizes make tall.
-                if opening.frame.maxY > app.frame.maxY - 160 { app.swipeUp(velocity: .slow) }
-                opening.tap()
-                if app.keyboards.firstMatch.waitForExistence(timeout: 2) { opening.typeText("150000") }
-            }
-            // A scroll takes the keyboard away too.
+        // The list with it, its page, the form from the page, and the delete question.
+        let created = row(app, russian ? "Альфа вклад" : "Alfa savings")
+        scrollTo(created, in: app)
+        try shoot("list-with-new")
+        created.tap()
+        XCTAssertTrue(page(app).waitForExistence(timeout: 5))
+        try shoot("page-new")
+        app.buttons["account.edit"].tap()
+        XCTAssertTrue(name.waitForExistence(timeout: 5))
+        try shoot("form-edit")
+        app.buttons["accountForm.delete"].tap()
+        XCTAssertTrue(app.alerts.firstMatch.waitForExistence(timeout: 5))
+        try shoot("form-delete-question")
+        app.alerts.firstMatch.buttons[russian ? "Удалить" : "Delete"].tap()
+        XCTAssertTrue(eventually { !self.page(app).exists })
+        try shoot("list-after-delete")
+
+        // The debts: the credit card's terms, the loan's, and the calculator.
+        for debt in ["Кредитка", "Кредит"] {
+            let account = row(app, debt)
+            scrollTo(account, in: app, orBack: true)
+            account.tap()
+            XCTAssertTrue(page(app).waitForExistence(timeout: 5))
+            try shoot(debt == "Кредит" ? "page-loan" : "page-credit")
             app.swipeUp()
-            try shoot("new-\(type)-more")
-            if type == "credit" {
-                let grace = app.switches["accountForm.grace"]
-                scrollTo(grace, in: app)
-                flip(grace)
-                try shoot("new-credit-grace")
-            }
-            cancel.tap()
-            XCTAssertTrue(eventually { !name.exists })
-        }
-
-        for name in ["Карта ₽", "Наличные ₾", "Накопительный", "Кредитка", "Кредит"] {
-            let row = row(app, name)
-            scrollTo(row, in: app, orBack: true)
-            row.tap()
-            XCTAssertTrue(cancel.waitForExistence(timeout: 5))
-            let file = "edit-" + String(name.split(separator: " ")[0])
-            try shoot(file)
-            if name == "Кредит" {
-                app.buttons["accountForm.delete"].tap()
-                try shoot("edit-delete")
-                app.alerts.firstMatch.buttons[language == "ru" ? "Отмена" : "Cancel"].tap()
-            }
-            app.swipeUp()
-            try shoot(file + "-more")
-            cancel.tap()
-            XCTAssertTrue(eventually { !cancel.exists })
-        }
-
-        for name in ["Кредит", "Кредитка"] {
-            let debt = app.buttons["debugHost.debt.\(name)"]
-            scrollTo(debt, in: app, orBack: true)
-            debt.tap()
-            try shoot("debt-\(name)")
-            if name == "Кредит" {
+            try shoot(debt == "Кредит" ? "page-loan-terms" : "page-credit-terms")
+            if debt == "Кредит" {
                 let prepay = app.buttons["debt.prepay"]
                 scrollTo(prepay, in: app)
-                try shoot("debt-\(name)-more")
                 prepay.tap()
                 let amount = app.textFields["prepay.amount"]
                 XCTAssertTrue(amount.waitForExistence(timeout: 5))
-                try shoot("prepay-empty")
                 amount.tap()
                 if app.keyboards.firstMatch.waitForExistence(timeout: 2) { amount.typeText("50000") }
-                app.swipeUp()
                 try shoot("prepay")
+                dismissKeyboard(app)
                 app.swipeUp()
                 try shoot("prepay-more")
                 app.buttons["prepay.done"].tap()
@@ -277,8 +328,6 @@ final class AccountFormUITests: XCTestCase {
     /// A toggle in a form flips at its switch, not at its label.
     @MainActor
     private func flip(_ toggle: XCUIElement) {
-        // The checks read the switch's value afterwards; a screenshot run goes on without it.
-        guard toggle.exists else { return }
         toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.93, dy: 0.5)).tap()
     }
 

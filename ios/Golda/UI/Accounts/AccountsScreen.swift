@@ -64,7 +64,7 @@ struct AccountsScreen: View {
                     }
                 } header: {
                     if let label = section.label {
-                        Text(verbatim: label.keepingDotsOnTheLine)
+                        Text(verbatim: label.keepingMarksOnTheLine)
                             .fixedSize(horizontal: false, vertical: true)
                             .font(.subheadline.weight(.medium))
                             .tabularDigits()
@@ -212,7 +212,7 @@ struct AccountsHeroView: View {
                 BigNumber(minor: hero.totalMinor, currency: hero.currency)
                     .padding(.top, Theme.Gap.xs)
                 if !hero.others.isEmpty {
-                    Text(verbatim: "≈ " + hero.others.keepingDotsOnTheLine)
+                    Text(verbatim: ("≈ " + hero.others).keepingMarksOnTheLine)
                         .font(.body)
                         .tabularDigits()
                         .foregroundStyle(.secondary)
@@ -234,10 +234,10 @@ struct AccountsHeroView: View {
 }
 
 extension String {
-    /// "4 103 ₾ · 1 576 $" with a no-break space before each dot, so a line that wraps at a large
-    /// text size never starts with one.
-    var keepingDotsOnTheLine: String {
-        replacingOccurrences(of: " · ", with: "\u{00A0}· ")
+    /// "Карта · ≈ 5 298 117 ₽" with no-break spaces before each dot and after each "≈", so a line
+    /// that wraps never starts with a dot nor ends with a lone "≈".
+    var keepingMarksOnTheLine: String {
+        replacingOccurrences(of: " · ", with: "\u{00A0}· ").replacingOccurrences(of: "≈ ", with: "≈\u{00A0}")
     }
 }
 
