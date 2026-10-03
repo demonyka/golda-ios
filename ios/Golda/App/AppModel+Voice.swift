@@ -17,11 +17,6 @@ extension AppModel {
         return Task { await voice.processQueue() }
     }
 
-    /// The person agreed (or no longer does) to send voice notes to Google Gemini; kept on this phone.
-    func setVoiceConsent(_ agreed: Bool) {
-        environment.deviceSettings.update { $0.voiceConsent = agreed }
-    }
-
     /// Read from the store, not from `device`, which trails a change by one observation.
     var hasVoiceConsent: Bool {
         environment.deviceSettings.current.voiceConsent

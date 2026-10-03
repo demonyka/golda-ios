@@ -20,6 +20,8 @@ struct GoldaApp: App {
         let model = AppModel(environment: environment)
         _model = State(initialValue: model)
         _voice = State(initialValue: VoiceMicModel.live(model: model))
+        // A key saved in Settings lets the notes that waited for one go through.
+        model.onGeminiKeyChanged = { [weak model] in model?.processVoiceQueue() }
     }
 
     var body: some Scene {
