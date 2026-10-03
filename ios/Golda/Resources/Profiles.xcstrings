@@ -1065,23 +1065,6 @@
         }
       }
     },
-    "Sharing" : {
-      "comment" : "Profile screen: sharing the profile with other people (not yet available).",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sharing"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Общий доступ"
-          }
-        }
-      }
-    },
     "Tax" : {
       "comment" : "Tax and hours sheet: the income tax in percent.",
       "localizations" : {
@@ -1282,23 +1265,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ч"
-          }
-        }
-      }
-    },
-    "soon" : {
-      "comment" : "Profile screen: a feature that is not there yet.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "soon"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "скоро"
           }
         }
       }

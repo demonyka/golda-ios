@@ -6,8 +6,8 @@ import SwiftUI
 private let log = Logger(subsystem: "com.f4studio.golda", category: "Profiles")
 
 /// One profile's own screen: its name and whether it is the active one, the income (rate, tax and
-/// hours, payday, an hour after tax), the markup over the CBR, the monthly payments, sharing (stage
-/// 5) and deleting it. What Android kept in its settings and belongs to a profile here (D21).
+/// hours, payday, an hour after tax), the markup over the CBR, the monthly payments and deleting
+/// it. What Android kept in its settings and belongs to a profile here (D21).
 ///
 /// It follows the profile's books itself, so any profile can be set up, the active one or not; a
 /// change to the active one shows on Home at once. When the profile goes (deleted here or
@@ -141,10 +141,6 @@ struct ProfileScreen: View {
                 Text(verbatim: Self.paymentsTitle.text(in: locale))
             } footer: {
                 Text(verbatim: Self.paymentsNote.text(in: locale))
-            }
-
-            Section {
-                sharingRow
             }
 
             Section {
@@ -326,20 +322,6 @@ struct ProfileScreen: View {
         .accessibilityIdentifier("profile.addPayment")
     }
 
-    /// Sharing arrives with sync (stage 5); until then the row says so and does nothing.
-    private var sharingRow: some View {
-        LabeledContent {
-            Text(verbatim: Self.soonTitle.text(in: locale))
-                .foregroundStyle(Theme.Color.muted)
-        } label: {
-            RowLabel(title: Self.sharingTitle.text(in: locale), symbol: Symbols.sharedProfile)
-        }
-        .listRowBackground(Theme.Color.card)
-        .disabled(true)
-        .accessibilityElement(children: .combine)
-        .accessibilityIdentifier("profile.sharing")
-    }
-
     @ViewBuilder private func sheet(_ edit: Edit, settings: ProfileSettings) -> some View {
         switch edit {
         case .rate: RateSheet(settings: settings, onSave: update)
@@ -452,8 +434,6 @@ struct ProfileScreen: View {
     )
     static let addPaymentTitle = LocalizedStringResource("Payment", table: "Profiles", comment: "A payment: the title of the payment form when changing one, and the last row of the payments, “+ Payment”.")
     static let addPaymentLabel = LocalizedStringResource("Add payment", table: "Profiles", comment: "VoiceOver: the “+ Payment” row.")
-    static let sharingTitle = LocalizedStringResource("Sharing", table: "Profiles", comment: "Profile screen: sharing the profile with other people (not yet available).")
-    static let soonTitle = LocalizedStringResource("soon", table: "Profiles", comment: "Profile screen: a feature that is not there yet.")
     static let failureText = LocalizedStringResource("The change was not saved. Try again.", table: "Profiles", comment: "Profile screens: saving or deleting failed.")
 }
 
