@@ -2,7 +2,7 @@ import Foundation
 import GRDB
 
 /// The SQLite database, migrated to the current schema. Reads and writes go through `read` and
-/// `write`, each one transaction; screens follow `profiles()` and `snapshots(profileId:)`.
+/// `write`, each one transaction; screens follow `profiles()`, `snapshots(profileId:)` and `rates()`.
 public final class GoldaDatabase: Sendable {
     let writer: any DatabaseWriter
 
@@ -54,6 +54,16 @@ public final class GoldaDatabase: Sendable {
     public func snapshots(profileId: UUID) -> AsyncStream<ProfileSnapshot> {
         let observation = ValueObservation
             .tracking { db in try Store(db: db).snapshot(profileId: profileId) }
+            .removeDuplicates()
+        return stream(observation.values(in: writer, bufferingPolicy: .bufferingNewest(1)))
+    }
+
+    /// The rate table by code, again after each change to it (a refresh, a reset), so the app
+    /// revalues what it shows without rereading after its own refresh. Rates are shared by every
+    /// profile; each applies its own markup.
+    public func rates() -> AsyncStream<[RateRecord]> {
+        let observation = ValueObservation
+            .tracking { db -> [RateRecord]? in try Store(db: db).rates() }
             .removeDuplicates()
         return stream(observation.values(in: writer, bufferingPolicy: .bufferingNewest(1)))
     }

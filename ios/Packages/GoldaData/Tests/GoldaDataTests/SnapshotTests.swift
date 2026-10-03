@@ -108,6 +108,23 @@ import Testing
         #expect(await snapshots.next() == nil)
     }
 
+    @Test func ratesFollowWrites() async throws {
+        let database = try await StoreFixture.database(profiles: 1)
+        var rates = database.rates().makeAsyncIterator()
+        #expect(await rates.next() == [])
+
+        let usd = RateRecord(code: "USD", rubPerUnit: 83.2454, date: "2026-10-02")
+        let gel = RateRecord(code: "GEL", rubPerUnit: 31.9597, date: "2026-10-02")
+        try await database.write { try $0.save([usd, gel]) }
+        #expect(await rates.next() == [gel, usd])
+
+        // A write to the books leaves the rates as they were, so the next value is the next refresh.
+        try await database.write { try $0.save(StoreFixture.account(10), profileId: personal) }
+        let fresh = RateRecord(code: "USD", rubPerUnit: 83.4839, date: "2026-10-03")
+        try await database.write { try $0.save([fresh]) }
+        #expect(await rates.next() == [gel, fresh])
+    }
+
     @Test func profilesFollowWrites() async throws {
         let database = try GoldaDatabase.inMemory()
         var profiles = database.profiles().makeAsyncIterator()
