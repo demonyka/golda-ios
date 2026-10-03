@@ -1,0 +1,312 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "A voice-first money tracker for people who earn in one currency and live in another." : {
+      "comment" : "Welcome screen: what the app is, under its name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A voice-first money tracker for people who earn in one currency and live in another."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Трекер денег с голосовым вводом для тех, кто зарабатывает в одной валюте, а живёт в другой."
+          }
+        }
+      }
+    },
+    "Accounts" : {
+      "comment" : "Tab and screen title: the list of accounts.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accounts"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Счета"
+          }
+        }
+      }
+    },
+    "Add by hand" : {
+      "comment" : "Toolbar button (+): record an operation by hand instead of by voice.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add by hand"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Записать вручную"
+          }
+        }
+      }
+    },
+    "Cancel" : {
+      "comment" : "Button that closes a dialog without changes.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отмена"
+          }
+        }
+      }
+    },
+    "Create" : {
+      "comment" : "New profile dialog: creates the profile.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Создать"
+          }
+        }
+      }
+    },
+    "Each profile keeps its own accounts, goals and budget." : {
+      "comment" : "New profile dialog: what a profile is.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Each profile keeps its own accounts, goals and budget."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У каждого профиля свои счета, цели и бюджет."
+          }
+        }
+      }
+    },
+    "Goals" : {
+      "comment" : "Tab and screen title: savings goals and the wishlist.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Goals"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Цели"
+          }
+        }
+      }
+    },
+    "Home" : {
+      "comment" : "Tab and screen title: today's budget and the operations.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Home"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Главная"
+          }
+        }
+      }
+    },
+    "Insights" : {
+      "comment" : "Tab and screen title: spending analytics.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Insights"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Аналитика"
+          }
+        }
+      }
+    },
+    "Manage profiles" : {
+      "comment" : "Profile menu: opens the list of profiles.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage profiles"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Управление профилями"
+          }
+        }
+      }
+    },
+    "Name" : {
+      "comment" : "New profile dialog: placeholder of the name field.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Название"
+          }
+        }
+      }
+    },
+    "New profile" : {
+      "comment" : "Profile menu item and the title of the dialog it opens.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New profile"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новый профиль"
+          }
+        }
+      }
+    },
+    "Personal" : {
+      "comment" : "Name of the first profile, created on the first launch.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personal"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Личный"
+          }
+        }
+      }
+    },
+    "Profile" : {
+      "comment" : "Profile menu: the list of profiles to switch between.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profile"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Профиль"
+          }
+        }
+      }
+    },
+    "Profile: %@" : {
+      "comment" : "The open profile, by name: the profile menu's spoken label and a placeholder screen's line.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profile: %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Профиль: %@"
+          }
+        }
+      }
+    },
+    "Say it" : {
+      "comment" : "The microphone button: record a voice note.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Say it"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сказать"
+          }
+        }
+      }
+    },
+    "Settings" : {
+      "comment" : "Toolbar button (gear) and screen title.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройки"
+          }
+        }
+      }
+    },
+    "Start" : {
+      "comment" : "Welcome screen: creates the first profile and opens the app.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Начать"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
