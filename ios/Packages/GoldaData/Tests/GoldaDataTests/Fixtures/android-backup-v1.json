@@ -1,0 +1,978 @@
+{
+    "version": 1,
+    "exportedAt": 1790000000000,
+    "settings": {
+        "onboarded": true,
+        "incomeHourly": true,
+        "hourlyRate": 1000.0,
+        "monthlySalary": 0.0,
+        "taxPercent": 10.0,
+        "hoursPerWeek": 40.0,
+        "payday": 10,
+        "displayCurrencies": [
+            "RUB",
+            "USD",
+            "GEL"
+        ],
+        "localCurrency": "GEL",
+        "baseCurrency": "GEL",
+        "markup": 0.1362,
+        "lastAccountId": 5,
+        "geminiModel": "gemini-3.5-flash-lite",
+        "hasGeminiKey": false,
+        "reconcileReminder": true,
+        "celebratedGoalId": null,
+        "reconciledAt": {
+            "1": 1789913600000,
+            "5": 1789992800000
+        },
+        "quickEntryHaptics": true
+    },
+    "accounts": [
+        {
+            "id": 1,
+            "name": "Карта ₽",
+            "currency": "RUB",
+            "type": "CARD",
+            "groupName": null,
+            "includeInFree": true,
+            "interestRate": null,
+            "sort": 0,
+            "paymentDay": null,
+            "paymentMinor": null,
+            "graceUntil": null,
+            "color": "#C9A24B"
+        },
+        {
+            "id": 2,
+            "name": "Накопительный",
+            "currency": "RUB",
+            "type": "SAVINGS",
+            "groupName": null,
+            "includeInFree": false,
+            "interestRate": 12.0,
+            "sort": 1,
+            "paymentDay": null,
+            "paymentMinor": null,
+            "graceUntil": null
+        },
+        {
+            "id": 3,
+            "name": "Мультивалютная USD",
+            "currency": "USD",
+            "type": "CARD",
+            "groupName": "Мультивалютная",
+            "includeInFree": true,
+            "interestRate": null,
+            "sort": 2,
+            "paymentDay": null,
+            "paymentMinor": null,
+            "graceUntil": null
+        },
+        {
+            "id": 4,
+            "name": "Мультивалютная GEL",
+            "currency": "GEL",
+            "type": "CARD",
+            "groupName": "Мультивалютная",
+            "includeInFree": true,
+            "interestRate": null,
+            "sort": 3,
+            "paymentDay": null,
+            "paymentMinor": null,
+            "graceUntil": null
+        },
+        {
+            "id": 5,
+            "name": "Наличные ₾",
+            "currency": "GEL",
+            "type": "CASH",
+            "groupName": null,
+            "includeInFree": true,
+            "interestRate": null,
+            "sort": 4,
+            "paymentDay": null,
+            "paymentMinor": null,
+            "graceUntil": null
+        },
+        {
+            "id": 6,
+            "name": "Кредитка",
+            "currency": "RUB",
+            "type": "CREDIT",
+            "groupName": null,
+            "includeInFree": false,
+            "interestRate": 29.9,
+            "sort": 5,
+            "paymentDay": 25,
+            "paymentMinor": 300000,
+            "graceUntil": 20731
+        },
+        {
+            "id": 7,
+            "name": "Кредит",
+            "currency": "RUB",
+            "type": "LOAN",
+            "groupName": null,
+            "includeInFree": false,
+            "interestRate": 19.9,
+            "sort": 6,
+            "paymentDay": 5,
+            "paymentMinor": 1000000,
+            "graceUntil": null
+        }
+    ],
+    "categories": [
+        {
+            "id": 1,
+            "key": "eating_out",
+            "name": "Кафе",
+            "emoji": "🍔",
+            "kind": "EXPENSE",
+            "sort": 0
+        },
+        {
+            "id": 2,
+            "key": "groceries",
+            "name": "Продукты",
+            "emoji": "🛒",
+            "kind": "EXPENSE",
+            "sort": 1
+        },
+        {
+            "id": 3,
+            "key": "transport",
+            "name": "Транспорт",
+            "emoji": "🚕",
+            "kind": "EXPENSE",
+            "sort": 2
+        },
+        {
+            "id": 4,
+            "key": "housing",
+            "name": "Жильё",
+            "emoji": "🏠",
+            "kind": "EXPENSE",
+            "sort": 3
+        },
+        {
+            "id": 5,
+            "key": "telecom",
+            "name": "Связь",
+            "emoji": "📱",
+            "kind": "EXPENSE",
+            "sort": 4
+        },
+        {
+            "id": 6,
+            "key": "fun",
+            "name": "Развлечения",
+            "emoji": "🎉",
+            "kind": "EXPENSE",
+            "sort": 5
+        },
+        {
+            "id": 7,
+            "key": "health",
+            "name": "Здоровье",
+            "emoji": "💊",
+            "kind": "EXPENSE",
+            "sort": 6
+        },
+        {
+            "id": 8,
+            "key": "clothes",
+            "name": "Одежда",
+            "emoji": "👕",
+            "kind": "EXPENSE",
+            "sort": 7
+        },
+        {
+            "id": 9,
+            "key": "subscriptions",
+            "name": "Подписки",
+            "emoji": "🔁",
+            "kind": "EXPENSE",
+            "sort": 8
+        },
+        {
+            "id": 10,
+            "key": "travel",
+            "name": "Путешествия",
+            "emoji": "✈️",
+            "kind": "EXPENSE",
+            "sort": 9
+        },
+        {
+            "id": 11,
+            "key": "fees",
+            "name": "Комиссии",
+            "emoji": "💸",
+            "kind": "EXPENSE",
+            "sort": 10
+        },
+        {
+            "id": 12,
+            "key": "other",
+            "name": "Прочее",
+            "emoji": "📦",
+            "kind": "EXPENSE",
+            "sort": 11
+        },
+        {
+            "id": 13,
+            "key": "salary",
+            "name": "Зарплата",
+            "emoji": "💼",
+            "kind": "INCOME",
+            "sort": 0
+        },
+        {
+            "id": 14,
+            "key": "interest",
+            "name": "Проценты",
+            "emoji": "🏦",
+            "kind": "INCOME",
+            "sort": 1
+        },
+        {
+            "id": 15,
+            "key": "gift",
+            "name": "Подарок",
+            "emoji": "🎁",
+            "kind": "INCOME",
+            "sort": 2
+        },
+        {
+            "id": 16,
+            "key": "other_income",
+            "name": "Прочее",
+            "emoji": "📦",
+            "kind": "INCOME",
+            "sort": 3
+        }
+    ],
+    "operations": [
+        {
+            "id": 1,
+            "type": "OPENING",
+            "timestamp": 1788790400000,
+            "categoryId": null,
+            "note": "",
+            "voiceText": null,
+            "purchaseAmountMinor": null,
+            "purchaseCurrency": null,
+            "isEstimate": false,
+            "cbrFrom": null,
+            "cbrTo": null
+        },
+        {
+            "id": 2,
+            "type": "OPENING",
+            "timestamp": 1788790401000,
+            "categoryId": null,
+            "note": "",
+            "voiceText": null,
+            "purchaseAmountMinor": null,
+            "purchaseCurrency": null,
+            "isEstimate": false,
+            "cbrFrom": null,
+            "cbrTo": null
+        },
+        {
+            "id": 3,
+            "type": "OPENING",
+            "timestamp": 1788790402000,
+            "categoryId": null,
+            "note": "",
+            "voiceText": null,
+            "purchaseAmountMinor": null,
+            "purchaseCurrency": null,
+            "isEstimate": false,
+            "cbrFrom": null,
+            "cbrTo": null
+        },
+        {
+            "id": 4,
+            "type": "OPENING",
+            "timestamp": 1788790403000,
+            "categoryId": null,
+            "note": "",
+            "voiceText": null,
+            "purchaseAmountMinor": null,
+            "purchaseCurrency": null,
+            "isEstimate": false,
+            "cbrFrom": null,
+            "cbrTo": null
+        },
+        {
+            "id": 5,
+            "type": "INCOME",
+            "timestamp": 1788963200000,
+            "categoryId": 13,
+            "note": "",
+            "voiceText": null,
+            "purchaseAmountMinor": null,
+            "purchaseCurrency": null,
+            "isEstimate": false,
+            "cbrFrom": null,
+            "cbrTo": null
+        },
+        {
+            "id": 6,
+            "type": "TRANSFER",
+            "timestamp": 1788966800000,
+            "categoryId": null,
+            "note": "В подушку",
+            "voiceText": null,
+            "purchaseAmountMinor": null,
+            "purchaseCurrency": null,
+            "isEstimate": false,
+            "cbrFrom": null,
+            "cbrTo": null,
+            "tags": [
+                "travel",
+                "atm"
+            ]
+        },
+        {
+            "id": 7,
+            "type": "TRANSFER",
+            "timestamp": 1788970400000,
+            "categoryId": null,
+            "note": "Перевод за границу",
+            "voiceText": null,
+            "purchaseAmountMinor": null,
+            "purchaseCurrency": null,
+            "isEstimate": false,
+            "cbrFrom": 1.0,
+            "cbrTo": 83.25
+        },
+        {
+            "id": 8,
+            "type": "TRANSFER",
+            "timestamp": 1789049600000,
+            "categoryId": null,
+            "note": "Обмен в приложении банка",
+            "voiceText": null,
+            "purchaseAmountMinor": null,
+            "purchaseCurrency": null,
+            "isEstimate": false,
+            "cbrFrom": 83.25,
+            "cbrTo": 31.96
+        },
+        {
+            "id": 9,
+            "type": "TRANSFER",
+            "timestamp": 1789136000000,
+            "categoryId": null,
+            "note": "Банкомат",
+            "voiceText": null,
+            "purchaseAmountMinor": null,
+            "purchaseCurrency": null,
+            "isEstimate": false,
+            "cbrFrom": 83.25,
+            "cbrTo": 31.96
+        },
+        {
+            "id": 10,
+            "type": "EXPENSE",
+            "timestamp": 1789136000000,
+            "categoryId": 11,
+            "note": "Комиссия банкомата",
+            "voiceText": null,
+            "purchaseAmountMinor": null,
+            "purchaseCurrency": null,
+            "isEstimate": false,
+            "cbrFrom": null,
+            "cbrTo": null
+        },
+        {
+            "id": 11,
+            "type": "EXPENSE",
+            "timestamp": 1789222400000,
+            "categoryId": 4,
+            "note": "Аренда",
+            "voiceText": null,
+            "purchaseAmountMinor": null,
+            "purchaseCurrency": null,
+            "isEstimate": false,
+            "cbrFrom": null,
+            "cbrTo": null
+        },
+        {
+            "id": 12,
+            "type": "EXPENSE",
+            "timestamp": 1789222400000,
+            "categoryId": 9,
+            "note": "Музыка и облако",
+            "voiceText": null,
+            "purchaseAmountMinor": null,
+            "purchaseCurrency": null,
+            "isEstimate": false,
+            "cbrFrom": null,
+            "cbrTo": null
+        },
+        {
+            "id": 13,
+            "type": "EXPENSE",
+            "timestamp": 1789308800000,
+            "categoryId": 2,
+            "note": "Продукты",
+            "voiceText": null,
+            "purchaseAmountMinor": null,
+            "purchaseCurrency": null,
+            "isEstimate": false,
+            "cbrFrom": null,
+            "cbrTo": null
+        },
+        {
+            "id": 14,
+            "type": "EXPENSE",
+            "timestamp": 1789308800000,
+            "categoryId": 1,
+            "note": "Хачапури",
+            "voiceText": null,
+            "purchaseAmountMinor": null,
+            "purchaseCurrency": null,
+            "isEstimate": false,
+            "cbrFrom": null,
+            "cbrTo": null
+        },
+        {
+            "id": 15,
+            "type": "EXPENSE",
+            "timestamp": 1789395200000,
+            "categoryId": 5,
+            "note": "Мобильный интернет",
+            "voiceText": null,
+            "purchaseAmountMinor": null,
+            "purchaseCurrency": null,
+            "isEstimate": false,
+            "cbrFrom": null,
+            "cbrTo": null
+        },
+        {
+            "id": 16,
+            "type": "EXPENSE",
+            "timestamp": 1789395200000,
+            "categoryId": 3,
+            "note": "Метро",
+            "voiceText": null,
+            "purchaseAmountMinor": null,
+            "purchaseCurrency": null,
+            "isEstimate": false,
+            "cbrFrom": null,
+            "cbrTo": null
+        },
+        {
+            "id": 17,
+            "type": "EXPENSE",
+            "timestamp": 1789481600000,
+            "categoryId": 1,
+            "note": "Ужин",
+            "voiceText": null,
+            "purchaseAmountMinor": null,
+            "purchaseCurrency": null,
+            "isEstimate": false,
+            "cbrFrom": null,
+            "cbrTo": null
+        },
+        {
+            "id": 18,
+            "type": "EXPENSE",
+            "timestamp": 1789568000000,
+            "categoryId": 2,
+            "note": "Продукты",
+            "voiceText": null,
+            "purchaseAmountMinor": null,
+            "purchaseCurrency": null,
+            "isEstimate": false,
+            "cbrFrom": null,
+            "cbrTo": null
+        },
+        {
+            "id": 19,
+            "type": "EXPENSE",
+            "timestamp": 1789568000000,
+            "categoryId": 6,
+            "note": "Музей",
+            "voiceText": null,
+            "purchaseAmountMinor": null,
+            "purchaseCurrency": null,
+            "isEstimate": false,
+            "cbrFrom": null,
+            "cbrTo": null
+        },
+        {
+            "id": 20,
+            "type": "EXPENSE",
+            "timestamp": 1789654400000,
+            "categoryId": 3,
+            "note": "Такси",
+            "voiceText": null,
+            "purchaseAmountMinor": null,
+            "purchaseCurrency": null,
+            "isEstimate": false,
+            "cbrFrom": null,
+            "cbrTo": null
+        },
+        {
+            "id": 21,
+            "type": "EXPENSE",
+            "timestamp": 1789740800000,
+            "categoryId": 8,
+            "note": "Куртка",
+            "voiceText": null,
+            "purchaseAmountMinor": null,
+            "purchaseCurrency": null,
+            "isEstimate": false,
+            "cbrFrom": null,
+            "cbrTo": null
+        },
+        {
+            "id": 22,
+            "type": "EXPENSE",
+            "timestamp": 1789740800000,
+            "categoryId": 1,
+            "note": "Кофе",
+            "voiceText": null,
+            "purchaseAmountMinor": null,
+            "purchaseCurrency": null,
+            "isEstimate": false,
+            "cbrFrom": null,
+            "cbrTo": null
+        },
+        {
+            "id": 23,
+            "type": "EXPENSE",
+            "timestamp": 1789827200000,
+            "categoryId": 2,
+            "note": "Продукты",
+            "voiceText": null,
+            "purchaseAmountMinor": null,
+            "purchaseCurrency": null,
+            "isEstimate": false,
+            "cbrFrom": null,
+            "cbrTo": null
+        },
+        {
+            "id": 24,
+            "type": "EXPENSE",
+            "timestamp": 1789899200000,
+            "categoryId": 2,
+            "note": "Рынок",
+            "voiceText": null,
+            "purchaseAmountMinor": 4850,
+            "purchaseCurrency": "GEL",
+            "isEstimate": true,
+            "cbrFrom": null,
+            "cbrTo": null
+        },
+        {
+            "id": 25,
+            "type": "EXPENSE",
+            "timestamp": 1789913600000,
+            "categoryId": 7,
+            "note": "Аптека",
+            "voiceText": null,
+            "purchaseAmountMinor": null,
+            "purchaseCurrency": null,
+            "isEstimate": false,
+            "cbrFrom": null,
+            "cbrTo": null
+        },
+        {
+            "id": 26,
+            "type": "EXPENSE",
+            "timestamp": 1789913600000,
+            "categoryId": 1,
+            "note": "Обед",
+            "voiceText": null,
+            "purchaseAmountMinor": null,
+            "purchaseCurrency": null,
+            "isEstimate": false,
+            "cbrFrom": null,
+            "cbrTo": null
+        },
+        {
+            "id": 27,
+            "type": "EXPENSE",
+            "timestamp": 1789989200000,
+            "categoryId": 1,
+            "note": "Шаурма",
+            "voiceText": "шаурма пятнадцать лари и кофе восемь лари",
+            "purchaseAmountMinor": null,
+            "purchaseCurrency": null,
+            "isEstimate": false,
+            "cbrFrom": null,
+            "cbrTo": null
+        },
+        {
+            "id": 28,
+            "type": "EXPENSE",
+            "timestamp": 1789989200000,
+            "categoryId": 1,
+            "note": "Кофе",
+            "voiceText": "шаурма пятнадцать лари и кофе восемь лари",
+            "purchaseAmountMinor": null,
+            "purchaseCurrency": null,
+            "isEstimate": false,
+            "cbrFrom": null,
+            "cbrTo": null
+        },
+        {
+            "id": 29,
+            "type": "ADJUSTMENT",
+            "timestamp": 1789992800000,
+            "categoryId": null,
+            "note": "",
+            "voiceText": null,
+            "purchaseAmountMinor": null,
+            "purchaseCurrency": null,
+            "isEstimate": false,
+            "cbrFrom": null,
+            "cbrTo": null
+        }
+    ],
+    "postings": [
+        {
+            "id": 1,
+            "operationId": 1,
+            "accountId": 1,
+            "amountMinor": 500000,
+            "rubMinor": 500000
+        },
+        {
+            "id": 2,
+            "operationId": 2,
+            "accountId": 2,
+            "amountMinor": 25000000,
+            "rubMinor": 25000000
+        },
+        {
+            "id": 3,
+            "operationId": 3,
+            "accountId": 6,
+            "amountMinor": -1500000,
+            "rubMinor": -1500000
+        },
+        {
+            "id": 4,
+            "operationId": 4,
+            "accountId": 7,
+            "amountMinor": -20000000,
+            "rubMinor": -20000000
+        },
+        {
+            "id": 5,
+            "operationId": 5,
+            "accountId": 1,
+            "amountMinor": 15840000,
+            "rubMinor": 15840000
+        },
+        {
+            "id": 6,
+            "operationId": 6,
+            "accountId": 1,
+            "amountMinor": -8000000,
+            "rubMinor": -8000000
+        },
+        {
+            "id": 7,
+            "operationId": 6,
+            "accountId": 2,
+            "amountMinor": 8000000,
+            "rubMinor": 8000000
+        },
+        {
+            "id": 8,
+            "operationId": 7,
+            "accountId": 1,
+            "amountMinor": -7360000,
+            "rubMinor": -7360000
+        },
+        {
+            "id": 9,
+            "operationId": 7,
+            "accountId": 3,
+            "amountMinor": 80000,
+            "rubMinor": 7360000
+        },
+        {
+            "id": 10,
+            "operationId": 8,
+            "accountId": 3,
+            "amountMinor": -60000,
+            "rubMinor": -5520000
+        },
+        {
+            "id": 11,
+            "operationId": 8,
+            "accountId": 4,
+            "amountMinor": 160800,
+            "rubMinor": 5520000
+        },
+        {
+            "id": 12,
+            "operationId": 9,
+            "accountId": 3,
+            "amountMinor": -10000,
+            "rubMinor": -920000
+        },
+        {
+            "id": 13,
+            "operationId": 9,
+            "accountId": 5,
+            "amountMinor": 26500,
+            "rubMinor": 920000
+        },
+        {
+            "id": 14,
+            "operationId": 10,
+            "accountId": 3,
+            "amountMinor": -300,
+            "rubMinor": -27600
+        },
+        {
+            "id": 15,
+            "operationId": 11,
+            "accountId": 4,
+            "amountMinor": -90000,
+            "rubMinor": -3089552
+        },
+        {
+            "id": 16,
+            "operationId": 12,
+            "accountId": 1,
+            "amountMinor": -69900,
+            "rubMinor": -69900
+        },
+        {
+            "id": 17,
+            "operationId": 13,
+            "accountId": 4,
+            "amountMinor": -6420,
+            "rubMinor": -220388
+        },
+        {
+            "id": 18,
+            "operationId": 14,
+            "accountId": 5,
+            "amountMinor": -1500,
+            "rubMinor": -52075
+        },
+        {
+            "id": 19,
+            "operationId": 15,
+            "accountId": 4,
+            "amountMinor": -3500,
+            "rubMinor": -120149
+        },
+        {
+            "id": 20,
+            "operationId": 16,
+            "accountId": 5,
+            "amountMinor": -800,
+            "rubMinor": -27774
+        },
+        {
+            "id": 21,
+            "operationId": 17,
+            "accountId": 4,
+            "amountMinor": -4800,
+            "rubMinor": -164776
+        },
+        {
+            "id": 22,
+            "operationId": 18,
+            "accountId": 4,
+            "amountMinor": -8960,
+            "rubMinor": -307582
+        },
+        {
+            "id": 23,
+            "operationId": 19,
+            "accountId": 5,
+            "amountMinor": -2000,
+            "rubMinor": -69434
+        },
+        {
+            "id": 24,
+            "operationId": 20,
+            "accountId": 4,
+            "amountMinor": -1200,
+            "rubMinor": -41194
+        },
+        {
+            "id": 25,
+            "operationId": 21,
+            "accountId": 4,
+            "amountMinor": -12500,
+            "rubMinor": -429105
+        },
+        {
+            "id": 26,
+            "operationId": 22,
+            "accountId": 5,
+            "amountMinor": -900,
+            "rubMinor": -31245
+        },
+        {
+            "id": 27,
+            "operationId": 23,
+            "accountId": 4,
+            "amountMinor": -5230,
+            "rubMinor": -179537
+        },
+        {
+            "id": 28,
+            "operationId": 24,
+            "accountId": 3,
+            "amountMinor": -1899,
+            "rubMinor": -174708
+        },
+        {
+            "id": 29,
+            "operationId": 25,
+            "accountId": 4,
+            "amountMinor": -4500,
+            "rubMinor": -154478
+        },
+        {
+            "id": 30,
+            "operationId": 26,
+            "accountId": 5,
+            "amountMinor": -1800,
+            "rubMinor": -62491
+        },
+        {
+            "id": 31,
+            "operationId": 27,
+            "accountId": 5,
+            "amountMinor": -1500,
+            "rubMinor": -52075
+        },
+        {
+            "id": 32,
+            "operationId": 28,
+            "accountId": 5,
+            "amountMinor": -800,
+            "rubMinor": -27774
+        },
+        {
+            "id": 33,
+            "operationId": 29,
+            "accountId": 5,
+            "amountMinor": -300,
+            "rubMinor": -10415
+        }
+    ],
+    "rates": [
+        {
+            "code": "EUR",
+            "rubPerUnit": 90.4,
+            "date": "2026-09-21"
+        },
+        {
+            "code": "GEL",
+            "rubPerUnit": 31.96,
+            "date": "2026-09-21"
+        },
+        {
+            "code": "THB",
+            "rubPerUnit": 2.45,
+            "date": "2026-09-21"
+        },
+        {
+            "code": "USD",
+            "rubPerUnit": 83.25,
+            "date": "2026-09-21"
+        }
+    ],
+    "obligations": [
+        {
+            "id": 1,
+            "name": "Аренда",
+            "amountMinor": 90000,
+            "currency": "GEL",
+            "dayOfMonth": 1
+        },
+        {
+            "id": 2,
+            "name": "Подписки",
+            "amountMinor": 69900,
+            "currency": "RUB",
+            "dayOfMonth": 1
+        },
+        {
+            "id": 3,
+            "name": "Интернет дома",
+            "amountMinor": 45000,
+            "currency": "RUB",
+            "dayOfMonth": 20
+        }
+    ],
+    "goals": [
+        {
+            "id": 2,
+            "name": "Велосипед",
+            "targetMinor": 8000000,
+            "currency": "RUB",
+            "accountId": null,
+            "savedMinor": 2150000,
+            "isMain": true
+        },
+        {
+            "id": 1,
+            "name": "Подушка",
+            "targetMinor": 30000000,
+            "currency": "RUB",
+            "accountId": 2,
+            "savedMinor": 0,
+            "isMain": false
+        },
+        {
+            "id": 3,
+            "name": "Отпуск в Грузии",
+            "targetMinor": 300000,
+            "currency": "GEL",
+            "accountId": 4,
+            "savedMinor": 0,
+            "isMain": false
+        }
+    ],
+    "wishes": [
+        {
+            "id": 1,
+            "title": "Кроссовки",
+            "amountMinor": 25000,
+            "currency": "GEL",
+            "createdAt": 1789568000000,
+            "decideAt": 1789654400000,
+            "status": "SKIPPED",
+            "decidedAt": 1789654400000
+        },
+        {
+            "id": 2,
+            "title": "Наушники",
+            "amountMinor": 12000,
+            "currency": "USD",
+            "createdAt": 1789913600000,
+            "decideAt": 1790172800000,
+            "status": "WAITING",
+            "decidedAt": null
+        },
+        {
+            "id": 3,
+            "title": "Рюкзак",
+            "amountMinor": 3500,
+            "currency": "GEL",
+            "createdAt": 1789222400000,
+            "decideAt": 1789481600000,
+            "status": "BOUGHT",
+            "decidedAt": 1789481600000
+        }
+    ],
+    "appVersion": "0.15.0"
+}
