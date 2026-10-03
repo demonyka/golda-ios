@@ -10,6 +10,8 @@ import GoldaCore
 public actor Repository {
     public let database: GoldaDatabase
     public let deviceSettings: DeviceSettingsStore
+    /// Only `resetAll` touches it: wiping everything takes the API keys too, as on Android.
+    let secrets: any SecretStore
     /// Epoch milliseconds now. Injected so tests run on a fixed time.
     let clock: @Sendable () -> Int64
     /// Where "today" is; read on each use, since the phone travels.
@@ -18,11 +20,13 @@ public actor Repository {
     public init(
         database: GoldaDatabase,
         deviceSettings: DeviceSettingsStore,
+        secrets: any SecretStore,
         clock: @escaping @Sendable () -> Int64 = { Int64(Date().timeIntervalSince1970 * 1000) },
         zone: @escaping @Sendable () -> TimeZone = { TimeZone.current }
     ) {
         self.database = database
         self.deviceSettings = deviceSettings
+        self.secrets = secrets
         self.clock = clock
         self.zone = zone
     }
@@ -120,27 +124,38 @@ public actor Repository {
         }
     }
 
-    /// Wipes every profile and the rates, seeds the fallback rates and resets this phone's
-    /// settings. The settings go last: their reset is what sends the app back to onboarding.
+    /// Wipes every profile and the rates, seeds the fallback rates, deletes the API keys and resets
+    /// this phone's settings. The settings go last: their reset is what sends the app back to
+    /// onboarding, so it happens even when the Keychain refuses, and that error is thrown after.
     public func resetAll() async throws {
         try await write { store in
             try store.deleteAllProfiles()
             try store.deleteAllRates()
             try store.save(CbrRatesSource.fallback.map(RateRecord.init))
         }
+        // Android's `settings.clear()` took the encrypted key along with the settings.
+        let secrets = secrets
+        let keysDeleted = Result { for key in SecretKey.all { try secrets.delete(key) } }
         deviceSettings.reset()
+        try keysDeleted.get()
     }
 
     // MARK: Accounts
 
     /// A new account is inserted with [openingMinor], if any, booked as its opening balance; an
     /// existing one is updated and [openingMinor] is ignored, as on Android.
+    ///
+    /// `reconciledAt` is left as stored: only `reconcile` writes it. Android kept it in the
+    /// settings, out of reach of the account form, and a form built before a reconcile must not
+    /// wipe the stamp.
     public func saveAccount(_ account: Account, profileId: UUID, openingMinor: Int64? = nil) async throws {
         let now = clock()
         try await write { store in
-            let isNew = try store.account(account.id, profileId: profileId) == nil
+            let stored = try store.account(account.id, profileId: profileId)
+            var account = account
+            account.reconciledAt = stored?.reconciledAt
             try store.save(account, profileId: profileId)
-            if isNew, let openingMinor, openingMinor != 0 {
+            if stored == nil, let openingMinor, openingMinor != 0 {
                 let opening = Draft(type: .opening, timestamp: now, accountId: account.id, amountMinor: openingMinor)
                 _ = try Self.book(opening, profileId: profileId, in: store, at: now)
             }
@@ -171,24 +186,26 @@ public actor Repository {
         return id
     }
 
-    /// Deletes the operation and returns it with its postings for "Отменить"; nil when the profile
-    /// has no such operation.
+    /// Deletes the operation and returns what "Отменить" needs to bring it back; nil when the
+    /// profile has no such operation.
     @discardableResult
-    public func deleteOperation(_ id: UUID, profileId: UUID) async throws -> OperationFull? {
+    public func deleteOperation(_ id: UUID, profileId: UUID) async throws -> DeletedOperation? {
         try await write { store in
-            guard let full = try store.operation(id, profileId: profileId) else { return nil }
+            guard let full = try store.operation(id, profileId: profileId),
+                  let sequence = try store.sequence(ofOperation: id, profileId: profileId)
+            else { return nil }
             try store.deleteOperation(id, profileId: profileId)
-            return full
+            return DeletedOperation(full: full, sequence: sequence)
         }
     }
 
     /// Undo of `deleteOperation`: the operation comes back with the same ids, its own and its
-    /// postings', so sync sees the same rows return.
-    public func restoreOperation(_ full: OperationFull, profileId: UUID) async throws {
+    /// postings', so sync sees the same rows return, and in the same place among operations with
+    /// its timestamp, as Android re-inserted it under its autoincrement id.
+    public func restoreOperation(_ deleted: DeletedOperation, profileId: UUID) async throws {
         let now = clock()
         try await write { store in
-            try store.save(full.op, profileId: profileId, updatedAt: now)
-            for posting in full.postings { try store.save(posting, profileId: profileId) }
+            try store.restore(deleted.full, sequence: deleted.sequence, profileId: profileId, updatedAt: now)
         }
     }
 

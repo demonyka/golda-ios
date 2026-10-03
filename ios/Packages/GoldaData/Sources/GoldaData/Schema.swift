@@ -60,8 +60,13 @@ enum Schema {
             t.column("cbrTo", .double)
             // Last writer wins when two devices edit the same operation.
             t.column("updatedAt", .integer).notNull()
+            // Order of writing within the profile (1, 2, 3…): of operations with one timestamp the
+            // last written is listed first, as Android's autoincrement ids did, and an undone delete
+            // returns to its place. Unlike the rowid, nothing renumbers it.
+            t.column("sequence", .integer).notNull()
         }
         try db.create(index: "operation_on_profileId_timestamp", on: "operation", columns: ["profileId", "timestamp"])
+        try db.create(index: "operation_on_profileId_sequence", on: "operation", columns: ["profileId", "sequence"])
         try db.create(index: "operation_on_id_profileId", on: "operation", columns: ["id", "profileId"], unique: true)
 
         try db.create(table: "posting") { t in

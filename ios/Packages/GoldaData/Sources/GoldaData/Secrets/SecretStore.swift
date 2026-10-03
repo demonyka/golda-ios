@@ -22,6 +22,9 @@ public protocol SecretStore: Sendable {
 /// Names of the secrets the app keeps.
 public enum SecretKey {
     public static let gemini = "geminiKey"
+
+    /// Every key the app keeps, so wiping all data misses none.
+    public static let all = [gemini]
 }
 
 public enum SecretStoreError: Error, Equatable, Sendable {

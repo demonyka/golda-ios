@@ -50,6 +50,7 @@ final class RepositoryHarness {
     let defaults: UserDefaults
     let device: DeviceSettingsStore
     let database: GoldaDatabase
+    let secrets = InMemorySecretStore()
     let clock = TestClock(RepositoryHarness.start)
     let repository: Repository
 
@@ -57,8 +58,18 @@ final class RepositoryHarness {
         defaults = try #require(UserDefaults(suiteName: suiteName))
         device = DeviceSettingsStore(defaults: defaults)
         database = try GoldaDatabase.inMemory()
-        let clock = clock
-        repository = Repository(database: database, deviceSettings: device, clock: { clock.now }, zone: { RepositoryHarness.utc })
+        repository = Self.repository(database, device, secrets, clock, zone: RepositoryHarness.utc)
+    }
+
+    /// Another repository over the same database, settings, secrets and clock.
+    func repository(zone: TimeZone) -> Repository {
+        Self.repository(database, device, secrets, clock, zone: zone)
+    }
+
+    private static func repository(
+        _ database: GoldaDatabase, _ device: DeviceSettingsStore, _ secrets: any SecretStore, _ clock: TestClock, zone: TimeZone
+    ) -> Repository {
+        Repository(database: database, deviceSettings: device, secrets: secrets, clock: { clock.now }, zone: { zone })
     }
 
     deinit {

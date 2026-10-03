@@ -96,7 +96,7 @@ import Testing
         let original = try #require(try await harness.operation(id, profileId))
 
         let deleted = try #require(try await repository.deleteOperation(id, profileId: profileId))
-        #expect(deleted == original)
+        #expect(deleted.full == original)
         #expect(try await harness.operation(id, profileId) == nil)
         #expect(try await harness.state(rub.id, profileId).balanceMinor == 1_000_000)
         #expect(try await repository.deleteOperation(id, profileId: profileId) == nil)
@@ -105,6 +105,39 @@ import Testing
         #expect(try await harness.operation(id, profileId) == original)
         #expect(try await harness.state(rub.id, profileId).balanceMinor == 100_000)
         #expect(try await harness.state(usd.id, profileId).balanceMinor == 10_000)
+    }
+
+    /// Three expenses from one voice note share a timestamp; the last written is listed first.
+    @discardableResult
+    func voiceNote(_ notes: [String], at timestamp: Int64 = 5) async throws -> [UUID] {
+        var ids: [UUID] = []
+        for note in notes {
+            ids.append(try await repository.save(Draft(type: .expense, timestamp: timestamp, accountId: rub.id, amountMinor: 100, note: note), profileId: profileId))
+        }
+        return ids
+    }
+
+    func listedNotes() async throws -> [String] {
+        try await harness.snapshot(profileId).operations.map(\.op.note)
+    }
+
+    @Test func undoPutsTheOperationBackInItsPlace() async throws {
+        let ids = try await voiceNote(["кофе", "круассан", "сок"])
+        #expect(try await listedNotes() == ["сок", "круассан", "кофе"])
+
+        let deleted = try #require(try await repository.deleteOperation(ids[1], profileId: profileId))
+        #expect(try await listedNotes() == ["сок", "кофе"])
+        try await repository.restoreOperation(deleted, profileId: profileId)
+        #expect(try await listedNotes() == ["сок", "круассан", "кофе"])
+    }
+
+    @Test func undoOfTheLastWrittenStaysBeforeWhatWasWrittenSince() async throws {
+        let ids = try await voiceNote(["кофе", "круассан", "сок"])
+        let deleted = try #require(try await repository.deleteOperation(ids[2], profileId: profileId))
+        // Written after the delete, at the same moment: these took the freed place and the next one.
+        try await voiceNote(["вода", "булка"])
+        try await repository.restoreOperation(deleted, profileId: profileId)
+        #expect(try await listedNotes() == ["булка", "вода", "сок", "круассан", "кофе"])
     }
 
     // MARK: Accounts
@@ -166,6 +199,58 @@ import Testing
         #expect(books.accounts.first { $0.id == rub.id }?.reconciledAt == nil)
     }
 
+    @Test func editingAnAccountKeepsItsReconcileStamp() async throws {
+        let stale = try #require(try await harness.snapshot(profileId).accounts.first { $0.id == usd.id })
+        try await repository.reconcile(accountId: usd.id, actualMinor: 0, profileId: profileId)
+
+        // The form built a fresh account with the same id, and knows nothing of the stamp.
+        try await repository.saveAccount(
+            Account(id: usd.id, name: "Доллары", currency: "USD", type: .card, includeInFree: true, sort: 1), profileId: profileId
+        )
+        var stored = try #require(try await harness.snapshot(profileId).accounts.first { $0.id == usd.id })
+        #expect(stored.name == "Доллары" && stored.reconciledAt == RepositoryHarness.start)
+
+        // A copy read before the reconcile, saved after it.
+        try await repository.saveAccount(stale, profileId: profileId)
+        stored = try #require(try await harness.snapshot(profileId).accounts.first { $0.id == usd.id })
+        #expect(stored.name == usd.name && stored.reconciledAt == RepositoryHarness.start)
+
+        // Nor does a new account bring a stamp of its own.
+        var fresh = Account(id: StoreFixture.id(12), name: "Новая", currency: "RUB", type: .card, includeInFree: true)
+        fresh.reconciledAt = 1
+        try await repository.saveAccount(fresh, profileId: profileId)
+        #expect(try await harness.snapshot(profileId).accounts.first { $0.id == fresh.id }?.reconciledAt == nil)
+    }
+
+    // MARK: Cancellation
+
+    @Test func aWriteLandsEvenWhenItsTaskIsCancelled() async throws {
+        let repository = repository
+        let profileId = profileId
+        let rub = rub.id
+        func cancelled<T: Sendable>(_ body: @escaping @Sendable () async throws -> T) async -> Result<T, any Error> {
+            let task = Task {
+                // Wait for the cancel, so the call below starts in a cancelled task.
+                while !Task.isCancelled { await Task.yield() }
+                return try await body()
+            }
+            task.cancel()
+            return await task.result
+        }
+
+        // GRDB on its own gives up on a cancelled task: this is what the repository guards against.
+        let database = harness.database
+        let bare = await cancelled { try await database.write { _ in } }
+        #expect(throws: CancellationError.self) { try bare.get() }
+
+        let saved = await cancelled {
+            try await repository.save(Draft(type: .expense, timestamp: 1, accountId: rub, amountMinor: 100), profileId: profileId)
+        }
+        let id = try saved.get()
+        #expect(try await harness.operation(id, profileId)?.postings.map(\.amountMinor) == [-100])
+        #expect(harness.device.current.lastAccountId[profileId] == rub)
+    }
+
     // MARK: Rates
 
     @Test func freshRatesValueWhatHadNoRate() async throws {
@@ -209,7 +294,7 @@ import Testing
 
     @Test func seedingFillsAnEmptyRateTableOnly() async throws {
         let database = try GoldaDatabase.inMemory()
-        let repository = Repository(database: database, deviceSettings: harness.device)
+        let repository = Repository(database: database, deviceSettings: harness.device, secrets: InMemorySecretStore())
         try await repository.ensureSeed()
         #expect(try await database.read { try $0.rates() } == CbrRatesSource.fallback.map(RateRecord.init).sorted { $0.code < $1.code })
 
