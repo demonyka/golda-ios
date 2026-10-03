@@ -82,8 +82,40 @@ import Testing
     @Test func obligation() async throws {
         let database = try await StoreFixture.database(profiles: 1)
         let obligation = Obligation(id: StoreFixture.id(40), name: "Аренда", amountMinor: .max, currency: "GEL", dayOfMonth: 31)
+        let edited = Obligation(id: obligation.id, name: "", amountMinor: .min, currency: "RUB", dayOfMonth: 1)
         try await database.write { try $0.save(obligation, profileId: profileId) }
         #expect(try await database.read { try $0.obligation(obligation.id, profileId: profileId) } == obligation)
+        try await database.write { try $0.save(edited, profileId: profileId) }
+        #expect(try await database.read { try $0.obligations(profileId: profileId) } == [edited])
+    }
+
+    @Test func obligationsKeepTheirPlaceInTheCreationOrder() async throws {
+        let database = try await StoreFixture.database(profiles: 1, 2)
+        @Sendable func payment(_ n: Int, day: Int = 5, _ name: String = "") -> Obligation {
+            Obligation(id: StoreFixture.id(n), name: name, amountMinor: 1, currency: "RUB", dayOfMonth: day)
+        }
+        try await database.write { store in
+            try store.save(payment(9), profileId: profileId)
+            try store.save(payment(1), profileId: profileId)
+            // An edit keeps the payment's place, a new day included.
+            try store.save(payment(9, day: 6, "Аренда"), profileId: profileId)
+            try store.save(payment(9, day: 5, "Аренда"), profileId: profileId)
+            // An import passes the original order, and later payments go after it.
+            try store.save(payment(5), profileId: profileId, createdAt: 100)
+            try store.save(payment(7), profileId: profileId)
+            // Each profile counts on its own.
+            try store.save(payment(8), profileId: StoreFixture.id(2))
+        }
+        let stored = try await database.writer.read { db in
+            try ObligationRecord.order(Column("profileId"), Column("createdAt")).fetchAll(db)
+        }
+        #expect(stored.map(\.id) == [9, 1, 5, 7, 8].map(StoreFixture.id))
+        #expect(stored.map(\.createdAt) == [1, 2, 100, 101, 1])
+        // One day's payments in the order they were created, not by id.
+        #expect(try await database.read { try $0.obligations(profileId: profileId) }.map(\.id) == [9, 1, 5, 7].map(StoreFixture.id))
+        #expect(try await database.read { try $0.obligationCreationCounters(profileId: profileId) } == [
+            StoreFixture.id(9): 1, StoreFixture.id(1): 2, StoreFixture.id(5): 100, StoreFixture.id(7): 101,
+        ])
     }
 
     @Test func goal() async throws {

@@ -26,7 +26,9 @@ struct WireBackup: Codable {
         version = BackupFormat.version
         exportedAt = backup.exportedAt
         device = WireDevice(backup.device)
-        profiles = backup.profiles.map { WireProfile($0, goalCreatedAt: backup.goalCreatedAt) }
+        profiles = backup.profiles.map {
+            WireProfile($0, goalCreatedAt: backup.goalCreatedAt, obligationCreatedAt: backup.obligationCreatedAt)
+        }
         rates = backup.rates
     }
 
@@ -41,10 +43,14 @@ struct WireBackup: Codable {
 
     var backup: Backup {
         var goalCreatedAt: [UUID: Int64] = [:]
-        for profile in profiles { goalCreatedAt.merge(profile.goalCreatedAt) { first, _ in first } }
+        var obligationCreatedAt: [UUID: Int64] = [:]
+        for profile in profiles {
+            goalCreatedAt.merge(profile.goalCreatedAt) { first, _ in first }
+            obligationCreatedAt.merge(profile.obligationCreatedAt) { first, _ in first }
+        }
         return Backup(
             sourceVersion: version, exportedAt: exportedAt, device: device.device, profiles: profiles.map(\.snapshot),
-            goalCreatedAt: goalCreatedAt, rates: rates
+            goalCreatedAt: goalCreatedAt, obligationCreatedAt: obligationCreatedAt, rates: rates
         )
     }
 }
@@ -89,18 +95,18 @@ struct WireProfile: Codable {
     var settings: WireProfileSettings
     var accounts: [WireAccount]
     var operations: [WireOperation]
-    var obligations: [Obligation]
+    var obligations: [WireObligation]
     var goals: [WireGoal]
     var wishes: [WireWish]
 
-    init(_ snapshot: ProfileSnapshot, goalCreatedAt: [UUID: Int64]) {
+    init(_ snapshot: ProfileSnapshot, goalCreatedAt: [UUID: Int64], obligationCreatedAt: [UUID: Int64]) {
         id = snapshot.profile.id
         name = snapshot.profile.name
         sort = snapshot.profile.sort
         settings = WireProfileSettings(snapshot.profile.settings)
         accounts = snapshot.accounts.map(WireAccount.init)
         operations = snapshot.operations.map(WireOperation.init)
-        obligations = snapshot.obligations
+        obligations = snapshot.obligations.map { WireObligation($0, createdAt: obligationCreatedAt[$0.id]) }
         goals = snapshot.goals.map { WireGoal($0, createdAt: goalCreatedAt[$0.id]) }
         wishes = snapshot.wishes.map(WireWish.init)
     }
@@ -121,17 +127,26 @@ struct WireProfile: Codable {
     var snapshot: ProfileSnapshot {
         ProfileSnapshot(
             profile: Profile(id: id, name: name, sort: sort, settings: settings.settings),
-            accounts: accounts.map(\.account), operations: operations.map(\.full), obligations: obligations,
-            goals: goals.map(\.goal), wishes: wishes.map(\.wish)
+            accounts: accounts.map(\.account), operations: operations.map(\.full),
+            obligations: obligations.map(\.obligation), goals: goals.map(\.goal), wishes: wishes.map(\.wish)
         )
     }
 
-    /// The goals' creation counters, when the file gives every goal its own. A file from before the
-    /// counters, or one with a goal lacking one or two goals sharing one, gets none: the goals are then
-    /// created in the order the file lists them.
+    /// The goals' creation counters, when the file gives every goal its own.
     var goalCreatedAt: [UUID: Int64] {
-        let counters = goals.compactMap { goal in goal.createdAt.map { (goal.id, $0) } }
-        guard counters.count == goals.count, Set(counters.map(\.1)).count == counters.count else { return [:] }
+        Self.counters(goals.map { ($0.id, $0.createdAt) })
+    }
+
+    /// The payments' creation counters, when the file gives every payment its own.
+    var obligationCreatedAt: [UUID: Int64] {
+        Self.counters(obligations.map { ($0.id, $0.createdAt) })
+    }
+
+    /// A file from before the counters, or one with a row lacking one or two rows sharing one, gets
+    /// none for that kind of row: the rows are then created in the order the file lists them.
+    private static func counters(_ rows: [(id: UUID, createdAt: Int64?)]) -> [UUID: Int64] {
+        let counters = rows.compactMap { row in row.createdAt.map { (row.id, $0) } }
+        guard counters.count == rows.count, Set(counters.map(\.1)).count == counters.count else { return [:] }
         return Dictionary(counters) { first, _ in first }
     }
 }
@@ -304,6 +319,39 @@ struct WirePosting: Codable {
 
     func posting(of operationId: UUID) -> Posting {
         Posting(id: id, operationId: operationId, accountId: accountId, amountMinor: amountMinor, rubMinor: rubMinor)
+    }
+}
+
+struct WireObligation: Codable {
+    var id: UUID
+    var name: String
+    var amountMinor: Int64
+    var currency: String
+    var dayOfMonth: Int
+    /// The payment's place in the profile's creation order: a counter, not a time.
+    var createdAt: Int64?
+
+    init(_ o: Obligation, createdAt: Int64?) {
+        id = o.id
+        name = o.name
+        amountMinor = o.amountMinor
+        currency = o.currency
+        dayOfMonth = o.dayOfMonth
+        self.createdAt = createdAt
+    }
+
+    init(from decoder: any Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(UUID.self, forKey: .id)
+        name = try c.decode(String.self, forKey: .name)
+        amountMinor = try c.decode(Int64.self, forKey: .amountMinor)
+        currency = try c.decode(String.self, forKey: .currency)
+        dayOfMonth = try c.decode(Int.self, forKey: .dayOfMonth)
+        createdAt = try c.decodeIfPresent(Int64.self, forKey: .createdAt)
+    }
+
+    var obligation: Obligation {
+        Obligation(id: id, name: name, amountMinor: amountMinor, currency: currency, dayOfMonth: dayOfMonth)
     }
 }
 

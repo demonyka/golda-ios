@@ -293,14 +293,12 @@ import Testing
             let postings = full.postings.map { "\(names[$0.accountId] ?? "?") \($0.amountMinor) \($0.rubMinor)" }
             lines.append("operation \(op) \(postings)")
         }
-        // Same-day obligations come in the order of their random ids, so order them here.
-        var obligations: [String] = []
+        // Same-day obligations come in the order they were created, whatever their random ids.
         for obligation in books.obligations {
             var obligation = obligation
             obligation.id = .zero
-            obligations.append("obligation \(obligation)")
+            lines.append("obligation \(obligation)")
         }
-        lines += obligations.sorted()
         for goal in books.goals {
             var goal = goal
             let account = goal.accountId.flatMap { names[$0] } ?? "-"

@@ -54,6 +54,9 @@ import Testing
         let counters = try await source.goalCounters()
         #expect(counters.count == 5)
         #expect(try await target.goalCounters() == counters)
+        let paymentCounters = try await source.obligationCounters()
+        #expect(paymentCounters.count == 4)
+        #expect(try await target.obligationCounters() == paymentCounters)
 
         #expect(summary.sourceVersion == 2)
         #expect(summary.profiles == 2)
@@ -186,6 +189,72 @@ import Testing
             #expect(try await target.goalNamesByAge(snapshots[0].profile.id) == ["Велосипед", "Подушка", "Отпуск в Грузии"])
             #expect(try await target.goalNamesByAge(snapshots[1].profile.id) == ["Ремонт", "Машина"])
         }
+    }
+
+    // MARK: Payments' creation order
+
+    @Test func theRoundTripKeepsTheOrderOfOneDaysPayments() async throws {
+        let source = try await livedIn()
+        let family = StoreFixture.id(900)
+        let repository = source.repository()
+        // Ids out of creation order, and the first one deleted and undone: its place comes back.
+        for n in [925, 921] {
+            try await repository.saveObligation(
+                Obligation(id: StoreFixture.id(n), name: "Платёж \(n)", amountMinor: 100, currency: "RUB", dayOfMonth: 12),
+                profileId: family
+            )
+        }
+        let deleted = try #require(try await repository.deleteObligation(StoreFixture.id(920), profileId: family))
+        try await repository.saveObligation(deleted.obligation, profileId: family, createdAt: deleted.createdAt)
+        let order = [920, 925, 921].map(StoreFixture.id)
+        #expect(try await source.snapshots()[1].obligations.map(\.id) == order)
+        let file = try await source.backups.export()
+
+        let target = try BackupHarness()
+        try await target.backups.import(file, personalProfileName: "Не нужен")
+        #expect(try await target.snapshots()[1].obligations.map(\.id) == order)
+        #expect(try await target.obligationCounters() == source.obligationCounters())
+        #expect(try await target.backups.export() == file)
+
+        // A payment added later goes after them all.
+        try await target.repository().saveObligation(
+            Obligation(id: StoreFixture.id(922), name: "Новый", amountMinor: 1, currency: "RUB", dayOfMonth: 12), profileId: family
+        )
+        #expect(try await target.snapshots()[1].obligations.map(\.id) == order + [StoreFixture.id(922)])
+    }
+
+    @Test func theFileHoldsEveryPaymentsCounter() async throws {
+        let source = try await livedIn()
+        let file = try await source.backups.export()
+        let object = try #require(try JSONSerialization.jsonObject(with: file) as? [String: Any])
+        let profiles = try #require(object["profiles"] as? [[String: Any]])
+        // Android's ids for the imported books, and the family's own count from 1.
+        let counters = profiles.map { profile in
+            (profile["obligations"] as? [[String: Any]] ?? []).map { "\($0["name"] ?? "") \($0["createdAt"] ?? "-")" }
+        }
+        #expect(counters == [["Аренда 1", "Подписки 2", "Интернет дома 3"], ["Ипотека 1"]])
+    }
+
+    @Test func aFileWithoutPaymentCountersCreatesThemInTheListedOrder() async throws {
+        let source = try await livedIn()
+        let file = try await BackupFixtures.edit(source.backups.export()) { file in
+            var profiles = try #require(file["profiles"] as? [[String: Any]])
+            // The first profile's payments listed with the day-1 pair swapped and no counters.
+            var payments = try #require(profiles[0]["obligations"] as? [[String: Any]])
+            payments.swapAt(0, 1)
+            profiles[0]["obligations"] = payments.map { payment -> [String: Any] in
+                var payment = payment
+                payment.removeValue(forKey: "createdAt")
+                return payment
+            }
+            file["profiles"] = profiles
+        }
+        let target = try BackupHarness()
+        try await target.backups.import(file, personalProfileName: "Не нужен")
+        let snapshots = try await target.snapshots()
+        #expect(snapshots[0].obligations.map(\.name) == ["Подписки", "Аренда", "Интернет дома"])
+        let counters = try await target.obligationCounters()
+        #expect(snapshots[0].obligations.map { counters[$0.id] } == [1, 2, 3])
     }
 
     // MARK: Nothing to export

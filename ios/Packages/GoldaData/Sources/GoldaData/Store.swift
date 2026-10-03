@@ -141,9 +141,10 @@ public struct Store {
 
     // MARK: Obligations
 
+    /// By day of the month, then the order they were created in, as Android listed them (O10).
     public func obligations(profileId: UUID) throws -> [Obligation] {
         try ObligationRecord.owned(by: profileId)
-            .order(Column("dayOfMonth"), Column("id"))
+            .order(Column("dayOfMonth"), Column("createdAt"), Column("id"))
             .fetchAll(db)
             .map(\.obligation)
     }
@@ -152,8 +153,11 @@ public struct Store {
         try ObligationRecord.owned(by: profileId).filter(id: id).fetchOne(db)?.obligation
     }
 
-    public func save(_ obligation: Obligation, profileId: UUID) throws {
-        try saveOwned(ObligationRecord(obligation, profileId: profileId))
+    /// [createdAt] is the payment's place in the creation order. Nil keeps the place of a payment
+    /// that is already stored and puts a new one after every other payment of the profile; an import
+    /// passes the original order.
+    public func save(_ obligation: Obligation, profileId: UUID, createdAt: Int64? = nil) throws {
+        try saveInCreationOrder(ObligationRecord(obligation, profileId: profileId, createdAt: createdAt))
     }
 
     @discardableResult
@@ -179,13 +183,7 @@ public struct Store {
     /// already stored and puts a new one after every other goal of the profile; an import passes the
     /// original order.
     public func save(_ goal: Goal, profileId: UUID, createdAt: Int64? = nil) throws {
-        var record = GoalRecord(goal, profileId: profileId, createdAt: createdAt)
-        if record.createdAt == nil {
-            let stored = try Int64.fetchOne(db, GoalRecord.filter(id: goal.id).select(Column("createdAt")))
-            let last = try Int64.fetchOne(db, GoalRecord.owned(by: profileId).select(max(Column("createdAt"))))
-            record.createdAt = stored ?? (last ?? 0) + 1
-        }
-        try saveOwned(record)
+        try saveInCreationOrder(GoalRecord(goal, profileId: profileId, createdAt: createdAt))
     }
 
     @discardableResult
@@ -254,6 +252,18 @@ public struct Store {
         case record.profileId: try record.update(db)
         default: throw StoreError.belongsToAnotherProfile(record.id)
         }
+    }
+
+    /// `saveOwned` for a row with a place in the creation order: a nil place keeps the stored row's
+    /// one, or comes after every other row of the profile for a new row.
+    private func saveInCreationOrder<Record: CreationOrderedRecord>(_ record: Record) throws {
+        var record = record
+        if record.createdAt == nil {
+            let stored = try Int64.fetchOne(db, Record.filter(id: record.id).select(Column("createdAt")))
+            let last = try Int64.fetchOne(db, Record.owned(by: record.profileId).select(max(Column("createdAt"))))
+            record.createdAt = stored ?? (last ?? 0) + 1
+        }
+        try saveOwned(record)
     }
 
     private func deleteOwned<Record: ProfileOwnedRecord>(_ type: Record.Type, _ id: UUID, _ profileId: UUID) throws -> Bool {

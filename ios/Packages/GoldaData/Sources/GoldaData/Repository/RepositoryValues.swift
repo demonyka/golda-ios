@@ -16,6 +16,20 @@ public struct DeletedOperation: Equatable, Sendable {
     let sequence: Int64
 }
 
+/// A deleted goal as "Отменить" needs it: the goal as it was stored, and its place in the creation
+/// order, which `saveGoal(_:profileId:createdAt:)` puts it back at.
+public struct DeletedGoal: Equatable, Sendable {
+    public let goal: Goal
+    public let createdAt: Int64
+}
+
+/// A deleted payment as "Отменить" needs it: the payment as it was stored, and its place in the
+/// creation order, which `saveObligation(_:profileId:createdAt:)` puts it back at.
+public struct DeletedObligation: Equatable, Sendable {
+    public let obligation: Obligation
+    public let createdAt: Int64
+}
+
 /// What an expense just recorded means: "≈ 2,6 ч работы · на сегодня осталось 503 ₽". Numbers only;
 /// the screen writes the sentence in the main currency.
 public struct Impact: Equatable, Sendable {

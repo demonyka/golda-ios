@@ -23,19 +23,25 @@ public struct Backups: Sendable {
     /// Throws `BackupError.nothingToExport` when there is no profile, since no file could bring
     /// that state back.
     public func export() async throws -> Data {
-        typealias Books = (profiles: [ProfileSnapshot], goalCreatedAt: [UUID: Int64], rates: [RateRecord])
+        typealias Books = (
+            profiles: [ProfileSnapshot], goalCreatedAt: [UUID: Int64], obligationCreatedAt: [UUID: Int64],
+            rates: [RateRecord]
+        )
         let books = try await database.read { store -> Books in
             let profiles = try store.profiles().compactMap { try store.snapshot(profileId: $0.id) }
             var goalCreatedAt: [UUID: Int64] = [:]
+            var obligationCreatedAt: [UUID: Int64] = [:]
             for profile in profiles {
-                goalCreatedAt.merge(try store.goalCreationCounters(profileId: profile.profile.id)) { first, _ in first }
+                let id = profile.profile.id
+                goalCreatedAt.merge(try store.goalCreationCounters(profileId: id)) { first, _ in first }
+                obligationCreatedAt.merge(try store.obligationCreationCounters(profileId: id)) { first, _ in first }
             }
-            return (profiles, goalCreatedAt, try store.rates())
+            return (profiles, goalCreatedAt, obligationCreatedAt, try store.rates())
         }
         guard !books.profiles.isEmpty else { throw BackupError.nothingToExport }
         let backup = Backup(
             exportedAt: milliseconds(now()), device: BackupDevice(deviceSettings.current), profiles: books.profiles,
-            goalCreatedAt: books.goalCreatedAt, rates: books.rates
+            goalCreatedAt: books.goalCreatedAt, obligationCreatedAt: books.obligationCreatedAt, rates: books.rates
         )
         return try BackupFormat.encode(backup)
     }
@@ -87,9 +93,12 @@ public struct Backups: Sendable {
                     try store.save(full.op, profileId: profileId, updatedAt: importedAt)
                     for posting in full.postings { try store.save(posting, profileId: profileId) }
                 }
-                for obligation in snapshot.obligations { try store.save(obligation, profileId: profileId) }
-                // With a counter a goal takes its original place in the creation order; without one
-                // the store counts on from the last, so the listed order becomes the creation order.
+                // With a counter a payment or goal takes its original place in the creation order;
+                // without one the store counts on from the last, so the listed order becomes the
+                // creation order.
+                for obligation in snapshot.obligations {
+                    try store.save(obligation, profileId: profileId, createdAt: backup.obligationCreatedAt[obligation.id])
+                }
                 for goal in snapshot.goals {
                     try store.save(goal, profileId: profileId, createdAt: backup.goalCreatedAt[goal.id])
                 }
@@ -109,8 +118,17 @@ extension Store {
     /// Each goal's place in its profile's creation order, by goal id. `Goal` carries no such field,
     /// so the backup reads the counters from the rows.
     func goalCreationCounters(profileId: UUID) throws -> [UUID: Int64] {
+        try creationCounters(GoalRecord.self, profileId: profileId)
+    }
+
+    /// The same for payments, by payment id.
+    func obligationCreationCounters(profileId: UUID) throws -> [UUID: Int64] {
+        try creationCounters(ObligationRecord.self, profileId: profileId)
+    }
+
+    private func creationCounters<Record: CreationOrderedRecord>(_ type: Record.Type, profileId: UUID) throws -> [UUID: Int64] {
         var counters: [UUID: Int64] = [:]
-        for record in try GoalRecord.owned(by: profileId).fetchAll(db) {
+        for record in try Record.owned(by: profileId).fetchAll(db) {
             if let createdAt = record.createdAt { counters[record.id] = createdAt }
         }
         return counters

@@ -129,6 +129,26 @@ import Testing
         #expect(harness.model.data?.goals.filter(\.isMain).map(\.name) == ["Велосипед"])
     }
 
+    /// "The oldest becomes main" means created first, and an undone delete does not make a goal new.
+    @Test func anUndoneGoalKeepsItsPlaceSoItIsStillTheOldest() async throws {
+        let (harness, _) = try await samples()
+        try await harness.model.saveGoal(Goal(name: "Отпуск", targetMinor: 5_000_000, currency: "RUB"))
+        await eventually { harness.model.data?.goals.count == 3 }
+        let cushion = try goal("Подушка", in: harness)
+        let token = try await harness.model.deleteGoal(cushion)
+        #expect(token.goal == cushion && token.createdAt == 2)
+        await eventually { harness.model.data?.goals.count == 2 }
+        try await harness.model.restoreGoal(token)
+        await eventually { harness.model.data?.goals.count == 3 }
+        #expect(harness.model.data?.goals.map(\.name) == ["Велосипед", "Подушка", "Отпуск"])
+
+        // The main goal goes: the cushion, created before the trip, takes its place.
+        _ = try await harness.model.deleteGoal(try goal("Велосипед", in: harness))
+        await eventually { harness.model.data?.goals.count == 2 }
+        #expect(harness.model.data?.goals.map(\.name) == ["Подушка", "Отпуск"])
+        #expect(harness.model.data?.goals.map(\.isMain) == [true, false])
+    }
+
     @Test func aRemovedWishComesBackAsItWas() async throws {
         let (harness, _) = try await samples()
         let headphones = try #require(harness.model.data?.wishes.first { $0.title == "Наушники" })

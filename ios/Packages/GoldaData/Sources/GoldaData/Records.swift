@@ -10,6 +10,13 @@ protocol ProfileOwnedRecord: Codable, FetchableRecord, PersistableRecord, Identi
     var profileId: UUID { get }
 }
 
+/// A row whose place among its profile's rows is the order they were created in, as Android's
+/// autoincrement ids gave it; UUIDs do not, so the place is stored (D27). The store fills it in when
+/// it is nil.
+protocol CreationOrderedRecord: ProfileOwnedRecord {
+    var createdAt: Int64? { get set }
+}
+
 struct ProfileRecord: Codable, FetchableRecord, PersistableRecord, Identifiable {
     static let databaseTableName = "profile"
 
@@ -161,7 +168,7 @@ struct PostingRecord: ProfileOwnedRecord {
     }
 }
 
-struct ObligationRecord: ProfileOwnedRecord {
+struct ObligationRecord: CreationOrderedRecord {
     static let databaseTableName = "obligation"
 
     var id: UUID
@@ -170,14 +177,19 @@ struct ObligationRecord: ProfileOwnedRecord {
     var amountMinor: Int64
     var currency: String
     var dayOfMonth: Int
+    /// The payment's place in its profile's creation order (1, 2, 3…), not a time: payments of one
+    /// day are listed in it, as Android's ids listed them. The domain model has no such field, so the
+    /// store fills it in when it is nil (O10).
+    var createdAt: Int64?
 
-    init(_ obligation: Obligation, profileId: UUID) {
+    init(_ obligation: Obligation, profileId: UUID, createdAt: Int64? = nil) {
         id = obligation.id
         self.profileId = profileId
         name = obligation.name
         amountMinor = obligation.amountMinor
         currency = obligation.currency
         dayOfMonth = obligation.dayOfMonth
+        self.createdAt = createdAt
     }
 
     var obligation: Obligation {
@@ -185,7 +197,7 @@ struct ObligationRecord: ProfileOwnedRecord {
     }
 }
 
-struct GoalRecord: ProfileOwnedRecord {
+struct GoalRecord: CreationOrderedRecord {
     static let databaseTableName = "goal"
 
     var id: UUID

@@ -24,16 +24,51 @@ extension Store {
     }
 
     /// Puts a deleted operation back with its postings at [sequence], its old place among
-    /// operations with the same timestamp. When the deleted one was the last written, an operation
-    /// written since has taken its number; that one and any later move up by one, so every
-    /// operation keeps the order it was written in, as with Android's autoincrement ids.
+    /// operations with the same timestamp.
     func restore(_ full: OperationFull, sequence: Int64, profileId: UUID, updatedAt: Int64) throws {
-        let others = OperationRecord.owned(by: profileId).filter(Column("id") != full.op.id)
-        if try others.filter(Column("sequence") == sequence).fetchCount(db) > 0 {
-            try others.filter(Column("sequence") >= sequence).updateAll(db, Column("sequence") += 1)
-        }
+        try makeRoom(OperationRecord.self, "sequence", at: sequence, for: full.op.id, profileId: profileId)
         try save(full.op, profileId: profileId, updatedAt: updatedAt, sequence: sequence)
         for posting in full.postings { try save(posting, profileId: profileId) }
+    }
+
+    /// The goal's place in the profile's creation order.
+    func createdAt(ofGoal id: UUID, profileId: UUID) throws -> Int64? {
+        try createdAt(GoalRecord.self, id, profileId)
+    }
+
+    /// Saves the goal at [createdAt] in the profile's creation order: a deleted goal back at its
+    /// old place, so "the oldest becomes main" still means the one created first.
+    func restore(_ goal: Goal, createdAt: Int64, profileId: UUID) throws {
+        try makeRoom(GoalRecord.self, "createdAt", at: createdAt, for: goal.id, profileId: profileId)
+        try save(goal, profileId: profileId, createdAt: createdAt)
+    }
+
+    /// The payment's place in the profile's creation order.
+    func createdAt(ofObligation id: UUID, profileId: UUID) throws -> Int64? {
+        try createdAt(ObligationRecord.self, id, profileId)
+    }
+
+    /// Saves the payment at [createdAt] in the profile's creation order: a deleted payment back at
+    /// its old place among the payments of its day.
+    func restore(_ obligation: Obligation, createdAt: Int64, profileId: UUID) throws {
+        try makeRoom(ObligationRecord.self, "createdAt", at: createdAt, for: obligation.id, profileId: profileId)
+        try save(obligation, profileId: profileId, createdAt: createdAt)
+    }
+
+    private func createdAt<Record: CreationOrderedRecord>(_ type: Record.Type, _ id: UUID, _ profileId: UUID) throws -> Int64? {
+        try Int64.fetchOne(db, Record.owned(by: profileId).filter(id: id).select(Column("createdAt")))
+    }
+
+    /// Frees [place] in the profile's order held in [column] for row [id] coming back to it. When the
+    /// row was the last one, a row added since has taken its number; that one and every later one
+    /// move up by one, so all keep the order they were added in, as with Android's autoincrement ids.
+    private func makeRoom<Record: ProfileOwnedRecord>(
+        _ type: Record.Type, _ column: String, at place: Int64, for id: UUID, profileId: UUID
+    ) throws {
+        let others = Record.owned(by: profileId).filter(Column("id") != id)
+        if try others.filter(Column(column) == place).fetchCount(db) > 0 {
+            try others.filter(Column(column) >= place).updateAll(db, Column(column) += 1)
+        }
     }
 
     /// Postings that moved money but are worth 0 ₽: written while their currency had no rate.

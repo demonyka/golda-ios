@@ -72,6 +72,10 @@ extension AndroidBackup {
             )
         }
 
+        // Android's ids were handed out in creation order, so each payment's id is its place in the
+        // creation order, which lists the payments of one day.
+        var obligationCreatedAt: [UUID: Int64] = [:]
+        for o in obligations { obligationCreatedAt[obligationIds[o.id]!] = o.id }
         let obligationList = obligations.sorted { ($0.dayOfMonth, $0.id) < ($1.dayOfMonth, $1.id) }.map { o in
             Obligation(
                 id: obligationIds[o.id]!, name: o.name, amountMinor: o.amountMinor, currency: o.currency,
@@ -119,7 +123,7 @@ extension AndroidBackup {
                     goals: goalList, wishes: wishList
                 )
             ],
-            goalCreatedAt: goalCreatedAt, rates: rates
+            goalCreatedAt: goalCreatedAt, obligationCreatedAt: obligationCreatedAt, rates: rates
         )
     }
 }

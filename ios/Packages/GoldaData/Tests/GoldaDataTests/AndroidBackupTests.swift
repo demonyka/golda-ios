@@ -315,6 +315,9 @@ import Testing
         let ascending = ids.sorted()
         #expect(snapshot.accounts.map(\.name) == ascending.map { "a\($0)" })
         #expect(snapshot.obligations.map(\.name) == ascending.map { "p\($0)" })
+        // Payments hold the Android id as their place in the creation order, not just a sorted UUID.
+        let counters = try await h.obligationCounters()
+        #expect(snapshot.obligations.map { counters[$0.id] } == ascending)
         #expect(snapshot.wishes.map(\.title) == ascending.map { "w\($0)" })
         // The last written comes first.
         #expect(snapshot.operations.map(\.op.note) == ascending.reversed().map { "o\($0)" })
@@ -366,6 +369,26 @@ import Testing
         let goals = try await h.onlySnapshot().goals
         #expect(goals.map(\.name) == ["Подушка", "Велосипед"])
         #expect(goals.map(\.isMain) == [true, false])
+    }
+
+    @Test func paymentsKeepAndroidsIdsAsTheirPlaceInTheCreationOrder() async throws {
+        let backup = try BackupFormat.decode(BackupFixtures.androidV1(), personalProfileName: "Личный")
+        let byName = Dictionary(
+            uniqueKeysWithValues: backup.profiles[0].obligations.map { ($0.name, backup.obligationCreatedAt[$0.id]) }
+        )
+        #expect(byName == ["Аренда": 1, "Подписки": 2, "Интернет дома": 3])
+
+        let h = try BackupHarness()
+        try await h.importAndroidFixture()
+        let snapshot = try await h.onlySnapshot()
+        let counters = try await h.obligationCounters()
+        #expect(snapshot.obligations.map { counters[$0.id] } == [1, 2, 3])
+
+        // A payment added on day 1 goes after Android's two, before the 20th.
+        try await h.repository().saveObligation(
+            Obligation(name: "Вода", amountMinor: 1, currency: "RUB", dayOfMonth: 1), profileId: snapshot.profile.id
+        )
+        #expect(try await h.onlySnapshot().obligations.map(\.name) == ["Аренда", "Подписки", "Вода", "Интернет дома"])
     }
 
     @Test func goalsAddedAfterTheImportComeAfterTheAndroidOnes() async throws {

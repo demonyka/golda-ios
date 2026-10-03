@@ -6,21 +6,47 @@ import GoldaCore
 extension Repository {
     // MARK: Obligations
 
-    public func saveObligation(_ obligation: Obligation, profileId: UUID) async throws {
-        try await write { try $0.save(obligation, profileId: profileId) }
+    /// [createdAt] is the payment's place in the creation order, which lists the payments of one day.
+    /// Nil keeps a stored payment's place and puts a new one after the others; undo of
+    /// `deleteObligation` passes the place it had.
+    public func saveObligation(_ obligation: Obligation, profileId: UUID, createdAt: Int64? = nil) async throws {
+        try await write { store in
+            if let createdAt {
+                try store.restore(obligation, createdAt: createdAt, profileId: profileId)
+            } else {
+                try store.save(obligation, profileId: profileId)
+            }
+        }
     }
 
-    public func deleteObligation(_ id: UUID, profileId: UUID) async throws {
-        try await write { try $0.deleteObligation(id, profileId: profileId) }
+    /// Deletes the payment and returns what "Отменить" needs to bring it back to its place; nil when
+    /// the profile has no such payment.
+    @discardableResult
+    public func deleteObligation(_ id: UUID, profileId: UUID) async throws -> DeletedObligation? {
+        try await write { store in
+            guard let obligation = try store.obligation(id, profileId: profileId),
+                  let createdAt = try store.createdAt(ofObligation: id, profileId: profileId)
+            else { return nil }
+            try store.deleteObligation(id, profileId: profileId)
+            return DeletedObligation(obligation: obligation, createdAt: createdAt)
+        }
     }
 
     // MARK: Goals
 
     /// Saves the goal and keeps exactly one main goal: a goal saved as main takes over, and when
     /// none is left the oldest becomes main.
-    public func saveGoal(_ goal: Goal, profileId: UUID) async throws {
+    ///
+    /// [createdAt] is the goal's place in the creation order, which says which goal is the oldest.
+    /// Nil keeps a stored goal's place and puts a new one after the others; undo of `deleteGoal`
+    /// passes the place it had.
+    public func saveGoal(_ goal: Goal, profileId: UUID, createdAt: Int64? = nil) async throws {
         try await write { store in
-            try store.save(goal, profileId: profileId)
+            if let createdAt {
+                try store.restore(goal, createdAt: createdAt, profileId: profileId)
+            } else {
+                try store.save(goal, profileId: profileId)
+            }
             if goal.isMain {
                 for var other in try store.goals(profileId: profileId) where other.isMain && other.id != goal.id {
                     other.isMain = false
@@ -31,11 +57,17 @@ extension Repository {
         }
     }
 
-    /// Deletes the goal; when it was the main one, the oldest left takes its place.
-    public func deleteGoal(_ id: UUID, profileId: UUID) async throws {
+    /// Deletes the goal; when it was the main one, the oldest left takes its place. Returns what
+    /// "Отменить" needs to bring it back to its place; nil when the profile has no such goal.
+    @discardableResult
+    public func deleteGoal(_ id: UUID, profileId: UUID) async throws -> DeletedGoal? {
         try await write { store in
+            let goal = try store.goal(id, profileId: profileId)
+            let createdAt = try store.createdAt(ofGoal: id, profileId: profileId)
             try store.deleteGoal(id, profileId: profileId)
             try Self.electMainGoal(store, profileId: profileId)
+            guard let goal, let createdAt else { return nil }
+            return DeletedGoal(goal: goal, createdAt: createdAt)
         }
     }
 
