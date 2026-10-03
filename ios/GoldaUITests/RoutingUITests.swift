@@ -2,7 +2,7 @@ import XCTest
 
 /// The ways into the screens over the tabs, on the made-up person's books: "+" on every tab opens
 /// the operation form, the gear the settings, "Manage profiles" the profiles, and an operation's
-/// row the form with that operation, on Home and over an account's page. The screens are
+/// row the form with that operation, on Home and over an account's page. Some screens are
 /// stand-ins until their steps fill them in; what is checked here is that each way leads there.
 final class RoutingUITests: XCTestCase {
     override func setUp() {
@@ -68,22 +68,22 @@ final class RoutingUITests: XCTestCase {
         XCTAssertTrue(app.buttons["profiles.done"].waitForNonExistence(timeout: 5))
     }
 
-    /// A tap on an operation opens the form with that very operation: the form shows its row.
+    /// A tap on an operation opens the form with that very operation: its note is in the form.
     @MainActor
     func testAnOperationOnHomeOpensTheFormWithIt() {
         let app = launch()
         let operations = app.buttons.matching(identifier: "home.operation")
         XCTAssertTrue(operations.firstMatch.waitForExistence(timeout: 30))
         let second = operations.element(boundBy: 1)
-        let label = second.label
+        let title = String(second.label.prefix { $0 != "," })
         second.tap()
 
         XCTAssertTrue(app.navigationBars["Operation"].waitForExistence(timeout: 5))
-        let editing = app.descendants(matching: .any)["entry.editing"]
-        XCTAssertTrue(editing.waitForExistence(timeout: 5))
-        XCTAssertEqual(editing.label, label)
+        let note = app.textFields["entry.note"]
+        XCTAssertTrue(note.waitForExistence(timeout: 5))
+        XCTAssertEqual(note.value as? String, title)
         app.buttons["entry.cancel"].tap()
-        XCTAssertTrue(editing.waitForNonExistence(timeout: 5))
+        XCTAssertTrue(note.waitForNonExistence(timeout: 5))
     }
 
     /// The same over a page pushed on the Accounts tab: the form opens over the page, and the page
@@ -107,12 +107,12 @@ final class RoutingUITests: XCTestCase {
         let title = String(operation.label.prefix { $0 != "," })
         operation.tap()
 
-        let editing = app.descendants(matching: .any)["entry.editing"]
-        XCTAssertTrue(editing.waitForExistence(timeout: 5))
-        XCTAssertTrue(editing.label.hasPrefix(title + ","), "\(editing.label) is not \(title)")
+        let note = app.textFields["entry.note"]
+        XCTAssertTrue(note.waitForExistence(timeout: 5))
+        XCTAssertEqual(note.value as? String, title)
         XCTAssertTrue(app.navigationBars["Operation"].exists)
         app.buttons["entry.cancel"].tap()
-        XCTAssertTrue(editing.waitForNonExistence(timeout: 5))
+        XCTAssertTrue(note.waitForNonExistence(timeout: 5))
         XCTAssertTrue(page.exists, "back on the account's page")
         XCTAssertTrue(app.navigationBars["Карта ₽"].exists)
     }

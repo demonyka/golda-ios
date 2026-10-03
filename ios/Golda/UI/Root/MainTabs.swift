@@ -38,6 +38,8 @@ struct MainTabs: View {
     /// Accounts in reconcile mode: the Sunday reminder (stage 4) opens the tab this way.
     @State private var isReconciling: Bool
     @State private var router = AppRouter()
+    /// One toast for all tabs: the screens over the tabs report through it too, after they close.
+    @State private var toast: UndoToast?
 
     init(data: AppData, mic: any MicModel, tab: AppTab = .home, reconciling: Bool = false) {
         self.data = data
@@ -50,7 +52,7 @@ struct MainTabs: View {
         TabView(selection: $selection) {
             ForEach(AppTab.allCases, id: \.self) { tab in
                 Tab(value: tab) {
-                    TabRoot(tab: tab, data: data, mic: mic, isReconciling: $isReconciling)
+                    TabRoot(tab: tab, data: data, mic: mic, isReconciling: $isReconciling, toast: $toast)
                 } label: {
                     Label { Text(tab.title) } icon: { Image(systemName: tab.symbol) }
                 }
@@ -69,6 +71,8 @@ struct MainTabs: View {
         // Over the whole TabView, so a screen opens the same from every tab and over pushed pages.
         .sheet(item: $router.presented) { route in
             RouteDestination(route: route, data: data)
+                // A sheet is outside every tab's host; what it reports shows on the tab under it.
+                .environment(\.showUndoToast, ShowUndoToastAction { toast = $0 })
         }
         .environment(router)
     }
@@ -81,10 +85,10 @@ private struct TabRoot: View {
     let data: AppData
     let mic: any MicModel
     @Binding var isReconciling: Bool
+    @Binding var toast: UndoToast?
 
     @Environment(AppModel.self) private var model
     @Environment(AppRouter.self) private var router
-    @State private var toast: UndoToast?
     @State private var path = NavigationPath()
     @State private var accountForm: AccountFormRequest?
 
@@ -98,13 +102,15 @@ private struct TabRoot: View {
         NavigationStack(path: $path) {
             screen
                 // Inside the mic's inset, so the toast floats above the mic and the tab bar.
-                .undoToast($toast)
+                .undoToast(path.isEmpty ? $toast : .constant(nil))
                 .environment(\.showUndoToast, ShowUndoToastAction { toast = $0 })
                 // On the screen, not around the stack, so its list ends above the mic (`MicPlacement`).
                 .modifier(MicPlacement(mic: mic))
                 .navigationTitle(Text(tab.title))
                 .toolbar { MainToolbar(router: router) }
         }
+        // A page pushed over the screen hides the screen's toast, so over a page it shows here.
+        .undoToast(path.isEmpty ? .constant(nil) : $toast)
         .sheet(item: $accountForm) { request in
             AccountFormSheet(
                 data: data, editing: request.account,
