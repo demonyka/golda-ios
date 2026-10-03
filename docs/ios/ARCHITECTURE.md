@@ -75,7 +75,7 @@ app/ …                     Android, эталон; удаляется на эт
 | `account` | id, profileId, name, currency, type, groupName?, includeInFree, sort, interestRate?, paymentDay?, paymentMinor?, graceUntil?, reconciledAt? |
 | `operation` | id, profileId, sequence, type, timestamp, categoryKey?, note, voiceText?, purchaseAmountMinor?, purchaseCurrency?, isEstimate, cbrFrom?, cbrTo?, updatedAt |
 | `posting` | id, profileId, operationId, accountId, amountMinor, rubMinor |
-| `obligation`, `goal`, `wish` | как на Android, плюс profileId; id — UUID. У `goal` ещё `createdAt` — счётчик порядка создания внутри профиля (не время) |
+| `obligation`, `goal`, `wish` | как на Android, плюс profileId; id — UUID. У `goal` и `obligation` ещё `createdAt` — счётчик порядка создания внутри профиля (не время); отмена удаления возвращает строку на прежнее место |
 | `rate` | code, rubPerUnit, date — общие курсы, не синхронизируются |
 
 Категории встроенные (на Android их нельзя изменить): задаются перечислением с ключом, иконкой и названиями в String Catalog. В операции хранится `categoryKey`.
