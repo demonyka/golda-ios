@@ -335,10 +335,45 @@ import Testing
         #expect(snapshot.accounts.filter { $0.reconciledAt != nil }.count == 2)
     }
 
-    @Test func goalsAreCreatedInAndroidsOrderOfIds() throws {
-        // What the import hands to the store, before the store's own ordering: the creation order.
+    @Test func goalsKeepAndroidsIdsAsTheirPlaceInTheCreationOrder() async throws {
+        // The file lists the main goal first (Android ids 2, 1, 3), but ids were handed out in
+        // creation order: the cushion is the oldest goal, the bike the second, the trip the third.
         let backup = try BackupFormat.decode(BackupFixtures.androidV1(), personalProfileName: "Личный")
-        #expect(backup.profiles[0].goals.map(\.name) == ["Подушка", "Велосипед", "Отпуск в Грузии"])
+        let byName = Dictionary(
+            uniqueKeysWithValues: backup.profiles[0].goals.map { ($0.name, backup.goalCreatedAt[$0.id]) }
+        )
+        #expect(byName == ["Подушка": 1, "Велосипед": 2, "Отпуск в Грузии": 3])
+
+        let h = try BackupHarness()
+        try await h.importAndroidFixture()
+        let profileId = try await h.onlySnapshot().profile.id
+        #expect(try await h.goalNamesByAge(profileId) == ["Подушка", "Велосипед", "Отпуск в Грузии"])
+    }
+
+    @Test func whenTheMainGoalGoesTheOldestByCreationBecomesMain() async throws {
+        let h = try BackupHarness()
+        try await h.importAndroidFixture()
+        let snapshot = try await h.onlySnapshot()
+        let repository = h.repository()
+
+        // The trip becomes the main goal; then it is deleted. The oldest of the rest is the cushion
+        // (Android id 1), not the bike that the file happens to list first.
+        var trip = try #require(snapshot.goals.first { $0.name == "Отпуск в Грузии" })
+        trip.isMain = true
+        try await repository.saveGoal(trip, profileId: snapshot.profile.id)
+        try await repository.deleteGoal(trip.id, profileId: snapshot.profile.id)
+
+        let goals = try await h.onlySnapshot().goals
+        #expect(goals.map(\.name) == ["Подушка", "Велосипед"])
+        #expect(goals.map(\.isMain) == [true, false])
+    }
+
+    @Test func goalsAddedAfterTheImportComeAfterTheAndroidOnes() async throws {
+        let h = try BackupHarness()
+        try await h.importAndroidFixture()
+        let profileId = try await h.onlySnapshot().profile.id
+        try await h.repository().saveGoal(Goal(name: "Ноутбук", targetMinor: 1, currency: "RUB"), profileId: profileId)
+        #expect(try await h.goalNamesByAge(profileId) == ["Подушка", "Велосипед", "Отпуск в Грузии", "Ноутбук"])
     }
 
     // MARK: Settings

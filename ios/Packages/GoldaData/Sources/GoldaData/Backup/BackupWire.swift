@@ -26,7 +26,7 @@ struct WireBackup: Codable {
         version = BackupFormat.version
         exportedAt = backup.exportedAt
         device = WireDevice(backup.device)
-        profiles = backup.profiles.map(WireProfile.init)
+        profiles = backup.profiles.map { WireProfile($0, goalCreatedAt: backup.goalCreatedAt) }
         rates = backup.rates
     }
 
@@ -40,9 +40,11 @@ struct WireBackup: Codable {
     }
 
     var backup: Backup {
-        Backup(
+        var goalCreatedAt: [UUID: Int64] = [:]
+        for profile in profiles { goalCreatedAt.merge(profile.goalCreatedAt) { first, _ in first } }
+        return Backup(
             sourceVersion: version, exportedAt: exportedAt, device: device.device, profiles: profiles.map(\.snapshot),
-            rates: rates
+            goalCreatedAt: goalCreatedAt, rates: rates
         )
     }
 }
@@ -91,7 +93,7 @@ struct WireProfile: Codable {
     var goals: [WireGoal]
     var wishes: [WireWish]
 
-    init(_ snapshot: ProfileSnapshot) {
+    init(_ snapshot: ProfileSnapshot, goalCreatedAt: [UUID: Int64]) {
         id = snapshot.profile.id
         name = snapshot.profile.name
         sort = snapshot.profile.sort
@@ -99,7 +101,7 @@ struct WireProfile: Codable {
         accounts = snapshot.accounts.map(WireAccount.init)
         operations = snapshot.operations.map(WireOperation.init)
         obligations = snapshot.obligations
-        goals = snapshot.goals.map(WireGoal.init)
+        goals = snapshot.goals.map { WireGoal($0, createdAt: goalCreatedAt[$0.id]) }
         wishes = snapshot.wishes.map(WireWish.init)
     }
 
@@ -122,6 +124,15 @@ struct WireProfile: Codable {
             accounts: accounts.map(\.account), operations: operations.map(\.full), obligations: obligations,
             goals: goals.map(\.goal), wishes: wishes.map(\.wish)
         )
+    }
+
+    /// The goals' creation counters, when the file gives every goal its own. A file from before the
+    /// counters, or one with a goal lacking one or two goals sharing one, gets none: the goals are then
+    /// created in the order the file lists them.
+    var goalCreatedAt: [UUID: Int64] {
+        let counters = goals.compactMap { goal in goal.createdAt.map { (goal.id, $0) } }
+        guard counters.count == goals.count, Set(counters.map(\.1)).count == counters.count else { return [:] }
+        return Dictionary(counters) { first, _ in first }
     }
 }
 
@@ -304,8 +315,10 @@ struct WireGoal: Codable {
     var accountId: UUID?
     var savedMinor: Int64
     var isMain: Bool
+    /// The goal's place in the profile's creation order: a counter, not a time.
+    var createdAt: Int64?
 
-    init(_ g: Goal) {
+    init(_ g: Goal, createdAt: Int64?) {
         id = g.id
         name = g.name
         targetMinor = g.targetMinor
@@ -313,6 +326,7 @@ struct WireGoal: Codable {
         accountId = g.accountId
         savedMinor = g.savedMinor
         isMain = g.isMain
+        self.createdAt = createdAt
     }
 
     init(from decoder: any Decoder) throws {
@@ -324,6 +338,7 @@ struct WireGoal: Codable {
         accountId = try c.decodeIfPresent(UUID.self, forKey: .accountId)
         savedMinor = try c.value(.savedMinor, or: 0)
         isMain = try c.value(.isMain, or: false)
+        createdAt = try c.decodeIfPresent(Int64.self, forKey: .createdAt)
     }
 
     var goal: Goal {

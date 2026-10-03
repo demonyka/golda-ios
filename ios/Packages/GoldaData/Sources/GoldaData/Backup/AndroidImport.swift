@@ -79,9 +79,11 @@ extension AndroidBackup {
             )
         }
 
-        // In creation order, not in the file's "main first" order: the store lists the main goal first
-        // by itself, and it must not look like the oldest goal just because Android's query put it there.
+        // Android's ids were handed out in creation order, so each goal's id is its place in the
+        // creation order (the file itself lists the main goal first, which says nothing about age).
         // A goal whose account is gone keeps no link, as Android's goals do when their account is deleted.
+        var goalCreatedAt: [UUID: Int64] = [:]
+        for g in goals { goalCreatedAt[goalIds[g.id]!] = g.id }
         let goalList = goals.sorted { $0.id < $1.id }.map { g in
             Goal(
                 id: goalIds[g.id]!, name: g.name, targetMinor: g.targetMinor, currency: g.currency,
@@ -117,7 +119,7 @@ extension AndroidBackup {
                     goals: goalList, wishes: wishList
                 )
             ],
-            rates: rates
+            goalCreatedAt: goalCreatedAt, rates: rates
         )
     }
 }

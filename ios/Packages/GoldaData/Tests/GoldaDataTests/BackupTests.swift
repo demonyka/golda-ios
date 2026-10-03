@@ -51,6 +51,9 @@ import Testing
         #expect(before.count == 2)
         #expect(after == before)
         #expect(try await target.rates() == source.rates())
+        let counters = try await source.goalCounters()
+        #expect(counters.count == 5)
+        #expect(try await target.goalCounters() == counters)
 
         #expect(summary.sourceVersion == 2)
         #expect(summary.profiles == 2)
@@ -88,6 +91,119 @@ import Testing
         try await again.backups.import(h.backups.export(), personalProfileName: "Не нужен")
         #expect(try await again.onlySnapshot() == books)
         #expect(try await again.onlySnapshot().profile.name == "Личный")
+    }
+
+    // MARK: Goals' creation order
+
+    @Test func theRoundTripKeepsTheGoalCreationOrderSoTheOldestBecomesMain() async throws {
+        let source = try await livedIn()
+        let personal = try #require(try await source.snapshots().first).profile.id
+        // The store lists the main goal first, so the file's order is not the creation order.
+        let file = try await source.backups.export()
+        #expect(try await source.snapshots()[0].goals.map(\.name) == ["Велосипед", "Подушка", "Отпуск в Грузии"])
+        #expect(try await source.goalNamesByAge(personal) == ["Подушка", "Велосипед", "Отпуск в Грузии"])
+
+        let target = try BackupHarness()
+        try await target.backups.import(file, personalProfileName: "Не нужен")
+        #expect(try await target.goalNamesByAge(personal) == ["Подушка", "Велосипед", "Отпуск в Грузии"])
+
+        // Election after the import: the trip becomes main and is deleted; the oldest of the rest is
+        // the cushion. Had the import taken the file's order, the bike (listed first) would win.
+        let repository = target.repository()
+        var trip = try #require(try await target.snapshots()[0].goals.first { $0.name == "Отпуск в Грузии" })
+        trip.isMain = true
+        try await repository.saveGoal(trip, profileId: personal)
+        try await repository.deleteGoal(trip.id, profileId: personal)
+        let goals = try await target.snapshots()[0].goals
+        #expect(goals.map(\.name) == ["Подушка", "Велосипед"] && goals.map(\.isMain) == [true, false])
+
+        // A goal added later goes after all of them.
+        try await repository.saveGoal(Goal(name: "Ноутбук", targetMinor: 1, currency: "RUB"), profileId: personal)
+        #expect(try await target.goalNamesByAge(personal) == ["Подушка", "Велосипед", "Ноутбук"])
+    }
+
+    @Test func theFileHoldsEveryGoalsCounter() async throws {
+        let source = try await livedIn()
+        let file = try await source.backups.export()
+        let object = try #require(try JSONSerialization.jsonObject(with: file) as? [String: Any])
+        let profiles = try #require(object["profiles"] as? [[String: Any]])
+        let goals = profiles.flatMap { $0["goals"] as? [[String: Any]] ?? [] }
+        #expect(goals.count == 5)
+        #expect(goals.allSatisfy { $0["createdAt"] is Int })
+        // Counters per profile: the family's two goals are 1 and 2 again.
+        let family = try #require(profiles.last?["goals"] as? [[String: Any]])
+        #expect(Set(family.compactMap { $0["createdAt"] as? Int }) == [1, 2])
+    }
+
+    @Test func aFileWithoutCountersCreatesGoalsInTheListedOrder() async throws {
+        let source = try await livedIn()
+        let file = try await BackupFixtures.edit(source.backups.export()) { file in
+            var profiles = try #require(file["profiles"] as? [[String: Any]])
+            for index in profiles.indices {
+                let goals = profiles[index]["goals"] as? [[String: Any]] ?? []
+                profiles[index]["goals"] = goals.map { goal -> [String: Any] in
+                    var goal = goal
+                    goal.removeValue(forKey: "createdAt")
+                    return goal
+                }
+            }
+            file["profiles"] = profiles
+        }
+        let target = try BackupHarness()
+        try await target.backups.import(file, personalProfileName: "Не нужен")
+
+        // Main first, as listed: that is now also the creation order.
+        let snapshots = try await target.snapshots()
+        #expect(try await target.goalNamesByAge(snapshots[0].profile.id) == ["Велосипед", "Подушка", "Отпуск в Грузии"])
+        #expect(try await target.goalNamesByAge(snapshots[1].profile.id) == ["Машина", "Ремонт"])
+        #expect(try await target.goalCounters().values.sorted() == [1, 1, 2, 2, 3])
+    }
+
+    @Test func counterlessOrClashingGoalsFallBackToTheListedOrderForTheirProfile() async throws {
+        let source = try await livedIn()
+        let good = try await source.backups.export()
+
+        // One goal of the first profile has no counter: that profile falls back, the family keeps its own.
+        let missing = try BackupFixtures.edit(good) { file in
+            var profiles = try #require(file["profiles"] as? [[String: Any]])
+            var goals = try #require(profiles[0]["goals"] as? [[String: Any]])
+            goals[1].removeValue(forKey: "createdAt")
+            profiles[0]["goals"] = goals
+            file["profiles"] = profiles
+        }
+        // Two goals of the first profile share a counter.
+        let clash = try BackupFixtures.edit(good) { file in
+            var profiles = try #require(file["profiles"] as? [[String: Any]])
+            var goals = try #require(profiles[0]["goals"] as? [[String: Any]])
+            goals[2]["createdAt"] = goals[1]["createdAt"]
+            profiles[0]["goals"] = goals
+            file["profiles"] = profiles
+        }
+        for file in [missing, clash] {
+            let target = try BackupHarness()
+            try await target.backups.import(file, personalProfileName: "Не нужен")
+            let snapshots = try await target.snapshots()
+            #expect(try await target.goalNamesByAge(snapshots[0].profile.id) == ["Велосипед", "Подушка", "Отпуск в Грузии"])
+            #expect(try await target.goalNamesByAge(snapshots[1].profile.id) == ["Ремонт", "Машина"])
+        }
+    }
+
+    // MARK: Nothing to export
+
+    @Test func anExportOfNoProfilesIsRefusedWithATypedError() async throws {
+        let h = try BackupHarness()
+        await #expect(throws: BackupError.nothingToExport) { try await h.backups.export() }
+
+        // Rates alone are not worth a file either.
+        try await h.database.write { try $0.save([RateRecord(code: "USD", rubPerUnit: 83.25, date: "2026-09-21")]) }
+        await #expect(throws: BackupError.nothingToExport) { try await h.backups.export() }
+
+        // With a profile it works, and what it writes can be imported.
+        try await h.database.write { try $0.save(StoreFixture.profile(1)) }
+        let file = try await h.backups.export()
+        let again = try BackupHarness()
+        try await again.backups.import(file, personalProfileName: "Не нужен")
+        #expect(try await again.snapshots().count == 1)
     }
 
     // MARK: The file

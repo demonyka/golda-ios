@@ -13,21 +13,25 @@ public struct Backup: Equatable, Sendable {
     public var device: BackupDevice
     /// By `sort`, as the app lists them (the file is written in that order). Each profile's lists
     /// follow `ProfileSnapshot`'s orders (operations newest first), and the import writes them back
-    /// so the screens show the same order again. Goals are written in the order listed, which is
-    /// their creation order: the main goal first when exported from the store (it keeps no creation
-    /// time yet), by Android id when converted from Android.
+    /// so the screens show the same order again.
     public var profiles: [ProfileSnapshot]
+    /// Each goal's place in its profile's creation order (1, 2, 3… or Android's ids: a counter, not
+    /// a time), by goal id. The domain's `Goal` has no such field, and "the oldest goal becomes main"
+    /// needs it. A profile whose goals are not all here, or whose counters repeat, has no entries
+    /// and its goals are created in the order they are listed.
+    public var goalCreatedAt: [UUID: Int64]
     /// Official CBR rates, shared by all profiles; by code.
     public var rates: [RateRecord]
 
     public init(
         sourceVersion: Int = BackupFormat.version, exportedAt: Int64, device: BackupDevice = BackupDevice(),
-        profiles: [ProfileSnapshot], rates: [RateRecord] = []
+        profiles: [ProfileSnapshot], goalCreatedAt: [UUID: Int64] = [:], rates: [RateRecord] = []
     ) {
         self.sourceVersion = sourceVersion
         self.exportedAt = exportedAt
         self.device = device
         self.profiles = profiles
+        self.goalCreatedAt = goalCreatedAt
         self.rates = rates
     }
 }
@@ -113,6 +117,8 @@ public enum BackupError: Error, Equatable, Sendable {
     case unsupportedVersion(Int)
     /// A version 2 file with no profiles: the app always has at least one.
     case noProfiles
+    /// Export found no profile. Such a file could not be imported again, so none is written.
+    case nothingToExport
     /// Two rows of one kind share an id.
     case duplicateId(String)
     /// A row points at something the file does not hold, or holds in another profile.

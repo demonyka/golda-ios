@@ -37,6 +37,30 @@ final class BackupHarness {
         try await database.read { try $0.rates() }
     }
 
+    /// Every goal's creation counter, by goal id, over all profiles.
+    func goalCounters() async throws -> [UUID: Int64] {
+        try await database.read { store -> [UUID: Int64] in
+            var all: [UUID: Int64] = [:]
+            for profile in try store.profiles() {
+                all.merge(try store.goalCreationCounters(profileId: profile.id)) { first, _ in first }
+            }
+            return all
+        }
+    }
+
+    /// The goal names of [profileId] with the counters they hold, oldest first.
+    func goalNamesByAge(_ profileId: UUID) async throws -> [String] {
+        let goals = try await database.read { try $0.goals(profileId: profileId) }
+        let counters = try await goalCounters()
+        return goals.sorted { (counters[$0.id] ?? 0) < (counters[$1.id] ?? 0) }.map(\.name)
+    }
+
+    /// A repository over the same database and device settings, for the changes the tests make
+    /// the way the app does.
+    func repository() -> Repository {
+        Repository(database: database, deviceSettings: device)
+    }
+
     /// The only snapshot, for the tests of a one-profile import.
     func onlySnapshot() async throws -> ProfileSnapshot {
         let all = try await snapshots()

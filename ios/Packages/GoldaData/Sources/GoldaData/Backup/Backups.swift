@@ -20,13 +20,22 @@ public struct Backups: Sendable {
 
     /// Every profile with all it owns, the rates and the device settings worth carrying, as a
     /// version 2 file. The books are read in one transaction, so the file is a consistent moment.
+    /// Throws `BackupError.nothingToExport` when there is no profile, since no file could bring
+    /// that state back.
     public func export() async throws -> Data {
-        let (snapshots, rates) = try await database.read { store -> ([ProfileSnapshot], [RateRecord]) in
-            (try store.profiles().compactMap { try store.snapshot(profileId: $0.id) }, try store.rates())
+        typealias Books = (profiles: [ProfileSnapshot], goalCreatedAt: [UUID: Int64], rates: [RateRecord])
+        let books = try await database.read { store -> Books in
+            let profiles = try store.profiles().compactMap { try store.snapshot(profileId: $0.id) }
+            var goalCreatedAt: [UUID: Int64] = [:]
+            for profile in profiles {
+                goalCreatedAt.merge(try store.goalCreationCounters(profileId: profile.profile.id)) { first, _ in first }
+            }
+            return (profiles, goalCreatedAt, try store.rates())
         }
+        guard !books.profiles.isEmpty else { throw BackupError.nothingToExport }
         let backup = Backup(
-            exportedAt: milliseconds(now()), device: BackupDevice(deviceSettings.current), profiles: snapshots,
-            rates: rates
+            exportedAt: milliseconds(now()), device: BackupDevice(deviceSettings.current), profiles: books.profiles,
+            goalCreatedAt: books.goalCreatedAt, rates: books.rates
         )
         return try BackupFormat.encode(backup)
     }
@@ -63,9 +72,9 @@ public struct Backups: Sendable {
     func apply(_ backup: Backup) async throws -> UUID {
         let importedAt = milliseconds(now())
         return try await database.write { store in
-            for existing in try store.profiles() { try store.deleteProfile(existing.id) }
+            try store.deleteAllProfiles()
             // Rates belong to no profile, so deleting the profiles does not reach them.
-            try RateRecord.deleteAll(store.db)
+            try store.deleteAllRates()
             try store.save(backup.rates)
 
             for snapshot in backup.profiles {
@@ -79,8 +88,11 @@ public struct Backups: Sendable {
                     for posting in full.postings { try store.save(posting, profileId: profileId) }
                 }
                 for obligation in snapshot.obligations { try store.save(obligation, profileId: profileId) }
-                // In order: goals are created in the order they are listed.
-                for goal in snapshot.goals { try store.save(goal, profileId: profileId) }
+                // With a counter a goal takes its original place in the creation order; without one
+                // the store counts on from the last, so the listed order becomes the creation order.
+                for goal in snapshot.goals {
+                    try store.save(goal, profileId: profileId, createdAt: backup.goalCreatedAt[goal.id])
+                }
                 for wish in snapshot.wishes { try store.save(wish, profileId: profileId) }
             }
             guard let first = try store.profiles().first else { throw BackupError.noProfiles }
@@ -90,5 +102,17 @@ public struct Backups: Sendable {
 
     private func milliseconds(_ date: Date) -> Int64 {
         Int64((date.timeIntervalSince1970 * 1000).rounded(.down))
+    }
+}
+
+extension Store {
+    /// Each goal's place in its profile's creation order, by goal id. `Goal` carries no such field,
+    /// so the backup reads the counters from the rows.
+    func goalCreationCounters(profileId: UUID) throws -> [UUID: Int64] {
+        var counters: [UUID: Int64] = [:]
+        for record in try GoalRecord.owned(by: profileId).fetchAll(db) {
+            if let createdAt = record.createdAt { counters[record.id] = createdAt }
+        }
+        return counters
     }
 }
