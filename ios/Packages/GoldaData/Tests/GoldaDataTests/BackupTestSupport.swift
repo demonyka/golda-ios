@@ -58,7 +58,7 @@ final class BackupHarness {
     /// A repository over the same database and device settings, for the changes the tests make
     /// the way the app does.
     func repository() -> Repository {
-        Repository(database: database, deviceSettings: device)
+        Repository(database: database, deviceSettings: device, secrets: InMemorySecretStore())
     }
 
     /// The only snapshot, for the tests of a one-profile import.
