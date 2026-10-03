@@ -1,0 +1,363 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%@ against the CBR" : {
+      "comment" : "Insights: the exchange loss as a share of what was exchanged, “3 % against the CBR”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ against the CBR"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ против ЦБ"
+          }
+        }
+      }
+    },
+    "Cancel" : {
+      "comment" : "Button that closes the period sheet without a change.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отмена"
+          }
+        }
+      }
+    },
+    "Changes the dates" : {
+      "comment" : "VoiceOver hint of the line with the custom period’s dates.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changes the dates"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Меняет даты"
+          }
+        }
+      }
+    },
+    "Custom range" : {
+      "comment" : "Insights: pick the dates of the period yourself; the picker’s calendar button.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom range"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Свой период"
+          }
+        }
+      }
+    },
+    "Daily budget" : {
+      "comment" : "VoiceOver: the dashed line over the day bars, the share of the budget that falls on one day.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daily budget"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Бюджет на день"
+          }
+        }
+      }
+    },
+    "Done" : {
+      "comment" : "Button that takes the picked period.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Готово"
+          }
+        }
+      }
+    },
+    "Everything else" : {
+      "comment" : "Insights: the ring slice that gathers the small categories.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Everything else"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Остальное"
+          }
+        }
+      }
+    },
+    "From" : {
+      "comment" : "Insights, custom period: the first day.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "С"
+          }
+        }
+      }
+    },
+    "Income" : {
+      "comment" : "Insights: the tile with what came in during the period.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Income"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Доходы"
+          }
+        }
+      }
+    },
+    "Lost on exchange" : {
+      "comment" : "Insights: the tile with what currency exchanges cost against the CBR rate.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lost on exchange"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Потери на обмене"
+          }
+        }
+      }
+    },
+    "Month" : {
+      "comment" : "Insights: the last thirty days.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Month"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Месяц"
+          }
+        }
+      }
+    },
+    "no exchanges" : {
+      "comment" : "Insights: no currency exchange in the period.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "no exchanges"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "обменов не было"
+          }
+        }
+      }
+    },
+    "No spending in these days." : {
+      "comment" : "Insights: the period has no expenses.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No spending in these days."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "За эти дни трат нет."
+          }
+        }
+      }
+    },
+    "Period" : {
+      "comment" : "Insights: title of the sheet where the custom period is picked.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Period"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Период"
+          }
+        }
+      }
+    },
+    "Shows this category in the ring" : {
+      "comment" : "VoiceOver hint of a category row: it picks the slice in the ring.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows this category in the ring"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывает категорию в кольце"
+          }
+        }
+      }
+    },
+    "Since %@" : {
+      "comment" : "Insights: from the last payday on, “Since Sep 10”. The date.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Since %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "С %@"
+          }
+        }
+      }
+    },
+    "Spending by day" : {
+      "comment" : "VoiceOver: the bars of the period’s spending day by day.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spending by day"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Траты по дням"
+          }
+        }
+      }
+    },
+    "Spent %@, about %@ a day" : {
+      "comment" : "VoiceOver, Insights: the period’s spending and its daily average.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spent %@, about %@ a day"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Потрачено %@, около %@ в день"
+          }
+        }
+      }
+    },
+    "To" : {
+      "comment" : "Insights, custom period: the last day.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "По"
+          }
+        }
+      }
+    },
+    "Week" : {
+      "comment" : "Insights: the last seven days.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Week"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Неделя"
+          }
+        }
+      }
+    },
+    "≈ %@/day" : {
+      "comment" : "Insights, the ring’s center: the average spending per day of the period, “≈ 2 421 ₽/day”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈ %@/day"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈ %@/день"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

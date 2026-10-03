@@ -24,13 +24,12 @@ final class ButtonInventoryUITests: XCTestCase {
         XCTAssertTrue(walk.mic.isHittable, "the mic on Home")
         walk.shoot("home")
 
-        // Each tab opens its own screen; Insights is its stage's stand-in (2d).
+        // Each tab opens its own screen.
         walk.openTab("Accounts", "Счета", waitingFor: "accounts.hero")
         XCTAssertTrue(walk.mic.isHittable, "the mic on Accounts")
         walk.openTab("Goals", "Цели", waitingFor: "goals.hero")
-        let insights = walk.tab("Insights", "Аналитика")
-        insights.tap()
-        XCTAssertTrue(waitUntil { insights.isSelected })
+        walk.openTab("Insights", "Аналитика", waitingFor: "insights.ring")
+        XCTAssertTrue(walk.mic.isHittable, "the mic on Insights")
         walk.openTab("Home", "Главная", waitingFor: "home.hero")
 
         // "+": a new operation; "Cancel" closes it and records nothing.

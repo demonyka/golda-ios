@@ -87,7 +87,7 @@ struct MainTabs: View {
 }
 
 /// One tab: its own navigation stack with the shared toolbar, and on its screen an undo toast and
-/// the mic; the account form opens over it. The screens replace the placeholders in steps 2a to 2d.
+/// the mic; the account form opens over it.
 private struct TabRoot: View {
     let tab: AppTab
     let data: AppData
@@ -146,7 +146,7 @@ private struct TabRoot: View {
         case .goals:
             GoalsScreen(data: data)
         case .insights:
-            TabPlaceholder(tab: tab, profileName: data.profile.name)
+            InsightsScreen(data: data, today: model.environment.today())
         }
     }
 
@@ -188,23 +188,5 @@ private struct MainToolbar: ToolbarContent {
             }
             .accessibilityIdentifier("settings")
         }
-    }
-}
-
-private struct TabPlaceholder: View {
-    let tab: AppTab
-    let profileName: String
-
-    var body: some View {
-        ScrollView {
-            ContentUnavailableView {
-                Label { Text(tab.title) } icon: { Image(systemName: tab.symbol) }
-            } description: {
-                Text("Profile: \(profileName)")
-            }
-            .foregroundStyle(Theme.Color.muted)
-            .containerRelativeFrame(.vertical)
-        }
-        .background(Theme.Color.page)
     }
 }
