@@ -29,25 +29,7 @@ struct HomeScreen: View {
                         .accessibilityIdentifier("home.empty")
                 }
             }
-            ForEach(content.days) { day in
-                Section {
-                    ForEach(day.rows) { row in
-                        Button {
-                            onEdit(row.operation)
-                        } label: {
-                            OperationRowView(row: row)
-                        }
-                        .listRowBackground(Theme.Color.card)
-                        .accessibilityLabel(Text(verbatim: row.accessibilityLabel(in: locale)))
-                        .accessibilityIdentifier("home.operation")
-                    }
-                } header: {
-                    Text(verbatim: day.label.text(in: locale))
-                        .font(.subheadline.weight(.medium))
-                        .foregroundStyle(Theme.Color.muted)
-                        .textCase(nil)
-                }
-            }
+            OperationDaySections(days: content.days, rowIdentifier: "home.operation", onSelect: onEdit)
         }
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)

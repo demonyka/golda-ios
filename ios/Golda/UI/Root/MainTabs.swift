@@ -29,17 +29,30 @@ enum AppTab: Hashable, CaseIterable {
 struct MainTabs: View {
     let data: AppData
     let mic: any MicModel
-    @State private var selection = AppTab.home
+    @State private var selection: AppTab
+    /// Accounts in reconcile mode: the Sunday reminder (stage 4) opens the tab this way.
+    @State private var isReconciling: Bool
+
+    init(data: AppData, mic: any MicModel, tab: AppTab = .home, reconciling: Bool = false) {
+        self.data = data
+        self.mic = mic
+        _selection = State(initialValue: tab)
+        _isReconciling = State(initialValue: reconciling)
+    }
 
     var body: some View {
         TabView(selection: $selection) {
             ForEach(AppTab.allCases, id: \.self) { tab in
                 Tab(value: tab) {
-                    TabRoot(tab: tab, data: data, mic: mic)
+                    TabRoot(tab: tab, data: data, mic: mic, isReconciling: $isReconciling)
                 } label: {
                     Label { Text(tab.title) } icon: { Image(systemName: tab.symbol) }
                 }
             }
+        }
+        // Leaving Accounts ends a reconcile round, as on Android.
+        .onChange(of: selection) { _, tab in
+            if tab != .accounts { isReconciling = false }
         }
         // The bar stays whole. On iOS 26.2 `.onScrollDown` folds it on the way down but opens it
         // again only back at the very top or on a tap, never on a scroll up: a plain UIKit
@@ -58,6 +71,7 @@ private struct TabRoot: View {
     let tab: AppTab
     let data: AppData
     let mic: any MicModel
+    @Binding var isReconciling: Bool
 
     @Environment(AppModel.self) private var model
     @State private var toast: UndoToast?
@@ -81,7 +95,23 @@ private struct TabRoot: View {
             HomeScreen(data: data, today: model.environment.today()) { _ in
                 // The operation form arrives in step 2c.
             }
-        case .accounts, .goals, .insights:
+        case .accounts:
+            AccountsScreen(
+                data: data,
+                today: model.environment.today(),
+                reconcileMode: isReconciling,
+                onAddAccount: {
+                    // The account form (step 2b, `UI/AccountForm`) opens here, empty.
+                },
+                onEditAccount: { _ in
+                    // The account form (step 2b, `UI/AccountForm`) opens here for the account.
+                },
+                onEditOperation: { _ in
+                    // The operation form arrives in step 2c.
+                },
+                onAllReconciled: { isReconciling = false }
+            )
+        case .goals, .insights:
             TabPlaceholder(tab: tab, profileName: data.profile.name)
         }
     }

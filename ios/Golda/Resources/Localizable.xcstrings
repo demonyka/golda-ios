@@ -124,6 +124,23 @@
         }
       }
     },
+    "+%@ for %@" : {
+      "comment" : "A savings account's interest forecast this month, “+1 605 ₽ for October”. The amount, then the month's name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+%@ for %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+%1$@ за %2$@"
+          }
+        }
+      }
+    },
     "A voice-first money tracker for people who earn in one currency and live in another." : {
       "comment" : "Welcome screen: what the app is, under its name.",
       "localizations" : {
@@ -141,6 +158,23 @@
         }
       }
     },
+    "Account" : {
+      "comment" : "Accounts: the last row, “+ Account”, opens the form for a new account.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Счёт"
+          }
+        }
+      }
+    },
     "Accounts" : {
       "comment" : "Tab and screen title: the list of accounts.",
       "localizations" : {
@@ -154,6 +188,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Счета"
+          }
+        }
+      }
+    },
+    "Add account" : {
+      "comment" : "VoiceOver: the “+ Account” row.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add account"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить счёт"
           }
         }
       }
@@ -192,6 +243,23 @@
         }
       }
     },
+    "All accounts reconciled" : {
+      "comment" : "Toast after the last account of a reconcile round was checked.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All accounts reconciled"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все счета сверены"
+          }
+        }
+      }
+    },
     "Behind plan by %@" : {
       "comment" : "VoiceOver, Home hero: today's share is smaller than the pay period started with (▼).",
       "localizations" : {
@@ -226,6 +294,74 @@
         }
       }
     },
+    "Card" : {
+      "comment" : "Account type: a bank card or a current account.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Card"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Карта"
+          }
+        }
+      }
+    },
+    "Cash" : {
+      "comment" : "Account type: cash in hand.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cash"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Наличные"
+          }
+        }
+      }
+    },
+    "Change the sign" : {
+      "comment" : "VoiceOver: the +/− key above the keyboard of the reconcile sheet.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change the sign"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сменить знак"
+          }
+        }
+      }
+    },
+    "Checked" : {
+      "comment" : "VoiceOver, reconcile mode: this account has been checked against the bank.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checked"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сверено"
+          }
+        }
+      }
+    },
     "Clothes" : {
       "comment" : "Category.",
       "localizations" : {
@@ -243,6 +379,23 @@
         }
       }
     },
+    "Counts in “Safe to spend today”" : {
+      "comment" : "VoiceOver: the dot after an account's name; the account's money counts towards today's budget.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Counts in “Safe to spend today”"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Входит в «Можно сегодня»"
+          }
+        }
+      }
+    },
     "Create" : {
       "comment" : "New profile dialog: creates the profile.",
       "localizations" : {
@@ -256,6 +409,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Создать"
+          }
+        }
+      }
+    },
+    "Credit card" : {
+      "comment" : "Account type: a credit card; a negative balance is a debt.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Credit card"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кредитка"
+          }
+        }
+      }
+    },
+    "Difference %@ goes in as an adjustment" : {
+      "comment" : "Reconcile sheet: the typed balance differs from the account's; the difference is recorded as an adjustment.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Difference %@ goes in as an adjustment"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Разница %@ запишется корректировкой"
           }
         }
       }
@@ -290,6 +477,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Кафе"
+          }
+        }
+      }
+    },
+    "Edit" : {
+      "comment" : "Account page toolbar: opens the account's form.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изменить"
           }
         }
       }
@@ -430,6 +634,23 @@
         }
       }
     },
+    "How much is really there?" : {
+      "comment" : "Reconcile sheet: asks for the balance the bank shows.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How much is really there?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сколько на самом деле?"
+          }
+        }
+      }
+    },
     "Insights" : {
       "comment" : "Tab and screen title: spending analytics.",
       "localizations" : {
@@ -464,6 +685,40 @@
         }
       }
     },
+    "It matches" : {
+      "comment" : "Reconcile sheet's button while the typed balance is the same as the account's.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It matches"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сходится"
+          }
+        }
+      }
+    },
+    "Loan" : {
+      "comment" : "Account type: a loan paid off monthly.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loan"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кредит"
+          }
+        }
+      }
+    },
     "Manage profiles" : {
       "comment" : "Profile menu: opens the list of profiles.",
       "localizations" : {
@@ -477,6 +732,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Управление профилями"
+          }
+        }
+      }
+    },
+    "Matches" : {
+      "comment" : "Reconcile mode, a button on each account: the bank shows the same balance.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matches"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сходится"
+          }
+        }
+      }
+    },
+    "Matches the bank: “Matches”. Doesn’t: tap the account." : {
+      "comment" : "Accounts in reconcile mode: how to check each account against the bank.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matches the bank: “Matches”. Doesn’t: tap the account."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Совпало с банком — «Сходится». Нет — нажми на счёт."
           }
         }
       }
@@ -549,6 +838,23 @@
         }
       }
     },
+    "OK" : {
+      "comment" : "The toast's button that only closes it.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ОК"
+          }
+        }
+      }
+    },
     "Other" : {
       "comment" : "Category: anything else, spent or earned.",
       "localizations" : {
@@ -562,6 +868,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Прочее"
+          }
+        }
+      }
+    },
+    "Pay off “%@” first: it has the highest rate, %@." : {
+      "comment" : "Accounts hero: several debts and no savings; the dearest goes first. Debt name, its rate.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pay off “%@” first: it has the highest rate, %@."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сначала гаси «%1$@»: у него самая высокая ставка, %2$@."
           }
         }
       }
@@ -634,6 +957,23 @@
         }
       }
     },
+    "Reconcile" : {
+      "comment" : "Account page: opens the sheet to check the balance against the bank.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reconcile"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сверить"
+          }
+        }
+      }
+    },
     "Reconciliation" : {
       "comment" : "Row title of an operation that brought an account to the bank's balance.",
       "localizations" : {
@@ -647,6 +987,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Сверка"
+          }
+        }
+      }
+    },
+    "Reconciling" : {
+      "comment" : "Accounts in reconcile mode: the heading over the hint.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reconciling"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сверка"
+          }
+        }
+      }
+    },
+    "Record %@" : {
+      "comment" : "Reconcile sheet's button: record the difference, “Record −50 ₽”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Record %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Записать %@"
           }
         }
       }
@@ -681,6 +1055,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Зарплата"
+          }
+        }
+      }
+    },
+    "Savings" : {
+      "comment" : "Account type: a savings account that earns interest.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Savings"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Накопительный"
           }
         }
       }
@@ -787,6 +1178,23 @@
         }
       }
     },
+    "Total" : {
+      "comment" : "Accounts hero caption over the big number: everything on all accounts.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Всего"
+          }
+        }
+      }
+    },
     "Transfer" : {
       "comment" : "Row title of a transfer between accounts that has no note.",
       "localizations" : {
@@ -838,6 +1246,23 @@
         }
       }
     },
+    "Type what the bank shows" : {
+      "comment" : "VoiceOver hint, reconcile mode: tapping an account opens the sheet to enter its real balance.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type what the bank shows"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введи, сколько показывает банк"
+          }
+        }
+      }
+    },
     "Yesterday" : {
       "comment" : "Heading of yesterday's operations.",
       "localizations" : {
@@ -868,6 +1293,57 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "около %@"
+          }
+        }
+      }
+    },
+    "bought at %@" : {
+      "comment" : "Account page: the average rate a foreign currency was bought at, “bought at 92,5 ₽/$”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bought at %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "курс покупки %@"
+          }
+        }
+      }
+    },
+    "“%@” costs %@, more than “%@” earns (%@). Spare money does more paying it off." : {
+      "comment" : "Accounts hero: the dearest debt costs more than the best savings account earns. Debt name, its rate, savings name, its rate.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” costs %@, more than “%@” earns (%@). Spare money does more paying it off."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«%1$@» стоит %2$@ — дороже, чем приносит «%3$@» (%4$@). Лишние деньги выгоднее пустить на него."
+          }
+        }
+      }
+    },
+    "“%@” earns %@, more than your debts cost. Paying early does not pay." : {
+      "comment" : "Accounts hero: the best savings account earns more than the debts cost. Savings name, its rate.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” earns %@, more than your debts cost. Paying early does not pay."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«%1$@» приносит %2$@, больше ставки по долгам. Досрочно гасить невыгодно."
           }
         }
       }

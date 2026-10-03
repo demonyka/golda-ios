@@ -4,7 +4,8 @@ import GoldaCore
 /// What one operation's row says, worked out the way Android's `OperationRow` does and kept free of
 /// views so the rules can be tested: the title, the line under it, the amount and the line under
 /// that. Amounts are written by `Fmt` (always the Russian way, D13); the few words the row needs
-/// come from the String Catalog in `title(in:)`.
+/// come from the String Catalog in `title(in:)`. Home and an account's page share it; the page
+/// passes its account, so each row shows that account's own side.
 struct OperationRowModel: Identifiable, Equatable, Sendable {
     /// Where the row's title comes from. Only the last three need a translation.
     enum Title: Equatable, Sendable {
