@@ -301,6 +301,41 @@ import Testing
         #expect(!voice.exists(fresh))
     }
 
+    /// A note the recorder still holds is its to send, however long ago it was last written: a
+    /// queue run that reaches it first would book it behind the recorder's back, and the recorder's
+    /// own call would find nothing and say the note was lost.
+    @Test func aNoteTheRecorderHoldsIsLeftToTheRecorder() async throws {
+        let earlier = try voice.note(personal, recordedAt: hourAgo)
+        let recording = try service.newNote(profileId: personal, recordedAt: voice.now)
+        try Data([0x52, 0x49, 0x46, 0x46]).write(to: recording)
+        try setModified(recording, voice.now)
+        voice.provider.answer(Self.coffee())
+        // Stopped well before the queue gets to it.
+        voice.base.clock.set(voice.now + 10_000)
+
+        let queued = await service.processQueue()
+        #expect(queued.count == 1)
+        #expect(!voice.exists(earlier) && voice.exists(recording))
+
+        let outcome = try #require(await service.understand(file: recording).done)
+        #expect(!outcome.late)
+        #expect(!voice.exists(recording))
+        #expect(try await voice.operations(personal).count == 2)
+    }
+
+    /// Once the recorder's call is through, a note it left behind (it had to wait) is the queue's.
+    @Test func aNoteTheRecorderLeftWaitingGoesBackToTheQueue() async throws {
+        let recording = try service.newNote(profileId: personal, recordedAt: hourAgo)
+        try Data([0x52, 0x49, 0x46, 0x46]).write(to: recording)
+        try setModified(recording, hourAgo)
+        voice.provider.fail(VoiceProviderError.offline(message: "HTTP 503"))
+        #expect(await service.understand(file: recording) == .waiting(.offline))
+
+        voice.provider.answer(Self.coffee())
+        #expect(await service.processQueue().count == 1)
+        #expect(!voice.exists(recording))
+    }
+
     // MARK: One at a time
 
     @Test func twoNotesAtOnceAreUnderstoodOneAfterTheOther() async throws {

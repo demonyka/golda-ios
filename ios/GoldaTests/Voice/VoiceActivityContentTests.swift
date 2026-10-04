@@ -42,6 +42,26 @@ import Testing
         #expect(thinking.startedAt == startedAt)
     }
 
+    /// A run that dies mid-note cannot end its activity: «Слушаю…» goes stale soon after the
+    /// recorder's minute, «Разбираю…» after the model's longest wait, so the Lock Screen stops
+    /// claiming the microphone is on. A final state ends the activity and needs no stale date.
+    @Test func listeningAndThinkingGoStaleWhenNothingFollows() {
+        let now = startedAt.addingTimeInterval(20)
+        #expect(VoiceActivityContent.staleDate(of: VoiceActivityContent.listening(since: startedAt), at: now) == startedAt.addingTimeInterval(75))
+        #expect(VoiceActivityContent.staleDate(of: VoiceActivityContent.thinking(since: startedAt), at: now) == now.addingTimeInterval(90))
+        let ended = VoiceActivityContent.State(phase: .needsApp, startedAt: startedAt, headline: "…")
+        #expect(VoiceActivityContent.staleDate(of: ended, at: now) == nil)
+    }
+
+    /// Out of background time while the note is worked out: the note waits in the app.
+    @Test func runningOutOfTimeLeadsToTheApp() {
+        let ending = VoiceActivityContent.expired(since: startedAt, locale: ru)
+        #expect(ending.state?.phase == .needsApp)
+        #expect(ending.state?.headline == "Открой Golda, чтобы закончить запись")
+        #expect(ending.alert == "Открой Golda, чтобы закончить запись")
+        #expect(VoiceActivityContent.expired(since: startedAt, locale: en).alert == "Open Golda to finish the note")
+    }
+
     /// «Шаурма 15 ₾» as the toast says it, with «Отменить» for exactly what was booked; nothing to
     /// open the app for.
     @Test func aBookedNoteSaysWhatItBookedWithUndo() throws {

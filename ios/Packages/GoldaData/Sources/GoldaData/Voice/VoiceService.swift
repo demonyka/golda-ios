@@ -1,5 +1,6 @@
 import Foundation
 import GoldaCore
+import Synchronization
 
 /// Understands voice notes and books what they say, one note at a time: Android's
 /// `Repo.understand` and `processVoiceQueue`. Every outcome also goes to `outcomes()`, which the
@@ -22,6 +23,9 @@ public actor VoiceService {
     private nonisolated let observers = VoiceOutcomeObservers()
     /// The last note asked for; the next one starts when it is through.
     private var tail: Task<Void, Never>?
+    /// Names of the notes handed out by `newNote` whose recorder has not sent them yet. Read and
+    /// written off the actor, since the recorder asks for a file synchronously.
+    private nonisolated let recording = Mutex<Set<String>>([])
 
     /// [unnamedPurchase] titles a "хочу купить" said without a name; empty leaves the title empty
     /// for the screen to name. [clock] (epoch milliseconds) and [zone] are injected so tests run
@@ -51,12 +55,25 @@ public actor VoiceService {
         observers.stream()
     }
 
+    /// Where a note recorded now, in [profileId], goes. The note is the recorder's until its
+    /// `understand(file:)` is through: the queue leaves it alone however long ago it was last
+    /// written. Otherwise a queue run that started while the note was recording could reach it
+    /// after the recorder stopped, book it as late, and leave the recorder's own call to find
+    /// nothing and say the note was lost.
+    public nonisolated func newNote(profileId: UUID, recordedAt: Int64) throws -> URL {
+        let file = try queue.newFile(profileId: profileId, recordedAt: recordedAt, fileExtension: "wav")
+        recording.withLock { _ = $0.insert(file.lastPathComponent) }
+        return file
+    }
+
     /// Understands one recorded note and books what it says; the file is removed once it is booked.
     /// [late] marks a note understood after the moment it was recorded. Runs to the end even when
     /// the caller is cancelled, as Android's non-cancellable write did.
     @discardableResult
     public func understand(file: URL, late: Bool = false) async -> VoiceOutcome {
-        await serially { service in await service.understandLocked(file, late: late) }
+        // A note left waiting (no network, no key) is the queue's from now on.
+        defer { recording.withLock { _ = $0.remove(file.lastPathComponent) } }
+        return await serially { service in await service.understandLocked(file, late: late) }
     }
 
     /// Notes recorded offline, before the key was set or before consent, oldest first. Stops at the
@@ -84,6 +101,9 @@ public actor VoiceService {
     private func processQueueLocked() async -> [VoiceOutcome] {
         var outcomes: [VoiceOutcome] = []
         for file in queue.pending() {
+            // Checked as each file is reached, not once for the run: the recorder may have
+            // stopped and asked for its note while earlier ones went to the model.
+            if recording.withLock({ $0.contains(file.lastPathComponent) }) { continue }
             if let modified = queue.modifiedAt(of: file), clock() - modified < Self.settleMillis { continue }
             let outcome = await understandLocked(file, late: true)
             outcomes.append(outcome)

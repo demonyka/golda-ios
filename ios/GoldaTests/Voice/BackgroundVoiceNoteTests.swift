@@ -21,6 +21,8 @@ import Testing
         private(set) var handedOff: [VoiceOutcome] = []
         private(set) var keptRunning = 0
         private(set) var letGo = 0
+        /// What the note does when iOS takes its background time away.
+        private(set) var expiry: (@MainActor () async -> Void)?
         var note: BackgroundVoiceNote!
 
         init() throws {
@@ -32,7 +34,9 @@ import Testing
                 model: mic.app.model, recorder: recorder, notes: mic.notes, cues: cues, activities: activities, alerts: alerts,
                 // Weak: a note's work may outlive the test that started it.
                 hasKey: { [weak self] in self?.hasKey ?? false }, locale: Locale(identifier: "ru"), levelInterval: .seconds(3_600),
-                keepRunning: { [weak self] in
+                inAppMic: mic.mic,
+                keepRunning: { [weak self] onExpiry in
+                    self?.expiry = onExpiry
                     self?.keptRunning += 1
                     return { self?.letGo += 1 }
                 },
@@ -204,5 +208,113 @@ import Testing
         #expect(h.recorder.stops == 1)
         #expect(h.mic.recorder.started.isEmpty)
         #expect(mic.state == .idle)
+    }
+
+    // MARK: A press at an awkward moment
+
+    /// A second press while the rising chime still sounds: the note is called off before the
+    /// microphone opens, rather than recorded for a whole minute and booked.
+    @Test func aPressDuringTheChimeCallsTheNoteOff() async throws {
+        let h = try Harness()
+        try await h.open()
+        let gate = Gate()
+        h.cues.gate = gate
+        let starting = Task { try await h.note.start() }
+        await eventually { h.events.events.contains("rising chime") }
+        #expect(h.note.isRecording)
+        #expect(await h.note.route(appIsActive: false) == .stop)
+
+        #expect(h.note.stop() == nil)
+        await gate.open()
+        try await starting.value
+        #expect(!h.note.isRecording)
+        #expect(h.recorder.started.isEmpty)
+        let ending = try #require(h.activity?.ending)
+        #expect(ending.state == nil)
+        #expect(h.mic.notes.understood.isEmpty)
+    }
+
+    /// The app's mic still listening after the person went home: a press outside ends that note,
+    /// as a second tap would, instead of a second recorder booking the same purchase again.
+    @Test func aPressWhileTheAppsMicListensOutOfSightEndsThatNote() async throws {
+        let h = try Harness()
+        try await h.open()
+        h.mic.mic.tap()
+        #expect(h.mic.mic.state == .recording)
+        #expect(await h.note.route(appIsActive: false) == .stopInApp)
+
+        let launcher = VoiceNoteLauncher()
+        launcher.background = h.note
+        launcher.appIsActive = { false }
+        var broughtUp = false
+        try await launcher.start { broughtUp = true }
+        #expect(h.mic.mic.state != .recording)
+        #expect(h.mic.recorder.stops == 1)
+        #expect(h.recorder.started.isEmpty && h.activities.started.isEmpty)
+        #expect(!broughtUp)
+        await eventually { h.mic.notes.understood.count == 1 }
+    }
+
+    /// The app's mic pressed off during its own rising chime opens no microphone at all.
+    @Test func theAppsMicStoppedDuringItsChimeRecordsNothing() async throws {
+        let h = try Harness()
+        try await h.open()
+        let gate = Gate()
+        let cues = FakeCues(events: EventLog())
+        cues.gate = gate
+        let mic = VoiceMicModel(
+            model: h.mic.app.model, recorder: h.mic.recorder, notes: h.mic.notes, locale: Locale(identifier: "ru"),
+            levelInterval: .seconds(3_600), cues: cues
+        )
+        mic.tap()
+        await eventually { cues.events.events.contains("rising chime") }
+        #expect(mic.isListening)
+
+        mic.stopListening()
+        await gate.open()
+        await eventually { !mic.isListening }
+        #expect(h.mic.recorder.started.isEmpty)
+        #expect(mic.state == .idle)
+    }
+
+    // MARK: When the process cannot finish
+
+    /// iOS takes the background time away while the note is worked out: the activity stops
+    /// saying «Разбираю…» and leads to the app, where the note waits, before the app is suspended.
+    @Test func runningOutOfBackgroundTimeLeadsToTheApp() async throws {
+        let h = try Harness()
+        try await h.open()
+        let gate = Gate()
+        h.mic.notes.hold(gate)
+        try await h.note.start()
+        let work = try #require(h.note.stop())
+        await eventually { h.activity?.states.last?.phase == .thinking }
+
+        let expire = try #require(h.expiry)
+        await expire()
+        let state = try #require(h.activity?.ending?.state)
+        #expect(state.phase == .needsApp)
+        #expect(state.headline == "Открой Golda, чтобы закончить запись")
+        #expect(h.alerts.posted == ["Открой Golda, чтобы закончить запись"])
+
+        await gate.open()
+        await work.value
+    }
+
+    /// A run that died mid-note left its activity saying the microphone is on. The next launch
+    /// ends it, and so does its «Стоп», which finds no note of this run to stop.
+    @Test func anActivityNoNoteOwnsIsEnded() async throws {
+        let h = try Harness()
+        try await h.open()
+        h.note.endLeftovers()
+        #expect(h.activities.staleEnds == 1)
+
+        #expect(h.note.stop() == nil)
+        #expect(h.activities.staleEnds == 2)
+
+        // A note of this run is stopped as usual; nothing else is swept.
+        try await h.note.start()
+        await h.note.stop()?.value
+        #expect(h.activities.staleEnds == 2)
     }
 }

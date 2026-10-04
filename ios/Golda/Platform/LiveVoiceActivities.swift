@@ -16,13 +16,34 @@ final class LiveVoiceActivities: VoiceActivities {
         ActivityAuthorizationInfo().areActivitiesEnabled
     }
 
+    /// The activities this run began and has not ended: the rest are a dead run's leftovers.
+    private var owned: Set<String> = []
+
     func begin(_ state: State) throws -> any VoiceActivityHandle {
         let activity = try Activity.request(
             attributes: VoiceActivityAttributes(),
-            content: ActivityContent(state: state, staleDate: nil),
+            content: Self.content(state),
             pushType: nil
         )
-        return Handle(activity)
+        owned.insert(activity.id)
+        return Handle(activity, owner: self)
+    }
+
+    func endStale() {
+        // The ids are read now, so an activity begun right after is not taken for a leftover.
+        let stale = Activity<VoiceActivityAttributes>.activities
+            .filter { ($0.activityState == .active || $0.activityState == .stale) && !owned.contains($0.id) }
+            .map(\.id)
+        guard !stale.isEmpty else { return }
+        log.info("Ending \(stale.count) voice activities a previous run left behind")
+        Task {
+            for id in stale { await Handle.end(id, nil, .immediate) }
+        }
+    }
+
+    /// [state] with the moment it goes stale, should the app not live to say more.
+    fileprivate static func content(_ state: State) -> ActivityContent<State> {
+        ActivityContent(state: state, staleDate: VoiceActivityContent.staleDate(of: state, at: .now))
     }
 
     func showUndone(_ ticket: VoiceUndoTicket) async {
@@ -40,19 +61,22 @@ final class LiveVoiceActivities: VoiceActivities {
     /// afresh off the main actor for each call and never crosses from one to the other.
     private final class Handle: VoiceActivityHandle {
         private let id: String
+        private weak var owner: LiveVoiceActivities?
         /// How long the final state stays in the Dynamic Island before the activity ends.
         static let glance: Duration = .seconds(5)
 
-        init(_ activity: Activity<VoiceActivityAttributes>) {
+        init(_ activity: Activity<VoiceActivityAttributes>, owner: LiveVoiceActivities) {
             id = activity.id
+            self.owner = owner
         }
 
         func update(_ state: State) async {
-            await Self.update(id, ActivityContent(state: state, staleDate: nil))
+            await Self.update(id, LiveVoiceActivities.content(state))
         }
 
         func end(_ state: State?, lingering: Duration) async {
-            let content = state.map { ActivityContent(state: $0, staleDate: nil) }
+            owner?.owned.remove(id)
+            let content = state.map { LiveVoiceActivities.content($0) }
             if let content {
                 // An ended activity leaves the Dynamic Island at once and stays only on the Lock
                 // Screen; on an unlocked phone the last words would never be seen. They stay a
@@ -72,7 +96,7 @@ final class LiveVoiceActivities: VoiceActivities {
             await activity(id)?.update(content)
         }
 
-        private nonisolated static func end(_ id: String, _ content: ActivityContent<State>?, _ policy: ActivityUIDismissalPolicy) async {
+        nonisolated static func end(_ id: String, _ content: ActivityContent<State>?, _ policy: ActivityUIDismissalPolicy) async {
             await activity(id)?.end(content, dismissalPolicy: policy)
         }
     }
@@ -119,13 +143,35 @@ extension BackgroundVoiceNote {
             model: model, recorder: recorder, notes: environment.voice, cues: LiveVoiceCues.shared,
             activities: LiveVoiceActivities(), alerts: LiveVoiceAlerts(center: environment.notifications),
             hasKey: { environment.voiceKeys.read(SecretKey.gemini) != nil },
-            keepRunning: {
+            inAppMic: mic,
+            keepRunning: { onExpiry in
                 // Gemini answers in a few seconds; without this, iOS may suspend the app as soon
                 // as the microphone is off and the note would be worked out on the next launch.
-                let id = UIApplication.shared.beginBackgroundTask(withName: "voice note")
-                return { UIApplication.shared.endBackgroundTask(id) }
+                // The time is short (about 30 s) and the model may take longer: when it runs out
+                // the activity is told first, then the task ends, since a task still running at
+                // expiry gets the app killed.
+                let task = BackgroundTask()
+                task.id = UIApplication.shared.beginBackgroundTask(withName: "voice note") {
+                    Task { @MainActor in
+                        await onExpiry()
+                        task.end()
+                    }
+                }
+                return { task.end() }
             },
             handOff: { [weak mic] outcome in mic?.keepUntilShown(outcome) }
         )
+    }
+}
+
+/// One `beginBackgroundTask`, ended once whichever comes first: the note's work or its expiry.
+@MainActor
+private final class BackgroundTask {
+    var id = UIBackgroundTaskIdentifier.invalid
+
+    func end() {
+        guard id != .invalid else { return }
+        UIApplication.shared.endBackgroundTask(id)
+        id = .invalid
     }
 }

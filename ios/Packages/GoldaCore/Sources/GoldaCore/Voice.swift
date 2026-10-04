@@ -393,11 +393,20 @@ enum SpokenCurrency {
         return line
     }
 
-    /// [said] unless the person does not hold it and holds exactly one currency that shares a name
-    /// with it: the model knows only that «песо» is some peso, and the person meant theirs.
+    /// [said] unless the person does not hold it and holds exactly one currency that goes by the
+    /// same main name: the model knows only that «песо» is some peso, and the person meant theirs.
+    ///
+    /// The model returns only a code, never the words, so a qualified «белорусских рублей» cannot
+    /// be told from a bare «рублей» here. A name that a popular currency goes by (рубль, доллар,
+    /// фунт, рупия…) yields that popular code when said bare, so any other code under it was named
+    /// on purpose and stands: BYN never becomes the always-held RUB, USD never the person's CAD.
+    /// Main names spelled apart («риал», «риял») are different words, not one shared name.
     static func own(_ said: String, among held: [String]) -> String {
-        guard !held.contains(said), let names = byCode[said]?.names else { return said }
-        let kin = held.filter { code in byCode[code]?.names.contains(where: names.contains) == true }
+        guard !held.contains(said), let name = byCode[said]?.names.first, !popularNames.contains(name) else { return said }
+        let kin = held.filter { byCode[$0]?.names.first == name }
         return kin.count == 1 ? kin[0] : said
     }
+
+    /// Every word a popular currency goes by.
+    private static let popularNames = Set(Currencies.popular.flatMap { byCode[$0]?.names ?? [] })
 }

@@ -82,7 +82,11 @@ enum AppLaunch {
         // Before the launch finishes too: a voice intent may be what launched the app, in the
         // background, with no window. The unit-test host keeps requests in the app.
         if !options.isHostingTests {
-            VoiceNoteLauncher.shared.background = BackgroundVoiceNote.live(model: model, mic: voice)
+            let background = BackgroundVoiceNote.live(model: model, mic: voice)
+            // A run that died mid-note left its Live Activity saying the microphone is on; no note
+            // of this run has begun yet, so whatever runs now is such a leftover.
+            background.endLeftovers()
+            VoiceNoteLauncher.shared.background = background
             VoiceNoteLauncher.shared.appIsActive = { UIApplication.shared.applicationState == .active }
         }
         // An invitation the scene was launched with goes to this run's sync.

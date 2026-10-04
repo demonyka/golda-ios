@@ -43,6 +43,8 @@ final class VoiceMicModel: MicModel {
     @ObservationIgnored private var startAfterConsent = false
     /// The rising chime sounds; the recorder starts when it is over.
     @ObservationIgnored private var isStarting = false
+    /// Stopped from outside while the rising chime sounded: the recorder does not start.
+    @ObservationIgnored private var startCalledOff = false
     /// Outcomes of notes recorded outside the app before this mic followed the service: they are
     /// said once the app is on screen.
     @ObservationIgnored private var keptOutcomes: [VoiceOutcome] = []
@@ -166,6 +168,19 @@ final class VoiceMicModel: MicModel {
         }
     }
 
+    /// Recording, or about to once the rising chime is over.
+    var isListening: Bool { state == .recording || isStarting }
+
+    /// A press outside the app (`VoiceNoteLauncher`) while this mic listens with the app out of
+    /// sight: the note ends as a second tap would; during the chime it is called off.
+    func stopListening() {
+        if state == .recording {
+            finish()
+        } else if isStarting {
+            startCalledOff = true
+        }
+    }
+
     func answerConsent(_ agreed: Bool) {
         let wanted = startAfterConsent
         startAfterConsent = false
@@ -211,9 +226,14 @@ final class VoiceMicModel: MicModel {
         }
         // The rising chime first, so the note does not carry it; taps meanwhile change nothing.
         isStarting = true
+        startCalledOff = false
         Task { [weak self] in
-            await cues.listen { self?.record(into: profileId) }
+            await cues.listen {
+                guard let self, !self.startCalledOff else { return }
+                self.record(into: profileId)
+            }
             self?.isStarting = false
+            self?.startCalledOff = false
         }
     }
 

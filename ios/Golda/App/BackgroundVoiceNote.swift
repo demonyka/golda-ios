@@ -23,7 +23,21 @@ protocol VoiceActivities: AnyObject {
     func begin(_ state: VoiceActivityAttributes.ContentState) throws -> any VoiceActivityHandle
     /// The activity whose «Отменить» carries [ticket] now says «Отменено» and goes.
     func showUndone(_ ticket: VoiceUndoTicket) async
+    /// Ends at once every activity still running that no note of this run began: one left by a
+    /// run that died mid-note would otherwise say the microphone is on for hours.
+    func endStale()
 }
+
+/// The app's own mic, as a note asked for from outside sees it (`VoiceMicModel`).
+@MainActor
+protocol InAppVoiceMic: AnyObject {
+    /// Recording, or about to once the rising chime is over.
+    var isListening: Bool { get }
+    /// Ends that note as a second tap would.
+    func stopListening()
+}
+
+extension VoiceMicModel: InAppVoiceMic {}
 
 /// A notification about a note that needs the app; a tap opens it, where the toast or the form waits.
 @MainActor
@@ -51,9 +65,12 @@ final class BackgroundVoiceNote {
     private let hasKey: @MainActor () -> Bool
     private let locale: Locale
     private let levelInterval: Duration
+    /// The app's own mic: a press while it listens out of sight ends its note (`stopInApp`).
+    private weak var inAppMic: (any InAppVoiceMic)?
     /// Keeps the app running once the microphone is off, while the note goes to Gemini: the audio
-    /// no longer does. Returns what lets it go.
-    private let keepRunning: @MainActor () -> (@MainActor () -> Void)
+    /// no longer does. Returns what lets it go. iOS may take the time away first; the closure it
+    /// is given then runs, before the app is suspended.
+    private let keepRunning: @MainActor (_ onExpiry: @escaping @MainActor () async -> Void) -> (@MainActor () -> Void)
     /// Where an outcome goes when the app has never been on screen (`VoiceMicModel.keepUntilShown`).
     private let handOff: @MainActor (VoiceOutcome) -> Void
 
@@ -65,15 +82,18 @@ final class BackgroundVoiceNote {
 
     /// Listening now.
     private var note: Note?
-    /// The chime sounds and the recorder is about to start: a second press waits for it.
+    /// The chime sounds and the recorder is about to start.
     private var isStarting = false
+    /// A second press came during the chime: the recorder does not start, the activity goes.
+    private var startCalledOff = false
     private var meter: Task<Void, Never>?
 
     init(
         model: AppModel, recorder: any VoiceRecording, notes: any VoiceNotes, cues: any VoiceCues,
         activities: any VoiceActivities, alerts: any VoiceAlerts, hasKey: @escaping @MainActor () -> Bool,
         locale: Locale = VoiceMicModel.interfaceLocale, levelInterval: Duration = .milliseconds(100),
-        keepRunning: @escaping @MainActor () -> (@MainActor () -> Void) = { {} },
+        inAppMic: (any InAppVoiceMic)? = nil,
+        keepRunning: @escaping @MainActor (_ onExpiry: @escaping @MainActor () async -> Void) -> (@MainActor () -> Void) = { _ in {} },
         handOff: @escaping @MainActor (VoiceOutcome) -> Void = { _ in }
     ) {
         self.model = model
@@ -85,6 +105,7 @@ final class BackgroundVoiceNote {
         self.hasKey = hasKey
         self.locale = locale
         self.levelInterval = levelInterval
+        self.inAppMic = inAppMic
         self.keepRunning = keepRunning
         self.handOff = handOff
     }
@@ -98,6 +119,7 @@ final class BackgroundVoiceNote {
         return VoiceNoteRoute.of(VoiceNoteRoute.Conditions(
             appIsActive: appIsActive,
             isRecordingOutside: isRecording,
+            isRecordingInApp: inAppMic?.isListening ?? false,
             hasBooks: model.device.onboarded && model.activeProfileId != nil,
             hasConsent: model.hasVoiceConsent,
             hasKey: hasKey(),
@@ -120,16 +142,28 @@ final class BackgroundVoiceNote {
         let startedAt = Date()
         let activity = try activities.begin(VoiceActivityContent.listening(since: startedAt))
         isStarting = true
-        defer { isStarting = false }
+        startCalledOff = false
+        defer {
+            isStarting = false
+            startCalledOff = false
+        }
+        var started = false
         do {
             try await cues.listen {
+                // Pressed again during the chime: nothing is recorded, nothing is sent.
+                guard !startCalledOff else { return }
                 let file = try notes.newNote(profileId: profileId, recordedAt: model.environment.clock())
                 try recorder.start(into: file)
+                started = true
             }
         } catch {
             log.error("A note from outside the app could not start: \(String(describing: error))")
             await activity.end(nil, lingering: .zero)
             throw error
+        }
+        guard started else {
+            await activity.end(nil, lingering: .zero)
+            return
         }
         note = Note(activity: activity, startedAt: startedAt, profileId: profileId)
         let interval = levelInterval
@@ -154,10 +188,19 @@ final class BackgroundVoiceNote {
     }
 
     /// Ends the note: the falling chime, then «Разбираю…», then what it became. Returns the work
-    /// that follows the stop, so a test can wait for it; nil when nothing was listening.
+    /// that follows the stop, so a test can wait for it; nil when nothing was listening. During
+    /// the rising chime the note is called off. With no note of this run at all, «Стоп» came from
+    /// an activity a dead run left behind, and such activities go.
     @discardableResult
     func stop() -> Task<Void, Never>? {
-        guard let note else { return nil }
+        guard let note else {
+            if isStarting {
+                startCalledOff = true
+            } else {
+                activities.endStale()
+            }
+            return nil
+        }
         self.note = nil
         meter?.cancel()
         meter = nil
@@ -171,7 +214,13 @@ final class BackgroundVoiceNote {
             await note.activity.end(nil, lingering: .zero)
             return
         }
-        let letGo = keepRunning()
+        let letGo = keepRunning { [activity = note.activity, alerts, locale] in
+            // The app is about to be suspended with the note still at the model: it waits in the
+            // queue, and the activity stops saying «Разбираю…» and leads to the app instead.
+            let ending = VoiceActivityContent.expired(since: note.startedAt, locale: locale)
+            await activity.end(ending.state, lingering: VoiceActivityContent.lingering)
+            if let alert = ending.alert { await alerts.post(alert) }
+        }
         defer { letGo() }
         await note.activity.update(VoiceActivityContent.thinking(since: note.startedAt))
         let outcome = await notes.understand(note: file)
@@ -180,6 +229,16 @@ final class BackgroundVoiceNote {
         let ending = VoiceActivityContent.ending(of: outcome, books: books, since: note.startedAt, locale: locale)
         await note.activity.end(ending.state, lingering: VoiceActivityContent.lingering)
         if let alert = ending.alert { await alerts.post(alert) }
+    }
+
+    /// At launch: activities a run that died mid-note left behind go (`VoiceActivities.endStale`).
+    func endLeftovers() {
+        activities.endStale()
+    }
+
+    /// The app's mic listens out of sight and a press came from outside: its note ends.
+    func stopInApp() {
+        inAppMic?.stopListening()
     }
 
     /// «Отменить» on the Live Activity: what the note booked goes, from the profile it was booked
@@ -211,6 +270,9 @@ final class VoiceNoteLauncher {
             switch route {
             case .stop:
                 background.stop()
+                return
+            case .stopInApp:
+                background.stopInApp()
                 return
             case .background:
                 do {

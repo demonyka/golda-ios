@@ -8,7 +8,7 @@ import Testing
 @Suite struct VoiceNoteRouteTests {
     /// Everything in place, the app out of sight.
     private let ready = VoiceNoteRoute.Conditions(
-        appIsActive: false, isRecordingOutside: false, hasBooks: true, hasConsent: true, hasKey: true,
+        appIsActive: false, isRecordingOutside: false, isRecordingInApp: false, hasBooks: true, hasConsent: true, hasKey: true,
         microphone: .granted, allowsLiveActivities: true
     )
 
@@ -46,5 +46,20 @@ import Testing
             $0.isRecordingOutside = true
             $0.appIsActive = true
         } == .stop)
+    }
+
+    /// The app's own mic still listening after the person went home (the audio mode keeps it on):
+    /// a press ends that note, as a second tap would, instead of starting a second recorder beside
+    /// it. With the app on screen its mic is there to tap, and the request is left to it as before.
+    @Test func askingWhileTheAppsMicListensOutOfSightEndsThatNote() {
+        #expect(route { $0.isRecordingInApp = true } == .stopInApp)
+        #expect(route {
+            $0.isRecordingInApp = true
+            $0.hasKey = false
+        } == .stopInApp)
+        #expect(route {
+            $0.isRecordingInApp = true
+            $0.appIsActive = true
+        } == .inApp)
     }
 }

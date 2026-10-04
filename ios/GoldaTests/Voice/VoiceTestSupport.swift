@@ -254,6 +254,13 @@ final class FakeActivities: VoiceActivities {
     func showUndone(_ ticket: VoiceUndoTicket) async {
         undone.append(ticket)
     }
+
+    /// How many times the activities no note owns were swept.
+    private(set) var staleEnds = 0
+
+    func endStale() {
+        staleEnds += 1
+    }
 }
 
 /// Notifications kept as their words.

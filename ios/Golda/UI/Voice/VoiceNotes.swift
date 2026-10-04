@@ -16,11 +16,8 @@ protocol VoiceNotes: Sendable {
     func outcomes() -> AsyncStream<VoiceOutcome>
 }
 
+// `newNote` is the service's own: it holds the note back from the queue until it is understood.
 extension VoiceService: VoiceNotes {
-    nonisolated func newNote(profileId: UUID, recordedAt: Int64) throws -> URL {
-        try queue.newFile(profileId: profileId, recordedAt: recordedAt, fileExtension: "wav")
-    }
-
     func understand(note: URL) async -> VoiceOutcome {
         await understand(file: note, late: false)
     }

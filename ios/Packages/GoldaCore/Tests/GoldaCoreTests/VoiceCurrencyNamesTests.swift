@@ -103,7 +103,24 @@ import Testing
     /// Kronas and dollars are different names: an Australian holding no krona still gets the krona said.
     @Test func onlyTheSameNameIsTakenForTheHeldOne() throws {
         #expect(try considered("SEK", holding: ["RUB", "AUD"]) == "SEK")
-        #expect(try considered("USD", holding: ["RUB", "AUD"]) == "AUD")
+        #expect(try considered("QAR", holding: ["RUB", "AUD"], accounts: []) == "QAR")
+    }
+
+    /// The model sees no words, only the code it chose. A code the bare shared word never yields
+    /// was asked for by name («белорусских рублей», «американских долларов»): it stands, even when
+    /// the person holds one other currency of that name. The ruble is always held, so BYN must
+    /// never become RUB.
+    @Test func anExplicitlyNamedCurrencyIsNeverSwappedForTheHeldOne() throws {
+        #expect(try considered("BYN", holding: ["RUB", "USD"]) == "BYN")
+        #expect(try considered("USD", holding: ["RUB", "CAD"]) == "USD")
+        #expect(try considered("USD", holding: ["RUB", "AUD"]) == "USD")
+        #expect(try considered("GBP", holding: ["RUB", "EGP"]) == "GBP")
+        #expect(try considered("EGP", holding: ["RUB", "GBP"]) == "EGP")
+        #expect(try considered("CAD", holding: ["RUB", "AUD"]) == "CAD")
+        #expect(try considered("INR", holding: ["RUB", "LKR"]) == "INR")
+        // «Риал» and «риял» are spelled apart: an Iranian rial is not a Saudi riyal.
+        #expect(try considered("IRR", holding: ["RUB", "SAR"]) == "IRR")
+        #expect(try considered("SAR", holding: ["RUB", "IRR"]) == "SAR")
     }
 
     // MARK: Coins

@@ -12,11 +12,11 @@ import WidgetKit
 struct VoiceActivityWidget: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: VoiceActivityAttributes.self) { context in
-            VoiceActivityLockScreen(state: context.state)
+            VoiceActivityLockScreen(state: context.state.shown(isStale: context.isStale))
                 .padding(16)
                 .activitySystemActionForegroundColor(.primary)
         } dynamicIsland: { context in
-            let state = context.state
+            let state = context.state.shown(isStale: context.isStale)
             return DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
                     VoiceActivityGlyph(phase: state.phase)
@@ -52,6 +52,19 @@ struct VoiceActivityWidget: Widget {
                 VoiceActivityGlyph(phase: state.phase)
             }
         }
+    }
+}
+
+private extension VoiceActivityAttributes.ContentState {
+    /// «Слушаю…» or «Разбираю…» past its stale date: the run that showed it is gone (the app was
+    /// closed or killed mid-note), so the microphone is off and the note waits in the app.
+    func shown(isStale: Bool) -> Self {
+        guard isStale, phase == .listening || phase == .thinking else { return self }
+        let headline = String(
+            localized: "Open Golda to finish the note", table: "VoiceActivity",
+            comment: "Live Activity and notification: a note recorded from the Lock Screen needs the app."
+        )
+        return Self(phase: .needsApp, startedAt: startedAt, headline: headline)
     }
 }
 

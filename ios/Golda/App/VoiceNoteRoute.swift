@@ -10,6 +10,9 @@ enum VoiceNoteRoute: Equatable, Sendable {
     case background
     /// A note from outside is being recorded: asking again ends it, as a second tap on the mic does.
     case stop
+    /// The app's own mic is listening with the app out of sight (the `audio` mode keeps it on
+    /// after the person goes home): asking ends that note, since its mic cannot be tapped now.
+    case stopInApp
 
     /// What a note needs to be recorded outside the app, as things stand when it is asked for.
     struct Conditions: Equatable, Sendable {
@@ -17,6 +20,8 @@ enum VoiceNoteRoute: Equatable, Sendable {
         var appIsActive: Bool
         /// A note recorded outside the app is listening now.
         var isRecordingOutside: Bool
+        /// The app's own mic is listening, or its rising chime sounds.
+        var isRecordingInApp: Bool
         /// Onboarding is over and a profile is open: there are books to write the note into.
         var hasBooks: Bool
         /// The person agreed to send voice to Gemini (App Review 5.1.2(i)).
@@ -33,7 +38,9 @@ enum VoiceNoteRoute: Equatable, Sendable {
     /// a tap would: the consent screen, the system's prompt, the toast about the key.
     static func of(_ conditions: Conditions) -> VoiceNoteRoute {
         if conditions.isRecordingOutside { return .stop }
+        // On screen, the request goes to the mic as before, which leaves a busy note alone.
         if conditions.appIsActive { return .inApp }
+        if conditions.isRecordingInApp { return .stopInApp }
         let ready = conditions.hasBooks && conditions.hasConsent && conditions.hasKey
             && conditions.microphone == .granted && conditions.allowsLiveActivities
         return ready ? .background : .inApp

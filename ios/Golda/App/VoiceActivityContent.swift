@@ -24,6 +24,26 @@ enum VoiceActivityContent {
         State(phase: .thinking, startedAt: startedAt)
     }
 
+    /// When a state stops being true unless the app says more, for ActivityKit's `staleDate`. A
+    /// run that dies mid-note cannot end its activity, and «Слушаю…» must not outlive the
+    /// microphone: listening goes stale a little after the recorder's minute (the chimes and a
+    /// slow start), thinking after the model's longest wait (45 s) with a note or two ahead of it
+    /// in the queue. The widget then leads to the app (`VoiceActivityWidget`). A final state ends
+    /// the activity and needs none.
+    static func staleDate(of state: State, at now: Date) -> Date? {
+        switch state.phase {
+        case .listening: state.startedAt.addingTimeInterval(75)
+        case .thinking: now.addingTimeInterval(90)
+        case .recorded, .undone, .needsApp: nil
+        }
+    }
+
+    /// iOS took the background time away while the note was at the model: it waits in the queue,
+    /// and the app is where it ends.
+    static func expired(since startedAt: Date, locale: Locale) -> Ending {
+        needsApp(Strings.openToFinish.text(in: locale), since: startedAt)
+    }
+
     /// After «Отменить»: the same note, with nothing left to undo.
     static func undone(_ state: State) -> State {
         State(phase: .undone, startedAt: state.startedAt, headline: state.headline)
