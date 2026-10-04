@@ -28,8 +28,10 @@ jobs:
         working-directory: ios/Packages/GoldaData
         run: swift test
 
-      - name: Sync package
-        run: swift build --package-path ios/Packages/GoldaSync
+      # The stub transport and the CloudKit mapping need no iCloud: CKRecords are built locally.
+      - name: Sync tests
+        working-directory: ios/Packages/GoldaSync
+        run: swift test
 
       - name: Generate the Xcode project
         working-directory: ios

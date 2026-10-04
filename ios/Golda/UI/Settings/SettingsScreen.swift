@@ -297,6 +297,15 @@ struct SettingsScreen: View {
                 SettingRow(title: SettingsText.licences.text(in: locale), symbol: SettingsSymbols.licences)
             }
             .accessibilityIdentifier("settings.licences.row")
+            #if DEBUG
+            // Stage 5a's CloudKit spike; debug builds only, so its English text never ships.
+            NavigationLink {
+                SyncSpikeScreen()
+            } label: {
+                SettingRow(title: "Sync spike", symbol: "icloud", detail: "Debug: CloudKit sharing test")
+            }
+            .accessibilityIdentifier("settings.syncSpike.row")
+            #endif
         } header: {
             Text(verbatim: SettingsText.about.text(in: locale))
         }

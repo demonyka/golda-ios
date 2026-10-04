@@ -15,7 +15,7 @@
 | 2 Интерфейс | ☑ все экраны, онбординг и иконка; темы, крупный шрифт, VoiceOver и сверка с Android проверены |
 | 3 Голос | ◐ код и тесты готовы; на живом ключе проверено с Mac (S2), осталось — микрофон iPhone |
 | 4 Вне приложения | ◐ уведомления, виджет, Control Center, App Shortcuts, quick action готовы и проверены на симуляторе; осталась проверка на iPhone |
-| 5 Синхронизация и шаринг | ☐ нужна подпись командой Apple |
+| 5 Синхронизация и шаринг | ◐ спайк 5a: код и тесты готовы, ждёт подписи с iCloud и прогона на двух iPhone |
 | 6 App Store | ☐ |
 | 7 Финал | ☐ удаление Android |
 
@@ -110,7 +110,9 @@
 - каждая точка входа на устройстве начинает запись;
 - число запланированных уведомлений не превышает лимит iOS (64).
 
-## Этап 5 — Синхронизация и шаринг по профилям 🔑 ☐
+## Этап 5 — Синхронизация и шаринг по профилям 🔑 ◐
+
+Сделано (2026-10-04, 5a ◐): основа `GoldaSync` (D57) — `SyncTransport`, `CloudKitSyncTransport` на двух `CKSyncEngine`, зона `profile-<uuid>` и `CKShare(recordZoneID:)` на профиль, записи `Profile`, `Operation`, `Posting`, состояние движков и исходящая очередь в GRDB, заглушка `InMemorySyncTransport`; 34 теста пакета без iCloud. Capabilities в `project.yml`: iCloud (CloudKit, `iCloud.com.f4studio.golda`), Push, `remote-notification`, `CKSharingSupported`; приглашение принимает `SceneDelegate`. Экран Debug «Настройки → Sync spike» пишет в свой файл и свои зоны, книги не трогает. Осталось: подписанная сборка с iCloud-контейнером и прогон сценария на iPhone 16e и iPhone 15, вердикт в `DECISIONS.md` (S1).
 
 - **5a Спайк.** На двух устройствах с разными Apple ID: `CKSyncEngine` на private и shared БД, зона на профиль, `CKShare(recordZoneID:)`, приглашение, запись, удаление, выход. Вердикт — в `DECISIONS.md`.
 - **5b** Синхронизация своих профилей (зона на профиль, private БД), исходящая очередь, слияние, `postingCount`.

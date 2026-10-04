@@ -42,7 +42,9 @@ targets:
     # without the app (`BackgroundVoiceNote`) shows a Live Activity, and keeps the microphone with the
     # app out of sight: the `audio` background mode, without which iOS suspends the app a few seconds
     # after the intent returns and the note is cut off. The file is generated; its versions stay the
-    # build settings', which XcodeGen would otherwise write as 1.0 (1).
+    # build settings', which XcodeGen would otherwise write as 1.0 (1). Sync (stage 5): CloudKit's
+    # silent pushes wake the sync engines (`remote-notification`), and `CKSharingSupported` lets the
+    # app take an iCloud invitation (`SceneDelegate`).
     info:
       path: Golda/Info.plist
       properties:
@@ -56,14 +58,20 @@ targets:
             UIApplicationShortcutItemTitle: Say a purchase
             UIApplicationShortcutItemIconSymbolName: mic.fill
         BGTaskSchedulerPermittedIdentifiers: [com.f4studio.golda.reminders]
-        UIBackgroundModes: [fetch, audio]
+        UIBackgroundModes: [fetch, audio, remote-notification]
         NSSupportsLiveActivities: true
-    # The App Group where the app leaves «Можно сегодня» for the widgets (`TodaySnapshot`). The
-    # file is generated, like Info.plist.
+        CKSharingSupported: true
+    # The App Group where the app leaves «Можно сегодня» for the widgets (`TodaySnapshot`); the
+    # iCloud container of sync and sharing (D4) and the pushes CloudKit sends its engines. Automatic
+    # signing turns `aps-environment` to production for App Store builds. The file is generated,
+    # like Info.plist.
     entitlements:
       path: Golda/Golda.entitlements
       properties:
         com.apple.security.application-groups: [group.com.f4studio.golda]
+        com.apple.developer.icloud-container-identifiers: [iCloud.com.f4studio.golda]
+        com.apple.developer.icloud-services: [CloudKit]
+        aps-environment: development
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.f4studio.golda

@@ -1,3 +1,4 @@
+import CloudKit
 import UIKit
 
 /// UIKit's part of the launch that SwiftUI has no modifier for: the quick action on the app icon.
@@ -25,8 +26,18 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
     }
 }
 
-/// SwiftUI keeps the window; this only hears the quick action while the app runs.
+/// SwiftUI keeps the window; this only hears what SwiftUI does not: the quick action while the app
+/// runs, and an accepted iCloud invitation (Info.plist `CKSharingSupported`), whether it launched
+/// the app or found it running.
 final class SceneDelegate: NSObject, UIWindowSceneDelegate {
+    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+        if let metadata = connectionOptions.cloudKitShareMetadata { ShareInvitations.accept(metadata) }
+    }
+
+    func windowScene(_ windowScene: UIWindowScene, userDidAcceptCloudKitShareWith cloudKitShareMetadata: CKShare.Metadata) {
+        ShareInvitations.accept(cloudKitShareMetadata)
+    }
+
     func windowScene(
         _ windowScene: UIWindowScene,
         performActionFor shortcutItem: UIApplicationShortcutItem,

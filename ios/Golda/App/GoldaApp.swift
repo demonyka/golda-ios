@@ -81,6 +81,11 @@ enum AppLaunch {
             VoiceNoteLauncher.shared.background = BackgroundVoiceNote.live(model: model, mic: voice)
             VoiceNoteLauncher.shared.appIsActive = { UIApplication.shared.applicationState == .active }
         }
+        #if DEBUG
+        // The sync spike follows CloudKit from launch once it was opened on this phone, so a push
+        // finds its engines. Never in tests or in-memory runs.
+        if !options.isHostingTests, !options.inMemory { SyncSpike.shared.startIfEnabled() }
+        #endif
         return .opened(model, voice)
     }
 }
