@@ -1,8 +1,10 @@
 import Foundation
+import GoldaData
 
 /// A CloudKit stand-in for tests: zones owned by people, shares that let others in, change tags
-/// that turn a stale save into a conflict, and one change counter per server, so phones can fetch
-/// what changed since they last looked. No network and no iCloud.
+/// that turn a stale save into a conflict, one change counter per server, so phones can fetch
+/// what changed since they last looked, and refusals with a time to wait, as a full quota gives.
+/// No network and no iCloud.
 public actor InMemoryCloud {
     struct ZoneKey: Hashable {
         let owner: String
@@ -27,6 +29,7 @@ public actor InMemoryCloud {
         case saved(tag: Int)
         case conflict(server: SyncRecord, tag: Int)
         case zoneNotFound
+        case retryLater(seconds: Int)
     }
 
     public struct Changes: Sendable {
@@ -41,6 +44,9 @@ public actor InMemoryCloud {
     private var gone: [(user: String, zone: SyncZone, seq: Int)] = []
     private var seq = 0
     private var nextTag = 0
+    private var refusals: [(left: Int, seconds: Int)] = []
+    /// Every save the server took, in order: what a test can count.
+    public private(set) var savesTaken = 0
 
     public init() {}
 
@@ -79,10 +85,15 @@ public actor InMemoryCloud {
         if zones[key] == nil { zones[key] = Zone(createdSeq: tick()) }
     }
 
-    /// [owner] shares [zone] and [participant] accepts, in one step.
-    public func share(_ zone: SyncZone, of owner: String, with participant: String) {
-        let key = ZoneKey(owner: owner, zoneName: zone.zoneName)
+    /// [owner] shares the zone of [profileId] and [participant] accepts, in one step.
+    public func share(_ profileId: UUID, of owner: String, with participant: String) {
+        let key = ZoneKey(owner: owner, zoneName: SyncZone.own(profileId).zoneName)
         zones[key]?.participants[participant] = tick()
+    }
+
+    /// Whether the server has a zone for [profileId] of [owner]: for tests.
+    public func hasZone(_ profileId: UUID, of owner: String) -> Bool {
+        zones[ZoneKey(owner: owner, zoneName: SyncZone.own(profileId).zoneName)] != nil
     }
 
     func stopSharing(_ zone: SyncZone, by owner: String) {
@@ -103,16 +114,35 @@ public actor InMemoryCloud {
 
     func deleteZone(_ zone: SyncZone, by user: String) {
         let key = key(zone, for: user)
-        guard let removed = zones.removeValue(forKey: key), key.owner == user else { return }
+        guard key.owner == user, let removed = zones.removeValue(forKey: key) else { return }
         let at = tick()
         for person in [user] + removed.participants.keys {
             gone.append((person, view(key, profileId: zone.profileId, for: person), at))
         }
     }
 
+    func participants(of zone: SyncZone, for user: String) -> [SyncParticipant] {
+        let key = key(zone, for: user)
+        guard canSee(key, user), let stored = zones[key], !stored.participants.isEmpty else { return [] }
+        let owner = SyncParticipant(id: key.owner, name: key.owner, isOwner: true, isCurrentUser: key.owner == user, status: .joined, canWrite: true)
+        return [owner] + stored.participants.keys.sorted().map {
+            SyncParticipant(id: $0, name: $0, isOwner: false, isCurrentUser: $0 == user, status: .joined, canWrite: true)
+        }
+    }
+
     // MARK: Records
 
+    /// The next [count] saves are refused with "try again in [seconds]".
+    public func refuseNextSaves(_ count: Int, retryAfter seconds: Int) {
+        refusals.append((count, seconds))
+    }
+
     func save(_ record: SyncRecord, baseTag: Int?, by user: String) -> SaveResult {
+        if let first = refusals.first {
+            refusals[0].left -= 1
+            if refusals[0].left <= 0 { refusals.removeFirst() }
+            return .retryLater(seconds: first.seconds)
+        }
         let key = key(record.zone, for: user)
         guard canSee(key, user), var zone = zones[key] else { return .zoneNotFound }
         let name = record.ref.recordName
@@ -120,9 +150,12 @@ public actor InMemoryCloud {
             return .conflict(server: view(stored.record, in: key, for: user), tag: stored.tag)
         }
         nextTag += 1
-        zone.records[name] = StoredRecord(record: record, tag: nextTag, seq: tick())
+        var stored = record
+        stored.zone = view(key, profileId: record.zone.profileId, for: key.owner)
+        zone.records[name] = StoredRecord(record: stored, tag: nextTag, seq: tick())
         zone.tombstones[name] = nil
         zones[key] = zone
+        savesTaken += 1
         return .saved(tag: nextTag)
     }
 
@@ -171,6 +204,9 @@ public actor InMemorySyncTransport: SyncTransport {
     private let now: @Sendable () -> Int64
     private var pending: [SyncRecordRef: OutgoingKind] = [:]
     private var cursor = 0
+    /// What the server last refused with, for the tests to see.
+    public private(set) var lastProblem: SyncProblem?
+    public var status: SyncAccountStatus = .available
 
     private struct State: Codable {
         var cursor: Int
@@ -183,7 +219,7 @@ public actor InMemorySyncTransport: SyncTransport {
         self.now = now
     }
 
-    public func start() async throws {
+    public func start(accountChanged: @escaping @Sendable () async -> Void) async throws {
         if let data = try await store.engineState(.private) {
             cursor = try JSONDecoder().decode(State.self, from: data).cursor
         }
@@ -191,7 +227,11 @@ public actor InMemorySyncTransport: SyncTransport {
         await outgoingChanged()
     }
 
-    public func accountStatus() async -> SyncAccountStatus { .available }
+    public func accountStatus() async -> SyncAccountStatus { status }
+
+    public func setStatus(_ status: SyncAccountStatus) {
+        self.status = status
+    }
 
     public func outgoingChanged() async {
         guard let due = try? await store.takeDue(at: now()) else { return }
@@ -204,6 +244,7 @@ public actor InMemorySyncTransport: SyncTransport {
         for _ in 0..<2 where !pending.isEmpty {
             let batch = pending
             pending = [:]
+            // In a fixed order, so a run repeats; the receiver copes with any (`SyncInbox`).
             for (ref, kind) in batch.sorted(by: { $0.key.key < $1.key.key }) {
                 try await send(kind, ref)
             }
@@ -233,8 +274,12 @@ public actor InMemorySyncTransport: SyncTransport {
                     await cloud.createZone(ref.zone, by: user)
                     try await store.rehand([ref])
                 } else {
-                    try await store.removeZone(ref.zone)
+                    try await store.zoneGone(ref.zone, .deleted)
                 }
+            case .retryLater(let seconds):
+                // As `CloudKitSyncTransport` does with `retryAfterSeconds`: not a moment before.
+                lastProblem = .retryLater(seconds: seconds)
+                try await store.postpone([ref], until: now() + Int64(seconds) * 1000)
             }
         }
     }
@@ -246,7 +291,7 @@ public actor InMemorySyncTransport: SyncTransport {
         }
         let kept = try await store.apply(changes.records.map(\.record), deletions: changes.deletions)
         if !kept.isEmpty { try await store.rehand(kept) }
-        for zone in changes.goneZones { try await store.removeZone(zone) }
+        for zone in changes.goneZones { try await store.zoneGone(zone, .deleted) }
         cursor = changes.cursor
         try await store.setEngineState(try JSONEncoder().encode(State(cursor: cursor)), for: .private)
     }
@@ -262,11 +307,20 @@ public actor InMemorySyncTransport: SyncTransport {
         } else {
             await cloud.leave(zone, by: user)
         }
-        try await store.removeZone(zone)
     }
 
     public func stopSharing(_ zone: SyncZone) async throws {
         guard zone.isOwned else { throw SyncTransportError.notOwner }
         await cloud.stopSharing(zone, by: user)
     }
+
+    public func participants(of zone: SyncZone) async throws -> [SyncParticipant] {
+        await cloud.participants(of: zone, for: user)
+    }
+}
+
+public enum SyncTransportError: Error, Sendable {
+    /// Only the owner may create, share and stop sharing a zone.
+    case notOwner
+    case shareNotSaved
 }

@@ -1,56 +1,98 @@
 import Foundation
 import GoldaCore
 import GoldaData
+import Synchronization
+import Testing
+
 @testable import GoldaSync
 
-/// A clock the tests move by hand, in ms since 1970.
-final class TestClock: @unchecked Sendable {
-    private let lock = NSLock()
-    private var value: Int64 = 1_760_000_000_000
+/// A clock the tests move by hand, in ms since 1970; it starts at 2026-10-02 10:00 UTC.
+final class TestClock: Sendable {
+    static let utc = TimeZone(secondsFromGMT: 0)!
+    static let today = LocalDate(2026, 10, 2)
+    private let value = Mutex(TestClock.today.atTimeMillis(hour: 10, in: TestClock.utc))
 
-    var now: Int64 { lock.withLock { value } }
+    var now: Int64 { value.withLock { $0 } }
 
-    func advance(_ ms: Int64) { lock.withLock { value += ms } }
+    func advance(_ ms: Int64) { value.withLock { $0 += ms } }
 
     var reader: @Sendable () -> Int64 { { [self] in now } }
 }
 
-enum Fixtures {
-    static let profileId = UUID(uuidString: "6F9619FF-8B86-D011-B42D-00C04FC964FF")!
-    static let accountId = UUID(uuidString: "11111111-2222-3333-4444-555555555555")!
+/// One person's phone: the books, this phone's settings, sync over the shared in-memory cloud.
+final class Phone: Sendable {
+    let user: String
+    let database: GoldaDatabase
+    let device: DeviceSettingsStore
+    let repository: Repository
+    let store: SyncStore
+    let transport: InMemorySyncTransport
+    let service: SyncService
+    private let suite: String
 
-    static func profile(_ name: String = "Семья", id: UUID = profileId, zone: SyncZone? = nil, at time: Int64 = 1, by device: String = "A") -> SyncRecord {
-        SyncRecord(
-            zone: zone ?? .own(id),
-            payload: .profile(Profile(id: id, name: name, sort: 2, settings: ProfileSettings(
-                incomeHourly: true, hourlyRate: 1500.5, monthlySalary: 0, taxPercent: 13, hoursPerWeek: 40, payday: 10, markup: 0.02
-            ))),
-            updatedAt: time, authorDevice: device
+    init(_ user: String, cloud: InMemoryCloud, clock: TestClock, database: GoldaDatabase? = nil) async throws {
+        self.user = user
+        suite = "golda.sync.tests.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        device = DeviceSettingsStore(defaults: defaults)
+        self.database = try database ?? GoldaDatabase.inMemory(clock: clock.reader)
+        repository = Repository(
+            database: self.database, deviceSettings: device, secrets: InMemorySecretStore(), clock: clock.reader, zone: { TestClock.utc }
         )
+        try await repository.ensureSeed()
+        store = SyncStore(database: self.database)
+        transport = InMemorySyncTransport(cloud: cloud, user: user, store: store, now: clock.reader)
+        service = SyncService(store: store, transport: transport, now: clock.reader)
     }
 
-    /// An expense of [amountMinor] with its one posting, as the spike writes it.
-    static func expense(
-        _ note: String, _ amountMinor: Int64, in zone: SyncZone, id: UUID = UUID(), at time: Int64 = 1, by device: String = "A"
-    ) -> (operation: SyncRecord, posting: SyncRecord) {
-        let operation = GoldaCore.Operation(id: id, type: .expense, timestamp: time, categoryKey: "food", note: note)
-        let posting = Posting(operationId: id, accountId: accountId, amountMinor: -amountMinor, rubMinor: -amountMinor)
-        return (
-            SyncRecord(zone: zone, payload: .operation(operation, postingCount: 1), updatedAt: time, authorDevice: device),
-            SyncRecord(zone: zone, payload: .posting(posting), updatedAt: time, authorDevice: device)
-        )
+    deinit {
+        UserDefaults.standard.removePersistentDomain(forName: suite)
     }
 
-    static func temporaryURL() -> URL {
-        FileManager.default.temporaryDirectory
-            .appending(path: "golda-sync-tests-\(UUID().uuidString)", directoryHint: .isDirectory)
-            .appending(path: "sync.sqlite")
+    /// Opens the app: sync starts when iCloud is there.
+    func launch() async {
+        await service.start()
+    }
+
+    /// Sends what is due and fetches what changed, as the engines do on their own.
+    func sync() async throws {
+        try await service.syncNow()
+    }
+
+    func profiles() async throws -> [Profile] {
+        try await database.read { try $0.profiles() }
+    }
+
+    func books(_ profileId: UUID) async throws -> ProfileSnapshot? {
+        try await database.read { try $0.snapshot(profileId: profileId) }
+    }
+
+    /// Each account's balance, by name.
+    func balances(_ profileId: UUID) async throws -> [String: Int64] {
+        let books = try #require(try await books(profileId))
+        let states = Ledger.states(books.accounts, books.operations.flatMap(\.postings))
+        return Dictionary(uniqueKeysWithValues: books.accounts.map { ($0.name, states[$0.id]?.balanceMinor ?? 0) })
+    }
+
+    /// «Можно сегодня» of the profile, as Home counts it, with this phone's settings.
+    func safeToSpend(_ profileId: UUID, at now: Int64) async throws -> Today {
+        let books = try #require(try await books(profileId))
+        let rates = try await repository.rates(profileId: profileId)
+        let day = LocalDate(epochMillis: now, in: TestClock.utc)
+        let start = day.startOfDayMillis(in: TestClock.utc)
+        return Budget.today(
+            states: Ledger.states(books.accounts, books.operations.flatMap(\.postings)),
+            operations: books.operations.filter { $0.op.timestamp >= start },
+            settings: Settings(profile: books.profile.settings, device: device.current, profileId: profileId),
+            today: day, zone: TestClock.utc,
+            obligations: books.obligations + Debts.obligations(books.accounts),
+            rates: rates
+        )
     }
 }
 
-extension SyncRecord {
-    var note: String? {
-        if case .operation(let op, _) = payload { return op.note }
-        return nil
+extension Account {
+    static func card(_ name: String, currency: String = "RUB", sort: Int = 0) -> Account {
+        Account(name: name, currency: currency, type: .card, includeInFree: true, sort: sort)
     }
 }

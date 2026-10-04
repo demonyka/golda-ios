@@ -26,10 +26,13 @@ final class AppHarness {
     let model: AppModel
 
     /// [reloadWidgets] hears each time the widgets are asked to read their snapshot again.
-    init(ratesSource: any RatesSource = StubRatesSource.offline, reloadWidgets: @escaping @MainActor @Sendable () -> Void = {}) throws {
+    init(
+        ratesSource: any RatesSource = StubRatesSource.offline, syncBackend: SyncBackend = .off,
+        reloadWidgets: @escaping @MainActor @Sendable () -> Void = {}
+    ) throws {
         environment = try AppEnvironment.inMemory(
             defaultsSuite: suiteName, ratesSource: ratesSource, clock: { AppHarness.now }, zone: { AppHarness.utc },
-            reloadWidgets: reloadWidgets
+            syncBackend: syncBackend, reloadWidgets: reloadWidgets
         )
         model = AppModel(environment: environment)
     }

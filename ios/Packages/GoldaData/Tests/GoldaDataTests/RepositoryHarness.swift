@@ -57,7 +57,7 @@ final class RepositoryHarness {
     init() throws {
         defaults = try #require(UserDefaults(suiteName: suiteName))
         device = DeviceSettingsStore(defaults: defaults)
-        database = try GoldaDatabase.inMemory()
+        database = try GoldaDatabase.inMemory(clock: { [clock] in clock.now })
         repository = Self.repository(database, device, secrets, clock, zone: RepositoryHarness.utc)
     }
 

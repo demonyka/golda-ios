@@ -27,6 +27,8 @@ struct AppEnvironment: Sendable {
     let notifications: any NotificationCenterClient
     /// What the widgets read (`TodayWidgetPublisher`); in memory unless the environment is the real one.
     let widgets: WidgetChannel
+    /// How the books reach the other phones: CloudKit on a real launch, nothing in memory.
+    let syncBackend: SyncBackend
 
     /// [voiceProvider] defaults to Gemini with the key in [secrets]; [voiceSecrets] lets the debug
     /// stub give the service a key of its own without writing one where the real key lives.
@@ -41,8 +43,10 @@ struct AppEnvironment: Sendable {
         voiceProvider: (any VoiceProvider)? = nil,
         voiceSecrets: (any SecretStore)? = nil,
         notifications: (any NotificationCenterClient)? = nil,
-        widgets: WidgetChannel? = nil
+        widgets: WidgetChannel? = nil,
+        syncBackend: SyncBackend = .off
     ) {
+        self.syncBackend = syncBackend
         self.database = database
         self.notifications = notifications ?? InMemoryNotificationCenter()
         self.widgets = widgets ?? .inMemory()
@@ -89,12 +93,14 @@ struct AppEnvironment: Sendable {
             voiceProvider: voiceProvider,
             voiceSecrets: voiceSecrets,
             notifications: UserNotificationCenterClient(),
-            widgets: .appGroup()
+            widgets: .appGroup(),
+            syncBackend: .cloudKit(containerIdentifier: SyncBackend.containerIdentifier)
         )
     }
 
     /// Nothing on disk survives it: a private database, a defaults suite wiped as it opens, keys in
-    /// memory, voice notes in a temporary folder of their own. By default the rates source is
+    /// memory, voice notes in a temporary folder of their own, and no sync unless [syncBackend]
+    /// asks for one (a test's in-memory cloud). By default the rates source is
     /// offline, so tests, previews and UI scenarios never touch the network and run on the fallback
     /// rates; with no key, voice notes wait. The widgets' snapshot goes to [defaultsSuite] too, with
     /// [reloadWidgets] hearing the reloads, unless [widgets] is given. Give each concurrent user its
@@ -108,6 +114,7 @@ struct AppEnvironment: Sendable {
         voiceSecrets: (any SecretStore)? = nil,
         notifications: (any NotificationCenterClient)? = nil,
         widgets: WidgetChannel? = nil,
+        syncBackend: SyncBackend = .off,
         reloadWidgets: @escaping @MainActor @Sendable () -> Void = {}
     ) throws -> AppEnvironment {
         // Nil only for the app's own bundle id or the global domain, never for our suite names.
@@ -117,7 +124,7 @@ struct AppEnvironment: Sendable {
         // The suite is a file in the sandbox; what an earlier run left there must not leak in.
         defaults.removePersistentDomain(forName: defaultsSuite)
         return AppEnvironment(
-            database: try GoldaDatabase.inMemory(),
+            database: try GoldaDatabase.inMemory(clock: clock),
             deviceSettings: DeviceSettingsStore(defaults: defaults),
             secrets: InMemorySecretStore(),
             ratesSource: ratesSource,
@@ -129,7 +136,8 @@ struct AppEnvironment: Sendable {
             voiceProvider: voiceProvider,
             voiceSecrets: voiceSecrets,
             notifications: notifications,
-            widgets: widgets ?? WidgetChannel(store: TodaySnapshotStore(defaults: defaults), reload: reloadWidgets)
+            widgets: widgets ?? WidgetChannel(store: TodaySnapshotStore(defaults: defaults), reload: reloadWidgets),
+            syncBackend: syncBackend
         )
     }
 

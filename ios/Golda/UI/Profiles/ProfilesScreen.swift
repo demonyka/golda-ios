@@ -63,7 +63,7 @@ struct ProfilesList: View {
         List {
             Section {
                 ForEach(rows) { row in
-                    profileRow(row, canDelete: canDelete)
+                    profileRow(row, canDelete: canDelete || model.sync.isParticipant(in: row.id))
                 }
             } footer: {
                 VStack(alignment: .leading, spacing: Theme.Gap.s) {
@@ -106,9 +106,9 @@ struct ProfilesList: View {
             presenting: deletion
         ) { pending in
             Button(role: .destructive) {
-                delete(pending.profileId)
+                delete(pending.profileId, leaving: pending.deletion.sharing == .sharedWithMe)
             } label: {
-                Text(verbatim: ProfileDeletion.confirmTitle.text(in: locale))
+                Text(verbatim: pending.deletion.confirmAction.text(in: locale))
             }
             Button(role: .cancel) {} label: {
                 Text("Cancel", tableName: "Profiles", comment: "Closes an alert or a sheet without changes.")
@@ -172,7 +172,7 @@ struct ProfilesList: View {
                     askToDelete(row)
                 } label: {
                     Label {
-                        Text(verbatim: ProfileDeletion.actionTitle.text(in: locale))
+                        Text(verbatim: deleteTitle(row).text(in: locale))
                     } icon: {
                         Image(systemName: Symbols.delete)
                     }
@@ -213,7 +213,7 @@ struct ProfilesList: View {
                 askToDelete(row)
             } label: {
                 Label {
-                    Text(verbatim: ProfileDeletion.actionTitle.text(in: locale))
+                    Text(verbatim: deleteTitle(row).text(in: locale))
                 } icon: {
                     Image(systemName: Symbols.delete)
                 }
@@ -248,17 +248,29 @@ struct ProfilesList: View {
         naming = .rename(current: row.name)
     }
 
+    /// "Удалить профиль", or "Выйти из профиля" for one someone shared with this person.
+    private func deleteTitle(_ row: ProfileRow) -> LocalizedStringResource {
+        model.sync.isParticipant(in: row.id) ? ProfileSharing.leaveTitle : ProfileDeletion.actionTitle
+    }
+
     /// Counts what would go before asking; a failed count still asks, naming the kinds of things.
+    /// A shared profile says who else loses it; someone else's profile is left, not deleted.
     private func askToDelete(_ row: ProfileRow) {
         let model = model
         Task {
+            if model.sync.isParticipant(in: row.id) {
+                deletion = PendingDeletion(profileId: row.id, deletion: ProfileDeletion(name: row.name, contents: nil, sharing: .sharedWithMe))
+                return
+            }
             var contents: ProfileContents?
             do {
                 contents = try await model.profileContents(row.id)
             } catch {
                 log.error("Counting a profile's contents failed: \(String(describing: error))")
             }
-            deletion = PendingDeletion(profileId: row.id, deletion: ProfileDeletion(name: row.name, contents: contents))
+            let people = (try? await model.sync.participants(row.id)) ?? []
+            let sharing = ProfileSharing(role: .owner, availability: model.sync.availability, participants: people).deletionKind
+            deletion = PendingDeletion(profileId: row.id, deletion: ProfileDeletion(name: row.name, contents: contents, sharing: sharing))
         }
     }
 
@@ -287,11 +299,15 @@ struct ProfilesList: View {
         }
     }
 
-    private func delete(_ id: UUID) {
+    private func delete(_ id: UUID, leaving: Bool) {
         let model = model
         Task {
             do {
-                try await model.deleteProfile(id)
+                if leaving {
+                    try await model.leaveProfile(id)
+                } else {
+                    try await model.deleteProfile(id)
+                }
             } catch {
                 log.error("Deleting a profile failed: \(String(describing: error))")
                 failed = true

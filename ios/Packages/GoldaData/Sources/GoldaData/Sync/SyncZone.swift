@@ -10,7 +10,7 @@ public enum SyncScope: String, Codable, Sendable, CaseIterable {
 /// A profile's zone (D21): one zone per profile, named after it, shared whole with one `CKShare`.
 ///
 /// The value carries no CloudKit type, so the queue, the store and the stub transport stay free of
-/// it; `CloudKitMapping` converts it to `CKRecordZone.ID`.
+/// it; `CloudKitMapping` (GoldaSync) converts it to `CKRecordZone.ID`.
 public struct SyncZone: Hashable, Codable, Sendable {
     public static let namePrefix = "profile-"
     /// CloudKit's name for the signed-in person as a zone's owner (`CKCurrentUserDefaultName`). Every
@@ -46,5 +46,5 @@ public struct SyncZone: Hashable, Codable, Sendable {
     public var isOwned: Bool { scope == .private }
 
     /// One string per zone, for keys of the store's tables.
-    var key: String { "\(scope.rawValue)|\(ownerName)|\(zoneName)" }
+    public var key: String { "\(scope.rawValue)|\(ownerName)|\(zoneName)" }
 }

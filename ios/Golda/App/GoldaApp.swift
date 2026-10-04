@@ -29,6 +29,9 @@ struct GoldaApp: App {
                     .onOpenURL { url in AppLinkRequests.shared.open(url) }
                     .onChange(of: scenePhase) { _, phase in
                         if phase == .background, !options.isHostingTests { model.publishWidgetsOnLeaving() }
+                        // Back in the app: iCloud may have been signed in meanwhile, and the other
+                        // phones may have written.
+                        if phase == .active, !options.isHostingTests { Task { await model.sync.start() } }
                     }
                     .task {
                         // A unit-test host stays idle: the tests build and drive their own models.
@@ -37,6 +40,7 @@ struct GoldaApp: App {
                         // After the launch command, which wipes this phone's settings with the books.
                         await voice.start()
                         model.startReminders()
+                        await model.sync.start()
                     }
             case .failed(let reason):
                 DataFailureView(reason: reason, retry: reopen)
@@ -81,11 +85,8 @@ enum AppLaunch {
             VoiceNoteLauncher.shared.background = BackgroundVoiceNote.live(model: model, mic: voice)
             VoiceNoteLauncher.shared.appIsActive = { UIApplication.shared.applicationState == .active }
         }
-        #if DEBUG
-        // The sync spike follows CloudKit from launch once it was opened on this phone, so a push
-        // finds its engines. Never in tests or in-memory runs.
-        if !options.isHostingTests, !options.inMemory { SyncSpike.shared.startIfEnabled() }
-        #endif
+        // An invitation the scene was launched with goes to this run's sync.
+        if !options.isHostingTests { ShareInvitations.attach(model.sync) }
         return .opened(model, voice)
     }
 }

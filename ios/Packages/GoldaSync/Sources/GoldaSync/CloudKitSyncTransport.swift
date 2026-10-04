@@ -1,36 +1,48 @@
 import CloudKit
 import Foundation
+import GoldaData
 
 /// Sync over CloudKit: one `CKSyncEngine` on the private database (this person's profiles) and one
 /// on the shared database (the profiles others shared with them), one zone per profile and one
-/// `CKShare` per zone (ARCHITECTURE, «Синхронизация и шаринг»).
+/// `CKShare` per zone (ARCHITECTURE, «Синхронизация и шаринг»). Verified on two iPhones with
+/// different Apple IDs in spike 5a (S1).
 ///
 /// The engines decide when to fetch and send, listen to CloudKit's silent pushes and retry what
 /// the network failed; their state goes into the `SyncStore` on every `stateUpdate`, so a new
-/// process resumes from the same change tokens and pending changes.
+/// process resumes from the same change tokens and pending changes. When the server asks to wait
+/// (`retryAfterSeconds`), the change leaves the engine and comes back to it only then.
 public actor CloudKitSyncTransport: SyncTransport, CKSyncEngineDelegate {
     public nonisolated let container: CKContainer
     private let store: SyncStore
     private let log: @Sendable (SyncLogEntry) -> Void
+    private let problem: @Sendable (SyncProblem) -> Void
     private let now: @Sendable () -> Int64
     private var engines: [SyncScope: CKSyncEngine] = [:]
     private var wakeUp: Task<Void, Never>?
+    private var accountChanged: (@Sendable () async -> Void)?
+    /// Not before these moments (ms) may a zone's share be asked for again: the server said so.
+    private var shareNotBefore: [SyncZone: Int64] = [:]
 
+    /// [problem] hears what went wrong while the engines worked on their own (a full iCloud, a
+    /// request to wait), so the app can say it; [log] hears everything, for the debug screen.
     public init(
         containerIdentifier: String, store: SyncStore,
         now: @escaping @Sendable () -> Int64 = { Int64(Date().timeIntervalSince1970 * 1000) },
-        log: @escaping @Sendable (SyncLogEntry) -> Void
+        problem: @escaping @Sendable (SyncProblem) -> Void = { _ in },
+        log: @escaping @Sendable (SyncLogEntry) -> Void = { _ in }
     ) {
         container = CKContainer(identifier: containerIdentifier)
         self.store = store
         self.now = now
+        self.problem = problem
         self.log = log
     }
 
     // MARK: SyncTransport
 
-    public func start() async throws {
+    public func start(accountChanged: @escaping @Sendable () async -> Void) async throws {
         guard engines.isEmpty else { return }
+        self.accountChanged = accountChanged
         for scope in SyncScope.allCases {
             let serialization = try await store.engineState(scope).flatMap {
                 try? JSONDecoder().decode(CKSyncEngine.State.Serialization.self, from: $0)
@@ -103,50 +115,88 @@ public actor CloudKitSyncTransport: SyncTransport, CKSyncEngineDelegate {
         } else {
             try await leave(zone)
         }
-        try await store.removeZone(zone)
     }
 
     public func stopSharing(_ zone: SyncZone) async throws {
         guard zone.isOwned else { throw SyncTransportError.notOwner }
-        _ = try await container.privateCloudDatabase.deleteRecord(withID: zone.shareRecordID)
+        do {
+            _ = try await container.privateCloudDatabase.deleteRecord(withID: zone.shareRecordID)
+        } catch let error as CKError where error.code == .unknownItem {
+            // Not shared any more: what was asked is done.
+        }
         say(.private, "deleted the share of \(zone.zoneName)")
+    }
+
+    public func participants(of zone: SyncZone) async throws -> [SyncParticipant] {
+        guard let share = try await existingShare(zone) else { return [] }
+        return share.participants.map { participant in
+            let identity = participant.userIdentity
+            let name = identity.nameComponents.map { PersonNameComponentsFormatter.localizedString(from: $0, style: .default) }
+                .flatMap { $0.isEmpty ? nil : $0 }
+                ?? identity.lookupInfo?.emailAddress ?? identity.lookupInfo?.phoneNumber
+            let status: SyncParticipant.Status = switch participant.acceptanceStatus {
+            case .accepted: .joined
+            case .removed: .removed
+            default: .invited
+            }
+            return SyncParticipant(
+                id: identity.userRecordID?.recordName ?? UUID().uuidString, name: name,
+                isOwner: participant.role == .owner, isCurrentUser: participant == share.currentUserParticipant,
+                status: status, canWrite: participant.permission == .readWrite
+            )
+        }
     }
 
     // MARK: Sharing
 
-    /// The zone's share, created on first use: everyone invited may read and write (O3, by default).
-    /// The zone has to be on the server first, so the queue is sent before.
+    /// The zone's share, created on first use: only the people invited may join, and they may read
+    /// and write (O3). The zone has to be on the server first, so the queue is sent before. When
+    /// the server asked to wait, asking again before then fails at once with how long is left,
+    /// without a request.
     public func share(_ zone: SyncZone, title: String) async throws -> CKShare {
         guard zone.isOwned else { throw SyncTransportError.notOwner }
-        try await sendNow()
+        if let notBefore = shareNotBefore[zone], notBefore > now() {
+            throw SyncProblem.retryLater(seconds: Int((notBefore - now() + 999) / 1000))
+        }
         do {
-            if let existing = try await container.privateCloudDatabase.record(for: zone.shareRecordID) as? CKShare {
-                say(.private, "share exists: \(existing.participants.count) participant(s), url \(existing.url?.absoluteString ?? "none")")
+            try await sendNow()
+            if let existing = try await existingShare(zone) {
+                say(.private, "share exists: \(existing.participants.count) participant(s)")
                 return existing
             }
-        } catch let error as CKError where error.code == .unknownItem {
-            // No share yet.
+            let share = CKShare(recordZoneID: zone.zoneID)
+            share[CKShare.SystemFieldKey.title] = title
+            share.publicPermission = .none
+            let (saved, _) = try await container.privateCloudDatabase.modifyRecords(saving: [share], deleting: [])
+            guard let result = saved[share.recordID] else { throw SyncTransportError.shareNotSaved }
+            let created = try result.get()
+            say(.private, "share created for \(zone.zoneName)")
+            shareNotBefore[zone] = nil
+            return created as? CKShare ?? share
+        } catch {
+            let problem = SyncProblem(error)
+            if case .retryLater(let seconds) = problem {
+                shareNotBefore[zone] = now() + Int64(seconds) * 1000
+            }
+            say(.private, "share failed: \(error)")
+            throw problem
         }
-        let share = CKShare(recordZoneID: zone.zoneID)
-        share[CKShare.SystemFieldKey.title] = title
-        share.publicPermission = .none
-        let (saved, _) = try await container.privateCloudDatabase.modifyRecords(saving: [share], deleting: [])
-        guard let result = saved[share.recordID] else { throw SyncTransportError.shareNotSaved }
-        let created = try result.get()
-        say(.private, "share created for \(zone.zoneName)")
-        return created as? CKShare ?? share
     }
 
     /// The share as the server has it now, nil when the zone is not shared.
-    public func existingShare(_ zone: SyncZone) async -> CKShare? {
+    public func existingShare(_ zone: SyncZone) async throws -> CKShare? {
         let database = zone.isOwned ? container.privateCloudDatabase : container.sharedCloudDatabase
-        return try? await database.record(for: zone.shareRecordID) as? CKShare
+        do {
+            return try await database.record(for: zone.shareRecordID) as? CKShare
+        } catch let error as CKError where error.code == .unknownItem || error.code == .zoneNotFound {
+            return nil
+        }
     }
 
     /// Accepts an invitation the system handed to the scene, then fetches the shared database so
     /// the profile shows up at once.
     public func accept(_ metadata: CKShare.Metadata) async throws {
-        say(.shared, "accepting share \(metadata.share.recordID.zoneID.zoneName) from \(metadata.ownerIdentity.nameComponents?.formatted() ?? "?")")
+        say(.shared, "accepting share \(metadata.share.recordID.zoneID.zoneName)")
         let results = try await container.accept([metadata])
         if case .failure(let error)? = results[metadata] { throw error }
         say(.shared, "accepted")
@@ -154,11 +204,13 @@ public actor CloudKitSyncTransport: SyncTransport, CKSyncEngineDelegate {
     }
 
     /// A participant leaves by deleting the share from their shared database; if CloudKit refuses,
-    /// deleting the zone there is the other documented way. Which one worked goes to the log.
+    /// deleting the zone there is the other documented way.
     private func leave(_ zone: SyncZone) async throws {
         do {
             _ = try await container.sharedCloudDatabase.deleteRecord(withID: zone.shareRecordID)
             say(.shared, "left \(zone.zoneName) by deleting the share")
+        } catch let error as CKError where error.code == .unknownItem || error.code == .zoneNotFound {
+            say(.shared, "\(zone.zoneName) was already gone")
         } catch {
             say(.shared, "deleting the share failed (\(error)); deleting the zone instead")
             _ = try await container.sharedCloudDatabase.modifyRecordZones(saving: [], deleting: [zone.zoneID])
@@ -182,13 +234,20 @@ public actor CloudKitSyncTransport: SyncTransport, CKSyncEngineDelegate {
                 }
                 for deletion in changes.deletions {
                     say(scope, "zone gone (\(deletion.reason)): \(deletion.zoneID.zoneName)")
-                    if let zone = SyncZone(zoneID: deletion.zoneID, scope: scope) { try await store.removeZone(zone) }
+                    guard let zone = SyncZone(zoneID: deletion.zoneID, scope: scope) else { continue }
+                    // Someone else's zone, or one its owner deleted: the profile goes. An own zone
+                    // the server lost (iCloud data deleted, encryption reset) keeps the books here.
+                    let loss: SyncStore.ZoneLoss = scope == .shared || deletion.reason == .deleted ? .deleted : .lostOnServer
+                    try await store.zoneGone(zone, loss)
                 }
             case .fetchedRecordZoneChanges(let changes):
                 try await fetched(changes, scope: scope)
             case .sentDatabaseChanges(let sent):
                 for zone in sent.savedZones { say(scope, "zone saved: \(zone.zoneID.zoneName)") }
-                for failure in sent.failedZoneSaves { say(scope, "zone save failed: \(failure.zone.zoneID.zoneName) \(failure.error.code)") }
+                for failure in sent.failedZoneSaves {
+                    say(scope, "zone save failed: \(failure.zone.zoneID.zoneName) \(failure.error.code)")
+                    problem(SyncProblem(failure.error))
+                }
                 for id in sent.deletedZoneIDs { say(scope, "zone deleted: \(id.zoneName)") }
                 for (id, error) in sent.failedZoneDeletes { say(scope, "zone delete failed: \(id.zoneName) \(error.code)") }
             case .sentRecordZoneChanges(let sent):
@@ -247,7 +306,7 @@ public actor CloudKitSyncTransport: SyncTransport, CKSyncEngineDelegate {
     }
 
     /// What the server did with a sent batch: confirmations leave the queue, conflicts are settled
-    /// by last writer wins, a missing zone is created again.
+    /// by last writer wins, a missing zone is created again, and a request to wait is honoured.
     private func sentChanges(_ sent: CKSyncEngine.Event.SentRecordZoneChanges, scope: SyncScope, engine: CKSyncEngine) async throws {
         for ck in sent.savedRecords {
             guard let ref = SyncRecordRef(recordID: ck.recordID, scope: scope) else { continue }
@@ -263,6 +322,7 @@ public actor CloudKitSyncTransport: SyncTransport, CKSyncEngineDelegate {
             say(scope, "sent \(sent.savedRecords.count) save(s), \(sent.deletedRecordIDs.count) delete(s)")
         }
         var again: [SyncRecordRef] = []
+        var waiting: [(SyncRecordRef, CKSyncEngine.PendingRecordZoneChange, CKError)] = []
         for failure in sent.failedRecordSaves {
             guard let ref = SyncRecordRef(recordID: failure.record.recordID, scope: scope) else { continue }
             say(scope, "save failed: \(ref.recordName) \(failure.error.code)")
@@ -279,46 +339,76 @@ public actor CloudKitSyncTransport: SyncTransport, CKSyncEngineDelegate {
                     engine.state.add(pendingDatabaseChanges: [.saveZone(CKRecordZone(zoneID: ref.zone.zoneID))])
                     again.append(ref)
                 } else {
-                    try await store.removeZone(ref.zone)
+                    try await store.zoneGone(ref.zone, .deleted)
                 }
             case .unknownItem:
                 try await store.setSystemFields(nil, for: ref)
                 again.append(ref)
+            case .batchRequestFailed:
+                // Another record of the batch failed; this one goes with the next batch.
+                again.append(ref)
             default:
-                // Network, throttling, quota: the engine retries what is still pending.
-                break
+                waiting.append((ref, .saveRecord(failure.record.recordID), failure.error))
             }
         }
         for (id, error) in sent.failedRecordDeletes {
             guard let ref = SyncRecordRef(recordID: id, scope: scope) else { continue }
-            if error.code == .unknownItem {
+            if error.code == .unknownItem || error.code == .zoneNotFound {
                 try await store.confirm(.delete, of: ref)
             } else {
                 say(scope, "delete failed: \(ref.recordName) \(error.code)")
+                waiting.append((ref, .deleteRecord(id), error))
             }
         }
+        try await postpone(waiting, engine: engine)
         if !again.isEmpty {
             try await store.rehand(again)
             await outgoingChanged()
         }
     }
 
+    /// Changes the server refused for now. With a time to wait (`retryAfterSeconds`), or a full
+    /// iCloud, they leave the engine, which would otherwise try again at once and again, and come
+    /// back to it when the time is up (`scheduleWakeUp`). The engine retries the rest (a lost
+    /// network) on its own.
+    private func postpone(_ refused: [(SyncRecordRef, CKSyncEngine.PendingRecordZoneChange, CKError)], engine: CKSyncEngine) async throws {
+        guard !refused.isEmpty else { return }
+        var latest: SyncProblem?
+        for (ref, change, error) in refused {
+            let seconds = error.retryAfterSeconds ?? (error.code == .quotaExceeded ? Self.fullQuotaPause : nil)
+            latest = SyncProblem(error)
+            guard let seconds else { continue }
+            engine.state.remove(pendingRecordZoneChanges: [change])
+            try await store.postpone([ref], until: now() + Int64((seconds * 1000).rounded(.up)))
+            say(ref.zone.scope, "postponed \(ref.recordName) by \(Int(seconds)) s")
+        }
+        if let latest { problem(latest) }
+        scheduleWakeUp(at: try await store.nextDue(after: now()))
+    }
+
+    /// How long a change waits after a full iCloud that named no time: long enough not to hammer
+    /// the server, short enough that freeing space is soon noticed.
+    static let fullQuotaPause: TimeInterval = 300
+
     private func accountChanged(_ change: CKSyncEngine.Event.AccountChange, scope: SyncScope) async throws {
         switch change.changeType {
         case .signIn:
             say(scope, "iCloud signed in")
         case .signOut, .switchAccounts:
-            // Another person's data must not stay, nor go to their iCloud.
-            say(scope, "iCloud signed out or switched: local sync data wiped")
-            try await store.wipe()
+            // The old account's shares leave the phone; its own books stay, for the new account.
+            say(scope, "iCloud signed out or switched: sync state reset, shared profiles removed")
+            try await store.resetForAccountChange()
         @unknown default:
             say(scope, "account change \(change)")
         }
+        // Both engines hear of it; one notice to the app is enough.
+        if scope == .private { await accountChanged?() }
     }
 
     // MARK: Helpers
 
-    /// Hands the next waiting delete over when its undo window ends.
+    /// Hands the next waiting change over when its time comes: a delete's undo window, a wait the
+    /// server asked for.
     private func scheduleWakeUp(at moment: Int64?) {
         wakeUp?.cancel()
         guard let moment else { return }
@@ -333,10 +423,4 @@ public actor CloudKitSyncTransport: SyncTransport, CKSyncEngineDelegate {
     private nonisolated func say(_ scope: SyncScope?, _ message: String) {
         log(SyncLogEntry(scope: scope, message: message))
     }
-}
-
-public enum SyncTransportError: Error, Sendable {
-    /// Only the owner may create, share and stop sharing a zone.
-    case notOwner
-    case shareNotSaved
 }

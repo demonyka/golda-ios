@@ -120,6 +120,28 @@ final class ProfilesUITests: XCTestCase {
         XCTAssertTrue(app.descendants(matching: .any)["profile.lastProfileReason"].exists)
     }
 
+    /// The simulator has no iCloud: the profile's screen offers no invitation and says why, the
+    /// books work as ever, and there is nothing to leave or stop (stage 5c).
+    @MainActor
+    func testWithoutICloudSharingIsOffAndSaysWhy() {
+        let app = launch()
+        XCTAssertTrue(hero(app).waitForExistence(timeout: 30))
+        openProfiles(app)
+        row("Personal, active", in: app).tap()
+
+        let invite = app.buttons["profile.invite"]
+        reveal(invite, in: app)
+        XCTAssertTrue(invite.exists)
+        XCTAssertFalse(invite.isEnabled, "no iCloud, no invitation")
+        XCTAssertEqual(invite.label, "Invite…")
+        let note = app.staticTexts["profile.sharingNote"]
+        XCTAssertTrue(note.exists)
+        XCTAssertTrue(note.label.contains("sign in to iCloud"), note.label)
+        XCTAssertFalse(app.buttons["profile.stopSharing"].exists)
+        XCTAssertFalse(app.buttons["profile.leave"].exists)
+        XCTAssertTrue(app.buttons["profile.delete"].exists)
+    }
+
     @MainActor
     func testANewPaydayChangesTheDaysToPaydayOnHome() {
         let app = launch()

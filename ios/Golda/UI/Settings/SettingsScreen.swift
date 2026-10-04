@@ -298,13 +298,13 @@ struct SettingsScreen: View {
             }
             .accessibilityIdentifier("settings.licences.row")
             #if DEBUG
-            // Stage 5a's CloudKit spike; debug builds only, so its English text never ships.
+            // What sync is doing, for diagnostics; debug builds only, so its English text never ships.
             NavigationLink {
-                SyncSpikeScreen()
+                SyncDebugScreen()
             } label: {
-                SettingRow(title: "Sync spike", symbol: "icloud", detail: "Debug: CloudKit sharing test")
+                SettingRow(title: "Sync", symbol: "icloud", detail: "Debug: iCloud queue and log")
             }
-            .accessibilityIdentifier("settings.syncSpike.row")
+            .accessibilityIdentifier("settings.syncDebug.row")
             #endif
         } header: {
             Text(verbatim: SettingsText.about.text(in: locale))

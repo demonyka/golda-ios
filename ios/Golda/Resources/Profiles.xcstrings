@@ -453,6 +453,23 @@
         }
       }
     },
+    "Can only view" : {
+      "comment" : "Profile screen, sharing: beside a person who may not change the profile.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Can only view"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Только просмотр"
+          }
+        }
+      }
+    },
     "Cancel" : {
       "comment" : "Closes an alert or a sheet without changes.",
       "localizations" : {
@@ -640,6 +657,40 @@
         }
       }
     },
+    "Everyone here sees and changes this profile, and gets the same “Safe to spend today”. It’s kept in your iCloud." : {
+      "comment" : "Profile screen, sharing: the owner's profile that others joined.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Everyone here sees and changes this profile, and gets the same “Safe to spend today”. It’s kept in your iCloud."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все участники видят и меняют этот профиль, и «Можно сегодня» у всех одно. Профиль хранится в вашем iCloud."
+          }
+        }
+      }
+    },
+    "Everyone you invited loses this profile on their phones. It stays on yours." : {
+      "comment" : "The question before the owner stops sharing a profile.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Everyone you invited loses this profile on their phones. It stays on yours."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все приглашённые потеряют этот профиль на своих телефонах. У вас он останется."
+          }
+        }
+      }
+    },
     "Everything in it goes too: %@. This can’t be undone." : {
       "comment" : "Question before a profile is deleted: what goes with it, “7 accounts, 25 operations and 2 payments”.",
       "localizations" : {
@@ -670,6 +721,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Обмен"
+          }
+        }
+      }
+    },
+    "Hasn’t joined yet" : {
+      "comment" : "Profile screen, sharing: beside a person who was invited and has not accepted.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hasn’t joined yet"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Приглашение ещё не принято"
           }
         }
       }
@@ -725,6 +793,74 @@
         }
       }
     },
+    "Invite your partner or friends by AirDrop, Messages or Mail: they’ll see and change this profile’s accounts, operations, goals and payments. Your other profiles stay yours." : {
+      "comment" : "Profile screen, sharing: what inviting does, before anyone is invited.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invite your partner or friends by AirDrop, Messages or Mail: they’ll see and change this profile’s accounts, operations, goals and payments. Your other profiles stay yours."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пригласите партнёра или друзей через AirDrop, Сообщения или Почту: они будут видеть и менять счета, операции, цели и платежи этого профиля. Другие ваши профили останутся только вашими."
+          }
+        }
+      }
+    },
+    "Invited person" : {
+      "comment" : "Profile screen, sharing: a person iCloud gives no name for.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invited person"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Приглашённый"
+          }
+        }
+      }
+    },
+    "Invite…" : {
+      "comment" : "Profile screen, sharing: opens the share sheet to invite someone by AirDrop, Messages or Mail.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invite…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пригласить…"
+          }
+        }
+      }
+    },
+    "It also goes from the phones of everyone you shared it with." : {
+      "comment" : "Question before the owner deletes a shared profile: the others lose it too.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It also goes from the phones of everyone you shared it with."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Он пропадёт и у всех, с кем вы им поделились."
+          }
+        }
+      }
+    },
     "Its accounts, operations, goals, wishlist and payments go too. This can’t be undone." : {
       "comment" : "Question before a profile is deleted, when its contents could not be counted.",
       "localizations" : {
@@ -738,6 +874,57 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Вместе с профилем удалятся его счета, операции, цели, вишлист и платежи. Это не отменить."
+          }
+        }
+      }
+    },
+    "Leave" : {
+      "comment" : "Confirms leaving a profile someone shared with this person.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leave"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выйти"
+          }
+        }
+      }
+    },
+    "Leave profile" : {
+      "comment" : "Profile screen and list: a participant leaves a profile someone shared with them.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leave profile"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выйти из профиля"
+          }
+        }
+      }
+    },
+    "Leave “%@”?" : {
+      "comment" : "Title of the question before a participant leaves a shared profile, with its name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leave “%@”?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выйти из «%@»?"
           }
         }
       }
@@ -861,6 +1048,23 @@
         }
       }
     },
+    "No connection to iCloud. Changes will go once it’s back." : {
+      "comment" : "A sync problem: no network or iCloud did not answer.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No connection to iCloud. Changes will go once it’s back."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет связи с iCloud. Изменения уйдут, когда она появится."
+          }
+        }
+      }
+    },
     "OK" : {
       "comment" : "Closes the message that a change was not saved.",
       "localizations" : {
@@ -874,6 +1078,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ОК"
+          }
+        }
+      }
+    },
+    "Owner" : {
+      "comment" : "Profile screen, sharing: beside the name of the person whose profile it is.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Owner"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Владелец"
           }
         }
       }
@@ -1065,6 +1286,108 @@
         }
       }
     },
+    "Shared with you by its owner, %@. Everyone in it sees the same accounts and “Safe to spend today”." : {
+      "comment" : "Profile screen, sharing: a profile someone shared with this person, with the owner's name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shared with you by its owner, %@. Everyone in it sees the same accounts and “Safe to spend today”."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Владелец профиля — %@. Все участники видят одни и те же счета и одно «Можно сегодня»."
+          }
+        }
+      }
+    },
+    "Sharing" : {
+      "comment" : "Profile screen: the header over inviting people to the profile.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sharing"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Совместный доступ"
+          }
+        }
+      }
+    },
+    "Sign in to iCloud in the Settings app to share and sync profiles." : {
+      "comment" : "A sync problem: no iCloud account.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in to iCloud in the Settings app to share and sync profiles."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Войдите в iCloud в приложении «Настройки», чтобы делиться профилями и синхронизировать их."
+          }
+        }
+      }
+    },
+    "Someone shared this profile with you. Everyone in it sees the same accounts and “Safe to spend today”." : {
+      "comment" : "Profile screen, sharing: a profile shared with this person, when the owner's name is not known.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Someone shared this profile with you. Everyone in it sees the same accounts and “Safe to spend today”."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Этим профилем с вами поделились. Все участники видят одни и те же счета и одно «Можно сегодня»."
+          }
+        }
+      }
+    },
+    "Stop sharing" : {
+      "comment" : "Profile screen, sharing: the owner takes the profile away from everyone invited.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop sharing"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закрыть доступ"
+          }
+        }
+      }
+    },
+    "Stop sharing “%@”?" : {
+      "comment" : "Title of the question before the owner stops sharing a profile, with its name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop sharing “%@”?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закрыть доступ к «%@»?"
+          }
+        }
+      }
+    },
     "Tax" : {
       "comment" : "Tax and hours sheet: the income tax in percent.",
       "localizations" : {
@@ -1133,6 +1456,40 @@
         }
       }
     },
+    "The owner hasn’t allowed you to change this profile." : {
+      "comment" : "A sync problem: a participant with read-only access.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The owner hasn’t allowed you to change this profile."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Владелец не разрешил вам менять этот профиль."
+          }
+        }
+      }
+    },
+    "The profile goes from this phone; its owner keeps it. To come back, ask them for a new invitation." : {
+      "comment" : "Question before a participant leaves a shared profile.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The profile goes from this phone; its owner keeps it. To come back, ask them for a new invitation."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Профиль исчезнет с этого телефона, у владельца он останется. Чтобы вернуться, попросите новое приглашение."
+          }
+        }
+      }
+    },
     "There is nothing in it yet." : {
       "comment" : "Question before an empty profile is deleted.",
       "localizations" : {
@@ -1146,6 +1503,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "В профиле пока ничего нет."
+          }
+        }
+      }
+    },
+    "To share this profile, sign in to iCloud in the Settings app. Everything stays on this phone until then." : {
+      "comment" : "Profile screen, sharing: why inviting is not offered without iCloud.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To share this profile, sign in to iCloud in the Settings app. Everything stays on this phone until then."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Чтобы делиться профилем, войдите в iCloud в приложении «Настройки». До тех пор всё хранится только на этом телефоне."
           }
         }
       }
@@ -1265,6 +1639,57 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ч"
+          }
+        }
+      }
+    },
+    "iCloud asked to wait. Try again in %lld min." : {
+      "comment" : "A sync problem: the server asked to wait, with the minutes to wait.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud asked to wait. Try again in %lld min."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud попросил подождать. Попробуйте через %lld мин."
+          }
+        }
+      }
+    },
+    "iCloud didn’t take the change (error %lld). Try again later." : {
+      "comment" : "A sync problem iCloud gave no reason for, with its error code.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud didn’t take the change (error %lld). Try again later."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud не принял изменение (ошибка %lld). Попробуйте позже."
+          }
+        }
+      }
+    },
+    "iCloud storage is full. Free up space, and changes will go on syncing." : {
+      "comment" : "A sync problem: the iCloud of the profile's owner is full.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud storage is full. Free up space, and changes will go on syncing."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Хранилище iCloud заполнено. Освободите место, и изменения снова начнут синхронизироваться."
           }
         }
       }

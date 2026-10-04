@@ -8,6 +8,8 @@ enum Schema {
     static var migrator: DatabaseMigrator {
         var migrator = DatabaseMigrator()
         migrator.registerMigration("v1", migrate: v1)
+        // Sync (stage 5b): the queue, the journal the triggers fill, the zones, the inbox.
+        migrator.registerMigration("v2", migrate: SyncSchema.v2)
         return migrator
     }
 

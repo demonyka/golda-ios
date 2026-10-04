@@ -41,6 +41,8 @@ final class AppModel {
     let reminders: ReminderScheduler
     /// The snapshot the «Можно сегодня» widgets read (`AppModel+Widgets`).
     @ObservationIgnored let widgets: TodayWidgetPublisher
+    /// Sync and sharing of the profiles (`AppSync`, `AppModel+Sharing`).
+    let sync: AppSync
 
     /// By `sort`, then id.
     private(set) var profiles: [Profile] = []
@@ -69,7 +71,10 @@ final class AppModel {
         self.environment = environment
         reminders = ReminderScheduler(environment: environment)
         widgets = TodayWidgetPublisher(environment: environment)
+        sync = AppSync(database: environment.database, backend: environment.syncBackend, clock: environment.clock)
         device = environment.deviceSettings.current
+        // A profile that arrived through an invitation opens at once.
+        sync.onJoined = { [weak self] profileId in self?.joined(profileId) }
     }
 
     isolated deinit {
@@ -212,7 +217,14 @@ final class AppModel {
         isBeginningOnboarding = true
         defer { isBeginningOnboarding = false }
         await reloadProfiles()
-        guard profiles.isEmpty else { return }
+        // A profile someone shared through the invitation that installed the app is not the
+        // person's own: the steps set up their own one, never another person's income.
+        await sync.reloadZones()
+        let own = profiles.filter { !sync.isParticipant(in: $0.id) }
+        if let first = own.first {
+            if sync.isParticipant(in: activeProfileId ?? first.id) { switchProfile(to: first.id) }
+            return
+        }
         try await createProfile(name: profileName)
     }
 
@@ -390,7 +402,7 @@ final class AppModel {
         publishWidgets()
     }
 
-    private func reloadProfiles() async {
+    func reloadProfiles() async {
         do {
             let fresh = try await environment.database.read { try $0.profiles() }
             if fresh != profiles { profiles = fresh }

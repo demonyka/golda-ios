@@ -5,12 +5,17 @@ import GRDB
 /// `write`, each one transaction; screens follow `profiles()`, `snapshots(profileId:)` and `rates()`.
 public final class GoldaDatabase: Sendable {
     let writer: any DatabaseWriter
+    /// Epoch milliseconds now: when a change to the books is stamped for sync (last writer wins).
+    let clock: @Sendable () -> Int64
 
-    private init(_ writer: any DatabaseWriter, eraseDatabaseOnSchemaChange: Bool = false) throws {
+    private init(
+        _ writer: any DatabaseWriter, eraseDatabaseOnSchemaChange: Bool = false, clock: (@Sendable () -> Int64)?
+    ) throws {
         var migrator = Schema.migrator
         migrator.eraseDatabaseOnSchemaChange = eraseDatabaseOnSchemaChange
         try migrator.migrate(writer)
         self.writer = writer
+        self.clock = clock ?? { Int64(Date().timeIntervalSince1970 * 1000) }
     }
 
     /// The database file at [url], created with its folder when missing. A pool in WAL mode, so
@@ -21,17 +26,21 @@ public final class GoldaDatabase: Sendable {
     /// unreleased migration edited in place leaves older files with its old shape, which the
     /// migrator counts as applied, and every read of the changed tables then fails. Off, such a
     /// file is left exactly as it is.
-    public static func open(at url: URL, eraseDatabaseOnSchemaChange: Bool = false) throws -> GoldaDatabase {
+    ///
+    /// [clock] stamps each change for sync; nil is the phone's clock.
+    public static func open(
+        at url: URL, eraseDatabaseOnSchemaChange: Bool = false, clock: (@Sendable () -> Int64)? = nil
+    ) throws -> GoldaDatabase {
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
         return try GoldaDatabase(
             DatabasePool(path: url.path, configuration: configuration),
-            eraseDatabaseOnSchemaChange: eraseDatabaseOnSchemaChange
+            eraseDatabaseOnSchemaChange: eraseDatabaseOnSchemaChange, clock: clock
         )
     }
 
     /// A private database that lives as long as this value: tests and UI test runs.
-    public static func inMemory() throws -> GoldaDatabase {
-        try GoldaDatabase(DatabaseQueue(configuration: configuration))
+    public static func inMemory(clock: (@Sendable () -> Int64)? = nil) throws -> GoldaDatabase {
+        try GoldaDatabase(DatabaseQueue(configuration: configuration), clock: clock)
     }
 
     private static var configuration: Configuration {
@@ -45,10 +54,17 @@ public final class GoldaDatabase: Sendable {
         try await writer.read { db in try body(Store(db: db)) }
     }
 
-    /// Runs [body] in one transaction: it all lands, or nothing does when it throws.
+    /// Runs [body] in one transaction: it all lands, or nothing does when it throws. What it
+    /// changed in the books joins the sync queue in the same transaction (`SyncLedger`), so no
+    /// change can reach the books without its way to the other phones, nor the other way round.
     @discardableResult
     public func write<T: Sendable>(_ body: @Sendable (Store) throws -> T) async throws -> T {
-        try await writer.write { db in try body(Store(db: db)) }
+        let clock = clock
+        return try await writer.write { db in
+            let result = try body(Store(db: db))
+            try SyncLedger.flush(db, now: clock())
+            return result
+        }
     }
 
     /// Every profile, again after each change to the table.

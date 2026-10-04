@@ -1,13 +1,15 @@
 import GoldaCore
 import GoldaData
+import GoldaSync
 import OSLog
 import SwiftUI
 
 private let log = Logger(subsystem: "com.f4studio.golda", category: "Profiles")
 
 /// One profile's own screen: its name and whether it is the active one, the income (rate, tax and
-/// hours, payday, an hour after tax), the markup over the CBR, the monthly payments and deleting
-/// it. What Android kept in its settings and belongs to a profile here (D21).
+/// hours, payday, an hour after tax), the markup over the CBR, the monthly payments, who it is
+/// shared with, and deleting it (or leaving it, when it is someone else's). What Android kept in
+/// its settings and belongs to a profile here (D21).
 ///
 /// It follows the profile's books itself, so any profile can be set up, the active one or not; a
 /// change to the active one shows on Home at once. When the profile goes (deleted here or
@@ -26,6 +28,11 @@ struct ProfileScreen: View {
     @State private var deletion: ProfileDeletion?
     @State private var toast: UndoToast?
     @State private var failed = false
+    /// Who the profile is shared with, as iCloud last said.
+    @State private var participants: [SyncParticipant] = []
+    @State private var askingToStopSharing = false
+    /// Why a sharing action failed, in words.
+    @State private var sharingFailure: String?
 
     /// The small sheet open over the screen.
     private enum Edit: String, Identifiable {
@@ -69,9 +76,11 @@ struct ProfileScreen: View {
             Text(verbatim: deletion?.title(in: locale) ?? ""),
             isPresented: Binding(get: { deletion != nil }, set: { if !$0 { deletion = nil } }),
             presenting: deletion
-        ) { _ in
-            Button(role: .destructive, action: deleteProfile) {
-                Text(verbatim: ProfileDeletion.confirmTitle.text(in: locale))
+        ) { deletion in
+            Button(role: .destructive) {
+                deleteProfile(leaving: deletion.sharing == .sharedWithMe)
+            } label: {
+                Text(verbatim: deletion.confirmAction.text(in: locale))
             }
             Button(role: .cancel) {} label: {
                 Text("Cancel", tableName: "Profiles", comment: "Closes an alert or a sheet without changes.")
@@ -84,7 +93,37 @@ struct ProfileScreen: View {
                 Text("OK", tableName: "Profiles", comment: "Closes the message that a change was not saved.")
             }
         }
+        .alert(
+            Text(verbatim: ProfileSharing.stopQuestion(snapshot?.profile.name ?? "", in: locale)),
+            isPresented: $askingToStopSharing
+        ) {
+            Button(role: .destructive, action: stopSharing) {
+                Text(verbatim: ProfileSharing.stopTitle.text(in: locale))
+            }
+            Button(role: .cancel) {} label: {
+                Text("Cancel", tableName: "Profiles", comment: "Closes an alert or a sheet without changes.")
+            }
+        } message: {
+            Text(verbatim: ProfileSharing.stopQuestionMessage.text(in: locale))
+        }
+        .alert(
+            Text(verbatim: sharingFailure ?? ""),
+            isPresented: Binding(get: { sharingFailure != nil }, set: { if !$0 { sharingFailure = nil } })
+        ) {
+            Button(role: .cancel) {} label: {
+                Text("OK", tableName: "Profiles", comment: "Closes the message that a change was not saved.")
+            }
+        }
+        .task(id: model.sync.zones[profileId]) { await loadParticipants() }
         .undoToast($toast)
+    }
+
+    /// What this person may do about sharing the profile, now.
+    private var sharing: ProfileSharing {
+        ProfileSharing(
+            role: model.sync.isParticipant(in: profileId) ? .participant : .owner,
+            availability: model.sync.availability, participants: participants, problem: model.sync.problem
+        )
     }
 
     // MARK: Content
@@ -143,29 +182,123 @@ struct ProfileScreen: View {
                 Text(verbatim: Self.paymentsNote.text(in: locale))
             }
 
+            sharingSection(profile, sharing: sharing)
+
             Section {
-                Button(role: .destructive) {
-                    deletion = ProfileDeletion(name: profile.name, contents: ProfileContents(snapshot))
-                } label: {
-                    // Red only while it can delete; the last profile's row reads as unavailable.
-                    ActionRowLabel(
-                        title: ProfileDeletion.actionTitle.text(in: locale), symbol: Symbols.delete,
-                        ink: AnyShapeStyle(canDelete ? Theme.Color.danger : Theme.Color.muted)
-                    )
+                if sharing.canLeave {
+                    // Leaving takes the profile from this phone, which is bad news: red, as a delete.
+                    Button(role: .destructive) {
+                        deletion = ProfileDeletion(name: profile.name, contents: nil, sharing: .sharedWithMe)
+                    } label: {
+                        ActionRowLabel(
+                            title: ProfileSharing.leaveTitle.text(in: locale), symbol: ProfileSymbols.leave,
+                            ink: AnyShapeStyle(Theme.Color.danger)
+                        )
+                    }
+                    .accessibilityIdentifier("profile.leave")
+                } else {
+                    Button(role: .destructive) {
+                        deletion = ProfileDeletion(name: profile.name, contents: ProfileContents(snapshot), sharing: sharing.deletionKind)
+                    } label: {
+                        // Red only while it can delete; the last profile's row reads as unavailable.
+                        ActionRowLabel(
+                            title: ProfileDeletion.actionTitle.text(in: locale), symbol: Symbols.delete,
+                            ink: AnyShapeStyle(canDelete ? Theme.Color.danger : Theme.Color.muted)
+                        )
+                    }
+                    .disabled(!canDelete)
+                    .accessibilityIdentifier("profile.delete")
                 }
-                .disabled(!canDelete)
-                .accessibilityIdentifier("profile.delete")
             } footer: {
-                if !canDelete {
+                if !canDelete, !sharing.canLeave {
                     Text(verbatim: ProfileDeletion.lastProfileReason.text(in: locale))
                         .accessibilityIdentifier("profile.lastProfileReason")
                 }
             }
         }
+        .refreshable {
+            await model.sync.syncNow()
+            await loadParticipants()
+        }
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .background(Theme.Color.page)
         .animation(.snappy, value: snapshot.obligations)
+    }
+
+    /// Who the profile is shared with, "Пригласить…" (the system share sheet: AirDrop, Messages,
+    /// Mail, Copy Link) and "Закрыть доступ" for the owner; without iCloud, a word on why not.
+    private func sharingSection(_ profile: Profile, sharing: ProfileSharing) -> some View {
+        Section {
+            ForEach(sharing.people) { person in
+                personRow(person)
+            }
+            if sharing.role == .owner {
+                if sharing.canInvite, let invitation = model.sync.invitation(for: profile.id, title: profile.name) {
+                    ShareLink(
+                        item: invitation,
+                        preview: SharePreview(Text(verbatim: profile.name), image: Image(systemName: ProfileSymbols.profile))
+                    ) {
+                        // An action row in the system blue, as an iOS list writes one (D34).
+                        ActionRowLabel(
+                            title: ProfileSharing.inviteTitle.text(in: locale), symbol: ProfileSymbols.invite, ink: AnyShapeStyle(.tint)
+                        )
+                    }
+                    .listRowBackground(Theme.Color.card)
+                    .accessibilityIdentifier("profile.invite")
+                } else {
+                    Button {} label: {
+                        ActionRowLabel(
+                            title: ProfileSharing.inviteTitle.text(in: locale), symbol: ProfileSymbols.invite,
+                            ink: AnyShapeStyle(Theme.Color.muted)
+                        )
+                    }
+                    .disabled(true)
+                    .listRowBackground(Theme.Color.card)
+                    .accessibilityIdentifier("profile.invite")
+                }
+            }
+            if sharing.canStopSharing {
+                Button(role: .destructive) {
+                    askingToStopSharing = true
+                } label: {
+                    ActionRowLabel(
+                        title: ProfileSharing.stopTitle.text(in: locale), symbol: ProfileSymbols.stopSharing,
+                        ink: AnyShapeStyle(Theme.Color.danger)
+                    )
+                }
+                .listRowBackground(Theme.Color.card)
+                .accessibilityIdentifier("profile.stopSharing")
+            }
+        } header: {
+            Text(verbatim: ProfileSharing.title.text(in: locale))
+        } footer: {
+            Text(verbatim: sharing.note(in: locale))
+                .accessibilityIdentifier("profile.sharingNote")
+        }
+    }
+
+    /// A person in the profile: their name, and what they are when not a plain member.
+    private func personRow(_ person: SyncParticipant) -> some View {
+        HStack(spacing: Theme.Gap.m) {
+            Image(systemName: ProfileSymbols.person)
+                .foregroundStyle(Theme.Color.muted)
+                .frame(width: ProfileSymbols.width)
+                .accessibilityHidden(true)
+            Text(verbatim: ProfileSharing.name(of: person, in: locale))
+                .foregroundStyle(Theme.Color.text)
+                .lineLimit(2)
+            Spacer(minLength: Theme.Gap.s)
+            if let detail = ProfileSharing.detail(of: person, in: locale) {
+                Text(verbatim: detail)
+                    .font(.subheadline)
+                    .foregroundStyle(Theme.Color.muted)
+                    .multilineTextAlignment(.trailing)
+            }
+        }
+        .listRowBackground(Theme.Color.card)
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("profile.person")
     }
 
     /// A setting: its glyph and name, and its value at the end in quiet ink. A tap opens its sheet.
@@ -412,15 +545,43 @@ struct ProfileScreen: View {
         }
     }
 
-    /// The snapshots end once the profile is gone, and that closes the screen.
-    private func deleteProfile() {
+    /// The snapshots end once the profile is gone, and that closes the screen. A participant
+    /// leaves rather than deletes: the profile goes from this phone only.
+    private func deleteProfile(leaving: Bool) {
         let model = model, profileId = profileId
         Task {
             do {
-                try await model.deleteProfile(profileId)
+                if leaving {
+                    try await model.leaveProfile(profileId)
+                } else {
+                    try await model.deleteProfile(profileId)
+                }
             } catch {
                 log.error("Deleting a profile failed: \(String(describing: error))")
                 failed = true
+            }
+        }
+    }
+
+    private func loadParticipants() async {
+        do {
+            participants = try await model.sync.participants(profileId)
+        } catch {
+            // Offline, say: the people iCloud named last stay on screen.
+            log.notice("Reading who the profile is shared with failed: \(String(describing: error))")
+        }
+    }
+
+    /// Everyone invited loses the profile; the owner keeps it.
+    private func stopSharing() {
+        let model = model, profileId = profileId, locale = locale
+        Task {
+            do {
+                try await model.stopSharing(profileId)
+                await loadParticipants()
+            } catch {
+                log.error("Stopping sharing failed: \(String(describing: error))")
+                sharingFailure = SyncProblemText.text(SyncProblem(error), in: locale)
             }
         }
     }
@@ -493,10 +654,14 @@ enum ProfileSymbols {
     static let payday = "calendar"
     static let markup = "percent"
     static let payment = "calendar.badge.clock"
+    static let invite = "person.crop.circle.badge.plus"
+    static let stopSharing = "person.crop.circle.badge.xmark"
+    static let leave = "rectangle.portrait.and.arrow.right"
+    static let person = "person.circle"
     /// The column every row's glyph stands in.
     static let width: CGFloat = 28
 
-    static let allNames = [profile, name, active, makeActive, rate, taxHours, payday, markup, payment]
+    static let allNames = [profile, name, active, makeActive, rate, taxHours, payday, markup, payment, invite, stopSharing, leave, person]
 }
 
 #Preview("Samples") {

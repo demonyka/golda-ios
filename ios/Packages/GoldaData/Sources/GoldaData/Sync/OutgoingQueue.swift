@@ -54,4 +54,14 @@ public enum OutgoingQueue {
     public static func isSettled(_ entry: OutgoingChange, by kind: OutgoingKind) -> Bool {
         entry.kind == kind && entry.handedRevision == entry.revision
     }
+
+    /// [entry] once the server said to try again not before [until] (CloudKit's `retryAfterSeconds`
+    /// on a full quota, throttling, a busy zone): taken back from the transport, and not handed
+    /// over again until then. A newer wish keeps its revision, so it is the one that goes.
+    public static func postponed(_ entry: OutgoingChange, until: Int64) -> OutgoingChange {
+        var entry = entry
+        entry.notBefore = max(entry.notBefore, until)
+        entry.handedRevision = nil
+        return entry
+    }
 }

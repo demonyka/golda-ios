@@ -8,11 +8,15 @@ import Testing
 @Suite struct SchemaTests {
     @Test func migrationCreatesEveryTable() async throws {
         let database = try GoldaDatabase.inMemory()
-        let tables = ["profile", "account", "operation", "posting", "obligation", "goal", "wish", "rate"]
+        let tables = [
+            "profile", "account", "operation", "posting", "obligation", "goal", "wish", "rate",
+            // Sync (v2): the queue and what it needs, in the same file as the books.
+            "syncJournal", "syncDevice", "syncZone", "syncOutgoing", "syncMeta", "syncSystemFields", "syncEngineState", "syncInbox",
+        ]
         let existing = try await database.writer.read { db in try tables.filter { try db.tableExists($0) } }
         #expect(existing == tables)
         let applied = try await database.writer.read { db in try Schema.migrator.appliedMigrations(db) }
-        #expect(applied == ["v1"])
+        #expect(applied == ["v1", "v2"])
     }
 
     @Test func foreignKeysAreOn() async throws {
@@ -151,7 +155,7 @@ import Testing
             (try db.columns(in: "obligation").map(\.name), try Schema.migrator.appliedMigrations(db))
         }
         #expect(schema.0.contains("createdAt"))
-        #expect(schema.1 == ["v1"])
+        #expect(schema.1 == ["v1", "v2"])
         let profileId = StoreFixture.id(1)
         try await database.write { store in
             try store.save(StoreFixture.profile(1))

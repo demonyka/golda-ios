@@ -1,16 +1,35 @@
 import Foundation
 import GoldaCore
-import GoldaData
 
-/// The kinds of record a profile's zone holds. The raw values are CloudKit record types, so they
-/// are part of the server schema and never change.
-///
-/// Stage 5a carries the profile and its operations with their postings; accounts, obligations,
-/// goals and wishes join in 5b the same way.
+/// The kinds of record a profile's zone holds, one per table of the books. The raw values are
+/// CloudKit record types, so they are part of the server schema and never change. Rates are not
+/// here: they are the same for everyone and every phone fetches its own.
 public enum SyncRecordType: String, Codable, Sendable, CaseIterable {
     case profile = "Profile"
+    case account = "Account"
     case operation = "Operation"
     case posting = "Posting"
+    case obligation = "Obligation"
+    case goal = "Goal"
+    case wish = "Wish"
+
+    /// The table the records of this type are rows of.
+    var tableName: String {
+        switch self {
+        case .profile: "profile"
+        case .account: "account"
+        case .operation: "operation"
+        case .posting: "posting"
+        case .obligation: "obligation"
+        case .goal: "goal"
+        case .wish: "wish"
+        }
+    }
+
+    init?(tableName: String) {
+        guard let type = Self.allCases.first(where: { $0.tableName == tableName }) else { return nil }
+        self = type
+    }
 }
 
 /// Where a record lives: its zone, its type and its id. The CloudKit record name is
@@ -40,31 +59,46 @@ public struct SyncRecordRef: Hashable, Codable, Sendable {
     }
 
     /// One string per record, for keys of the store's tables.
-    var key: String { "\(zone.key)|\(recordName)" }
+    public var key: String { "\(zone.key)|\(recordName)" }
 }
 
-/// What a record says, as the app's own values.
+/// What a record says, as the app's own values: one row of the books.
 public enum SyncPayload: Equatable, Codable, Sendable {
     /// The zone's root: the profile's name and settings (D16, D21). Its id is the zone's profile.
+    /// Its `sort` travels but is not applied: the order of profiles is each phone's own.
     case profile(Profile)
+    case account(Account)
     /// An operation's header. [postingCount] lets a receiver hold the operation back until all its
     /// postings have arrived, since CloudKit may deliver them in different batches.
     case operation(GoldaCore.Operation, postingCount: Int)
     case posting(Posting)
+    /// A monthly payment with its place in the creation order (payments of one day are listed in it).
+    case obligation(Obligation, createdAt: Int64)
+    /// A goal with its place in the creation order (the oldest becomes main, D27).
+    case goal(Goal, createdAt: Int64)
+    case wish(Wish)
 
     public var type: SyncRecordType {
         switch self {
         case .profile: .profile
+        case .account: .account
         case .operation: .operation
         case .posting: .posting
+        case .obligation: .obligation
+        case .goal: .goal
+        case .wish: .wish
         }
     }
 
     public var id: UUID {
         switch self {
         case .profile(let profile): profile.id
+        case .account(let account): account.id
         case .operation(let operation, _): operation.id
         case .posting(let posting): posting.id
+        case .obligation(let obligation, _): obligation.id
+        case .goal(let goal, _): goal.id
+        case .wish(let wish): wish.id
         }
     }
 }
@@ -76,8 +110,7 @@ public struct SyncRecord: Equatable, Codable, Sendable {
     /// When the record was last written, in milliseconds since 1970, by the writer's clock. The
     /// last writer wins on conflicts (ARCHITECTURE, «Правила»).
     public var updatedAt: Int64
-    /// The phone that wrote it last, so a conflict between equal times still has one winner and
-    /// the spike can show who wrote what.
+    /// The phone that wrote it last, so a conflict between equal times still has one winner.
     public var authorDevice: String
 
     public init(zone: SyncZone, payload: SyncPayload, updatedAt: Int64, authorDevice: String) {
@@ -95,7 +128,11 @@ public enum SyncConflict {
     /// Whether [incoming] replaces [local]. Equal times fall to the larger device name, so both
     /// phones settle on the same record whichever of them resolves the conflict.
     public static func incomingWins(_ incoming: SyncRecord, over local: SyncRecord) -> Bool {
-        if incoming.updatedAt != local.updatedAt { return incoming.updatedAt > local.updatedAt }
-        return incoming.authorDevice >= local.authorDevice
+        incomingWins(updatedAt: incoming.updatedAt, author: incoming.authorDevice, overUpdatedAt: local.updatedAt, author: local.authorDevice)
+    }
+
+    static func incomingWins(updatedAt: Int64, author: String, overUpdatedAt localUpdatedAt: Int64, author localAuthor: String) -> Bool {
+        if updatedAt != localUpdatedAt { return updatedAt > localUpdatedAt }
+        return author >= localAuthor
     }
 }

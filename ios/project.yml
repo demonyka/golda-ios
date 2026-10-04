@@ -136,6 +136,7 @@ targets:
       - target: Golda
       - package: GoldaCore
       - package: GoldaData
+      - package: GoldaSync
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.f4studio.golda.tests

@@ -35,22 +35,49 @@ struct ProfileContents: Equatable, Sendable {
 }
 
 /// The question before a profile goes with everything in it. Nothing can bring it back, so the
-/// question counts what goes; and the last profile cannot go at all.
+/// question counts what goes; and the last profile cannot go at all. A profile someone shared
+/// with this person is left rather than deleted: it goes from this phone only (stage 5c).
 struct ProfileDeletion: Equatable, Sendable {
+    /// Whether, and how, the profile is shared.
+    enum Sharing: Equatable, Sendable {
+        case notShared
+        /// This person's profile that others joined: it goes from their phones too.
+        case sharedByMe
+        /// Someone else's: this person leaves it.
+        case sharedWithMe
+    }
+
     let name: String
     /// Nil when the count could not be read; the question then names the kinds of things that go.
     let contents: ProfileContents?
+    var sharing: Sharing = .notShared
 
-    /// The app always has a profile to show.
+    /// The app always has a profile to show. Leaving the last one is allowed: a fresh «Личный»
+    /// takes its place (`AppModel.leaveProfile`).
     static func canDelete(profileCount: Int) -> Bool { profileCount > 1 }
 
-    /// "Удалить «Семья»?"
+    /// "Удалить «Семья»?", or "Выйти из «Семья»?" for a profile shared with this person.
     func title(in locale: Locale) -> String {
-        LocalizedStringResource("Delete “\(name)”?", table: "Profiles", comment: "Title of the question before a profile is deleted, with its name.").text(in: locale)
+        if sharing == .sharedWithMe {
+            return LocalizedStringResource("Leave “\(name)”?", table: "Profiles", comment: "Title of the question before a participant leaves a shared profile, with its name.").text(in: locale)
+        }
+        return LocalizedStringResource("Delete “\(name)”?", table: "Profiles", comment: "Title of the question before a profile is deleted, with its name.").text(in: locale)
     }
 
-    /// What goes too: "7 счетов, 25 операций и 2 платежа", or that there is nothing in it yet.
+    /// "Удалить" or "Выйти".
+    var confirmAction: LocalizedStringResource { sharing == .sharedWithMe ? Self.leaveConfirmTitle : Self.confirmTitle }
+
+    /// What goes too: "7 счетов, 25 операций и 2 платежа", or that there is nothing in it yet; for
+    /// a shared profile, who else loses it.
     func message(in locale: Locale) -> String {
+        switch sharing {
+        case .sharedWithMe: return Self.leaveNote.text(in: locale)
+        case .sharedByMe: return [contentsMessage(in: locale), Self.sharedNote.text(in: locale)].joined(separator: " ")
+        case .notShared: return contentsMessage(in: locale)
+        }
+    }
+
+    private func contentsMessage(in locale: Locale) -> String {
         guard let contents else { return Self.generalWarning.text(in: locale) }
         let parts = Self.parts(contents).map { $0.text(in: locale) }
         if parts.isEmpty { return Self.emptyNote.text(in: locale) }
@@ -83,6 +110,15 @@ struct ProfileDeletion: Equatable, Sendable {
     }
 
     static let confirmTitle = LocalizedStringResource("Delete", table: "Profiles", comment: "Confirms deleting a profile with everything in it.")
+    static let leaveConfirmTitle = LocalizedStringResource("Leave", table: "Profiles", comment: "Confirms leaving a profile someone shared with this person.")
+    static let leaveNote = LocalizedStringResource(
+        "The profile goes from this phone; its owner keeps it. To come back, ask them for a new invitation.",
+        table: "Profiles", comment: "Question before a participant leaves a shared profile."
+    )
+    static let sharedNote = LocalizedStringResource(
+        "It also goes from the phones of everyone you shared it with.",
+        table: "Profiles", comment: "Question before the owner deletes a shared profile: the others lose it too."
+    )
     static let actionTitle = LocalizedStringResource("Delete profile", table: "Profiles", comment: "Profile screen and list: the action that deletes a profile.")
     static let emptyNote = LocalizedStringResource("There is nothing in it yet.", table: "Profiles", comment: "Question before an empty profile is deleted.")
     static let generalWarning = LocalizedStringResource(

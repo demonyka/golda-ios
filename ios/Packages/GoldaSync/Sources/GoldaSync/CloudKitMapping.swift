@@ -38,7 +38,7 @@ extension SyncRecordRef {
 /// What the person wrote (names, notes, amounts, settings) goes into `encryptedValues`, so it is
 /// end-to-end encrypted when the account has Advanced Data Protection and never readable in the
 /// CloudKit console; only `updatedAt` and `authorDevice` stay plain. Money is `Int64` minor units;
-/// flags are 0 and 1.
+/// flags are 0 and 1; ids are lowercase UUID strings.
 public enum CloudKitMapping {
     enum Field {
         static let updatedAt = "updatedAt"
@@ -58,13 +58,25 @@ public enum CloudKitMapping {
         case .profile(let profile):
             values["name"] = profile.name
             values["sort"] = Int64(profile.sort)
-            values["incomeHourly"] = profile.settings.incomeHourly ? Int64(1) : Int64(0)
+            values["incomeHourly"] = flag(profile.settings.incomeHourly)
             values["hourlyRate"] = profile.settings.hourlyRate
             values["monthlySalary"] = profile.settings.monthlySalary
             values["taxPercent"] = profile.settings.taxPercent
             values["hoursPerWeek"] = profile.settings.hoursPerWeek
             values["payday"] = Int64(profile.settings.payday)
             values["markup"] = profile.settings.markup
+        case .account(let account):
+            values["name"] = account.name
+            values["currency"] = account.currency
+            values["type"] = account.type.rawValue
+            values["groupName"] = account.groupName
+            values["includeInFree"] = flag(account.includeInFree)
+            values["interestRate"] = account.interestRate
+            values["sort"] = Int64(account.sort)
+            values["paymentDay"] = account.paymentDay.map { Int64($0) }
+            values["paymentMinor"] = account.paymentMinor
+            values["graceUntil"] = account.graceUntil
+            values["reconciledAt"] = account.reconciledAt
         case .operation(let op, let postingCount):
             values["type"] = op.type.rawValue
             values["timestamp"] = op.timestamp
@@ -73,15 +85,37 @@ public enum CloudKitMapping {
             values["voiceText"] = op.voiceText
             values["purchaseAmountMinor"] = op.purchaseAmountMinor
             values["purchaseCurrency"] = op.purchaseCurrency
-            values["isEstimate"] = op.isEstimate ? Int64(1) : Int64(0)
+            values["isEstimate"] = flag(op.isEstimate)
             values["cbrFrom"] = op.cbrFrom
             values["cbrTo"] = op.cbrTo
             values["postingCount"] = Int64(postingCount)
         case .posting(let posting):
-            values["operationId"] = posting.operationId.uuidString.lowercased()
-            values["accountId"] = posting.accountId.uuidString.lowercased()
+            values["operationId"] = id(posting.operationId)
+            values["accountId"] = id(posting.accountId)
             values["amountMinor"] = posting.amountMinor
             values["rubMinor"] = posting.rubMinor
+        case .obligation(let obligation, let createdAt):
+            values["name"] = obligation.name
+            values["amountMinor"] = obligation.amountMinor
+            values["currency"] = obligation.currency
+            values["dayOfMonth"] = Int64(obligation.dayOfMonth)
+            values["createdAt"] = createdAt
+        case .goal(let goal, let createdAt):
+            values["name"] = goal.name
+            values["targetMinor"] = goal.targetMinor
+            values["currency"] = goal.currency
+            values["accountId"] = goal.accountId.map(id)
+            values["savedMinor"] = goal.savedMinor
+            values["isMain"] = flag(goal.isMain)
+            values["createdAt"] = createdAt
+        case .wish(let wish):
+            values["title"] = wish.title
+            values["amountMinor"] = wish.amountMinor
+            values["currency"] = wish.currency
+            values["createdAt"] = wish.createdAt
+            values["decideAt"] = wish.decideAt
+            values["status"] = wish.status.rawValue
+            values["decidedAt"] = wish.decidedAt
         }
         return ck
     }
@@ -90,55 +124,106 @@ public enum CloudKitMapping {
     /// later version) or lacks a field this version needs.
     public static func syncRecord(from ck: CKRecord, scope: SyncScope) -> SyncRecord? {
         guard let ref = SyncRecordRef(recordID: ck.recordID, scope: scope), ref.type.rawValue == ck.recordType,
-              let updatedAt = ck[Field.updatedAt] as? Int64
+              let updatedAt = ck[Field.updatedAt] as? Int64,
+              let payload = payload(ref, Values(ck.encryptedValues))
         else { return nil }
         let author = ck[Field.authorDevice] as? String ?? ""
-        let values = ck.encryptedValues
-        let payload: SyncPayload
+        return SyncRecord(zone: ref.zone, payload: payload, updatedAt: updatedAt, authorDevice: author)
+    }
+
+    /// Typed reads of a record's encrypted values.
+    private struct Values {
+        let values: any CKRecordKeyValueSetting
+
+        init(_ values: any CKRecordKeyValueSetting) {
+            self.values = values
+        }
+
+        func int(_ key: String) -> Int64? { values[key] as? Int64 }
+        func double(_ key: String) -> Double? { values[key] as? Double }
+        func string(_ key: String) -> String? { values[key] as? String }
+        func uuid(_ key: String) -> UUID? { string(key).flatMap(UUID.init(uuidString:)) }
+        func flag(_ key: String) -> Bool { (int(key) ?? 0) != 0 }
+    }
+
+    private static func payload(_ ref: SyncRecordRef, _ v: Values) -> SyncPayload? {
         switch ref.type {
         case .profile:
             // The zone's root has the zone's profile id, whatever its record says.
-            guard ref.id == ref.zone.profileId, let name = values["name"] as? String else { return nil }
+            guard ref.id == ref.zone.profileId, let name = v.string("name") else { return nil }
             let defaults = ProfileSettings()
-            payload = .profile(Profile(
-                id: ref.id, name: name, sort: Int(values["sort"] as? Int64 ?? 0),
+            return .profile(Profile(
+                id: ref.id, name: name, sort: Int(v.int("sort") ?? 0),
                 settings: ProfileSettings(
-                    incomeHourly: (values["incomeHourly"] as? Int64 ?? 0) != 0,
-                    hourlyRate: values["hourlyRate"] as? Double ?? defaults.hourlyRate,
-                    monthlySalary: values["monthlySalary"] as? Double ?? defaults.monthlySalary,
-                    taxPercent: values["taxPercent"] as? Double ?? defaults.taxPercent,
-                    hoursPerWeek: values["hoursPerWeek"] as? Double ?? defaults.hoursPerWeek,
-                    payday: Int(values["payday"] as? Int64 ?? Int64(defaults.payday)),
-                    markup: values["markup"] as? Double ?? defaults.markup
+                    incomeHourly: v.flag("incomeHourly"),
+                    hourlyRate: v.double("hourlyRate") ?? defaults.hourlyRate,
+                    monthlySalary: v.double("monthlySalary") ?? defaults.monthlySalary,
+                    taxPercent: v.double("taxPercent") ?? defaults.taxPercent,
+                    hoursPerWeek: v.double("hoursPerWeek") ?? defaults.hoursPerWeek,
+                    payday: Int(v.int("payday") ?? Int64(defaults.payday)),
+                    markup: v.double("markup") ?? defaults.markup
                 )
             ))
-        case .operation:
-            guard let type = (values["type"] as? String).flatMap(OpType.init(rawValue:)),
-                  let timestamp = values["timestamp"] as? Int64,
-                  let postingCount = values["postingCount"] as? Int64
+        case .account:
+            guard let name = v.string("name"), let currency = v.string("currency"),
+                  let type = v.string("type").flatMap(AccountType.init(rawValue:))
             else { return nil }
-            payload = .operation(
+            return .account(Account(
+                id: ref.id, name: name, currency: currency, type: type, groupName: v.string("groupName"),
+                includeInFree: v.flag("includeInFree"), interestRate: v.double("interestRate"), sort: Int(v.int("sort") ?? 0),
+                paymentDay: v.int("paymentDay").map { Int($0) }, paymentMinor: v.int("paymentMinor"),
+                graceUntil: v.int("graceUntil"), reconciledAt: v.int("reconciledAt")
+            ))
+        case .operation:
+            guard let type = v.string("type").flatMap(OpType.init(rawValue:)), let timestamp = v.int("timestamp"),
+                  let postingCount = v.int("postingCount")
+            else { return nil }
+            return .operation(
                 GoldaCore.Operation(
-                    id: ref.id, type: type, timestamp: timestamp, categoryKey: values["categoryKey"] as? String,
-                    note: values["note"] as? String ?? "", voiceText: values["voiceText"] as? String,
-                    purchaseAmountMinor: values["purchaseAmountMinor"] as? Int64,
-                    purchaseCurrency: values["purchaseCurrency"] as? String,
-                    isEstimate: (values["isEstimate"] as? Int64 ?? 0) != 0,
-                    cbrFrom: values["cbrFrom"] as? Double, cbrTo: values["cbrTo"] as? Double
+                    id: ref.id, type: type, timestamp: timestamp, categoryKey: v.string("categoryKey"),
+                    note: v.string("note") ?? "", voiceText: v.string("voiceText"),
+                    purchaseAmountMinor: v.int("purchaseAmountMinor"), purchaseCurrency: v.string("purchaseCurrency"),
+                    isEstimate: v.flag("isEstimate"), cbrFrom: v.double("cbrFrom"), cbrTo: v.double("cbrTo")
                 ),
                 postingCount: Int(postingCount)
             )
         case .posting:
-            guard let operationId = (values["operationId"] as? String).flatMap(UUID.init(uuidString:)),
-                  let accountId = (values["accountId"] as? String).flatMap(UUID.init(uuidString:)),
-                  let amountMinor = values["amountMinor"] as? Int64, let rubMinor = values["rubMinor"] as? Int64
+            guard let operationId = v.uuid("operationId"), let accountId = v.uuid("accountId"),
+                  let amountMinor = v.int("amountMinor"), let rubMinor = v.int("rubMinor")
             else { return nil }
-            payload = .posting(Posting(
-                id: ref.id, operationId: operationId, accountId: accountId, amountMinor: amountMinor, rubMinor: rubMinor
+            return .posting(Posting(id: ref.id, operationId: operationId, accountId: accountId, amountMinor: amountMinor, rubMinor: rubMinor))
+        case .obligation:
+            guard let name = v.string("name"), let amountMinor = v.int("amountMinor"), let currency = v.string("currency"),
+                  let day = v.int("dayOfMonth")
+            else { return nil }
+            return .obligation(
+                Obligation(id: ref.id, name: name, amountMinor: amountMinor, currency: currency, dayOfMonth: Int(day)),
+                createdAt: v.int("createdAt") ?? 0
+            )
+        case .goal:
+            guard let name = v.string("name"), let target = v.int("targetMinor"), let currency = v.string("currency") else { return nil }
+            return .goal(
+                Goal(
+                    id: ref.id, name: name, targetMinor: target, currency: currency, accountId: v.uuid("accountId"),
+                    savedMinor: v.int("savedMinor") ?? 0, isMain: v.flag("isMain")
+                ),
+                createdAt: v.int("createdAt") ?? 0
+            )
+        case .wish:
+            guard let title = v.string("title"), let amountMinor = v.int("amountMinor"), let currency = v.string("currency"),
+                  let createdAt = v.int("createdAt"), let decideAt = v.int("decideAt"),
+                  let status = v.string("status").flatMap(WishStatus.init(rawValue:))
+            else { return nil }
+            return .wish(Wish(
+                id: ref.id, title: title, amountMinor: amountMinor, currency: currency, createdAt: createdAt,
+                decideAt: decideAt, status: status, decidedAt: v.int("decidedAt")
             ))
         }
-        return SyncRecord(zone: ref.zone, payload: payload, updatedAt: updatedAt, authorDevice: author)
     }
+
+    private static func flag(_ value: Bool) -> Int64 { value ? 1 : 0 }
+
+    private static func id(_ value: UUID) -> String { value.uuidString.lowercased() }
 
     /// The server's part of [ck] (ids, change tag, who changed it and when), to keep without the values.
     public static func systemFields(of ck: CKRecord) -> Data {
@@ -153,5 +238,41 @@ public enum CloudKitMapping {
         coder.requiresSecureCoding = true
         defer { coder.finishDecoding() }
         return CKRecord(coder: coder)
+    }
+}
+
+extension SyncProblem {
+    /// What [error] means for the person. CloudKit's codes are sorted into what they can act on:
+    /// sign in, free iCloud space, wait, find a network. A time to wait, when the server gives one,
+    /// beats the code: on 2026-10-04 the first share failed with `quotaExceeded` and "retry after
+    /// 330 s" on an account with free space, and went through when tried again later (D58).
+    public init(_ error: any Error) {
+        if let problem = error as? SyncProblem {
+            self = problem
+            return
+        }
+        if error is URLError {
+            self = .offline
+            return
+        }
+        guard let ck = error as? CKError else {
+            self = .other(code: (error as NSError).code)
+            return
+        }
+        if ck.code == .partialFailure, let first = ck.partialErrorsByItemID?.values.first {
+            self.init(first)
+            return
+        }
+        if let seconds = ck.retryAfterSeconds, seconds > 0 {
+            self = .retryLater(seconds: Int(seconds.rounded(.up)))
+            return
+        }
+        switch ck.code {
+        case .notAuthenticated, .accountTemporarilyUnavailable: self = .noAccount
+        case .quotaExceeded: self = .iCloudFull
+        case .networkFailure, .networkUnavailable, .serviceUnavailable, .requestRateLimited, .zoneBusy: self = .offline
+        case .permissionFailure, .participantMayNeedVerification: self = .notPermitted
+        default: self = .other(code: ck.code.rawValue)
+        }
     }
 }
