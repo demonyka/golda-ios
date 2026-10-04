@@ -8,7 +8,8 @@ public final class GoldaDatabase: Sendable {
     /// Epoch milliseconds now: when a change to the books is stamped for sync (last writer wins).
     let clock: @Sendable () -> Int64
 
-    private init(
+    /// Internal for the migration tests, which hand it a file written by an older schema.
+    init(
         _ writer: any DatabaseWriter, eraseDatabaseOnSchemaChange: Bool = false, clock: (@Sendable () -> Int64)?
     ) throws {
         var migrator = Schema.migrator

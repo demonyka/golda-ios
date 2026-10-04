@@ -323,6 +323,7 @@ public actor CloudKitSyncTransport: SyncTransport, CKSyncEngineDelegate {
         }
         var again: [SyncRecordRef] = []
         var waiting: [(SyncRecordRef, CKSyncEngine.PendingRecordZoneChange, CKError)] = []
+        var refused: [(SyncRecordRef, CKSyncEngine.PendingRecordZoneChange)] = []
         for failure in sent.failedRecordSaves {
             guard let ref = SyncRecordRef(recordID: failure.record.recordID, scope: scope) else { continue }
             say(scope, "save failed: \(ref.recordName) \(failure.error.code)")
@@ -347,6 +348,8 @@ public actor CloudKitSyncTransport: SyncTransport, CKSyncEngineDelegate {
             case .batchRequestFailed:
                 // Another record of the batch failed; this one goes with the next batch.
                 again.append(ref)
+            case .permissionFailure:
+                refused.append((ref, .saveRecord(failure.record.recordID)))
             default:
                 waiting.append((ref, .saveRecord(failure.record.recordID), failure.error))
             }
@@ -355,12 +358,15 @@ public actor CloudKitSyncTransport: SyncTransport, CKSyncEngineDelegate {
             guard let ref = SyncRecordRef(recordID: id, scope: scope) else { continue }
             if error.code == .unknownItem || error.code == .zoneNotFound {
                 try await store.confirm(.delete, of: ref)
+            } else if error.code == .permissionFailure {
+                refused.append((ref, .deleteRecord(id)))
             } else {
                 say(scope, "delete failed: \(ref.recordName) \(error.code)")
                 waiting.append((ref, .deleteRecord(id), error))
             }
         }
         try await postpone(waiting, engine: engine)
+        try await takeServerVersions(refused, engine: engine)
         if !again.isEmpty {
             try await store.rehand(again)
             await outgoingChanged()
@@ -385,6 +391,53 @@ public actor CloudKitSyncTransport: SyncTransport, CKSyncEngineDelegate {
         if let latest { problem(latest) }
         scheduleWakeUp(at: try await store.nextDue(after: now()))
     }
+
+    /// Changes the server will never take: the owner made the profile read-only (the invitation
+    /// offers only read and write, D58, but the owner may change it later). They leave the engine,
+    /// which does not retry them anyway, and the server's version replaces them in the books, so
+    /// this phone never keeps a change no one else sees. A record the server does not have goes.
+    private func takeServerVersions(_ refused: [(SyncRecordRef, CKSyncEngine.PendingRecordZoneChange)], engine: CKSyncEngine) async throws {
+        guard !refused.isEmpty else { return }
+        engine.state.remove(pendingRecordZoneChanges: refused.map(\.1))
+        let scope = refused[0].0.zone.scope
+        let database = scope == .private ? container.privateCloudDatabase : container.sharedCloudDatabase
+        problem(.notPermitted)
+        var results: [CKRecord.ID: Result<CKRecord, any Error>] = [:]
+        do {
+            results = try await database.records(for: refused.map { $0.0.recordID })
+        } catch {
+            say(scope, "fetching refused records failed: \(error)")
+        }
+        var later: [SyncRecordRef] = []
+        for (ref, _) in refused {
+            var server: SyncRecord?
+            switch results[ref.recordID] {
+            case .success(let ck)?:
+                server = CloudKitMapping.syncRecord(from: ck, scope: scope)
+                // A record this version cannot read is not replaced by guesswork.
+                guard server != nil else {
+                    later.append(ref)
+                    continue
+                }
+                try await store.setSystemFields(CloudKitMapping.systemFields(of: ck), for: ref)
+            case .failure(let error as CKError)? where error.code == .unknownItem:
+                try await store.setSystemFields(nil, for: ref)
+            default:
+                // Not fetched (offline): tried again in a while, refused again, fetched then.
+                later.append(ref)
+                continue
+            }
+            try await store.refused(ref, serverVersion: server)
+            say(scope, "refused \(ref.recordName): the server's version is back")
+        }
+        if !later.isEmpty {
+            try await store.postpone(later, until: now() + Int64(Self.refusedPause * 1000))
+            scheduleWakeUp(at: try await store.nextDue(after: now()))
+        }
+    }
+
+    /// How long a refused change whose server version could not be fetched waits to try again.
+    static let refusedPause: TimeInterval = 60
 
     /// How long a change waits after a full iCloud that named no time: long enough not to hammer
     /// the server, short enough that freeing space is soon noticed.

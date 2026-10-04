@@ -237,8 +237,9 @@ final class AppSync {
 /// A profile's invitation for `ShareLink`: the system share sheet with a `CKShare` offers AirDrop,
 /// Messages, Mail and Copy Link, and the share is made only when the person picks one. The share
 /// starts as "only invited people" with read and write (`publicPermission = .none`, O3); the
-/// sheet's options let the owner pick read-only or a link anyone may open, since a way of sending
-/// that names no recipient may need it (D58).
+/// sheet's options let the owner pick a link anyone may open, since a way of sending that names no
+/// recipient may need it. Read-only is not offered: the app does not yet stop a read-only
+/// participant from editing, and their refused changes are only rolled back (D58).
 struct ProfileInvitation: Transferable {
     let container: CKContainer
     let prepare: @Sendable () async throws -> CKShare
@@ -252,6 +253,6 @@ struct ProfileInvitation: Transferable {
     }
 
     static var sharingOptions: CKAllowedSharingOptions {
-        CKAllowedSharingOptions(allowedParticipantPermissionOptions: .any, allowedParticipantAccessOptions: .any)
+        CKAllowedSharingOptions(allowedParticipantPermissionOptions: .readWrite, allowedParticipantAccessOptions: .any)
     }
 }

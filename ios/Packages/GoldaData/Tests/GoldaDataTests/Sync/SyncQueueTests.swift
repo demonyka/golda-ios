@@ -34,7 +34,9 @@ import Testing
         #expect(queue[name(.profile, profileId)] == .save)
         #expect(queue[name(.account, card.id)] == .save)
         #expect(queue[name(.operation, id)] == .save)
-        #expect(queue[name(.posting, full.postings[0].id)] == .save)
+        // A posting travels inside its operation's record, never on its own.
+        #expect(queue[name(.operation, full.postings[0].id)] == nil)
+        #expect(queue.count == 3)
         let refs = try await sync.outgoing().map(\.ref)
         #expect(refs.allSatisfy { $0.zone == .own(profileId) })
     }
@@ -72,15 +74,15 @@ import Testing
         let entry = try #require(try await sync.outgoing().first { $0.ref == ref })
         #expect(entry.kind == .delete)
         #expect(entry.notBefore == harness.clock.now + OutgoingQueue.undoWindow)
-        // Its posting went with it, by cascade, and waits the same.
-        #expect(try await sync.outgoing().filter { $0.kind == .delete }.map(\.ref.type).sorted { $0.rawValue < $1.rawValue } == [.operation, .posting])
+        // Its posting went with it, inside the record.
+        #expect(try await sync.outgoing().filter { $0.kind == .delete }.map(\.ref) == [ref])
         #expect(try await sync.takeDue(at: harness.clock.now + OutgoingQueue.undoWindow - 1).isEmpty)
 
         // "Отменить" in time: the rows come back and only saves are due; the delete never leaves.
         try await harness.repository.restoreOperation(deleted, profileId: profileId)
         let due = try await sync.takeDue(at: harness.clock.now)
         #expect(Set(due.map(\.kind)) == [.save])
-        #expect(Set(due.map(\.ref.type)) == [.operation, .posting])
+        #expect(due.map(\.ref) == [ref])
     }
 
     @Test func deletingAnAccountQueuesTheOperationsItTookAlong() async throws {
@@ -94,7 +96,6 @@ import Testing
         let queue = try await queued()
         #expect(queue[name(.account, card.id)] == .delete)
         #expect(queue[name(.operation, transfer)] == .delete)
-        #expect(try await sync.outgoing().count(where: { $0.ref.type == .posting && $0.kind == .delete }) == 2)
         #expect(queue[name(.account, cash.id)] == .save)
     }
 
@@ -135,11 +136,11 @@ import Testing
 
         #expect(try await sync.registerProfiles(now: harness.clock.now) == [.own(profileId)])
         let types = try await sync.outgoing().map(\.ref.type)
-        #expect(Set(types) == [.profile, .account, .operation, .posting, .goal])
+        #expect(Set(types) == [.profile, .account, .operation, .goal])
         #expect(try await sync.registerProfiles(now: harness.clock.now).isEmpty, "once")
     }
 
-    @Test func anOperationRecordCountsItsPostings() async throws {
+    @Test func anOperationRecordCarriesItsPostings() async throws {
         let card = Account.card("Карта"), cash = Account.card("Наличные")
         let profileId = try await harness.profile(accounts: [card, cash])
         let id = try await harness.repository.save(
@@ -147,11 +148,26 @@ import Testing
             profileId: profileId
         )
         let record = try #require(try await sync.record(SyncRecordRef(zone: .own(profileId), type: .operation, id: id)))
-        guard case .operation(let operation, let count) = record.payload else { Issue.record("not an operation"); return }
+        guard case .operation(let operation, let postings) = record.payload else { Issue.record("not an operation"); return }
         #expect(operation.type == .transfer)
-        #expect(count == 2)
+        #expect(postings == (try await harness.operation(id, profileId))?.postings)
         // Another profile's zone does not read this profile's rows.
         #expect(try await sync.record(SyncRecordRef(zone: .own(UUID()), type: .operation, id: id)) == nil)
+    }
+
+    /// The operation and its postings are one unit for conflicts, so a change of a posting alone
+    /// (a new amount) is a new version of its operation, stamped now.
+    @Test func aChangeOfAPostingAloneIsANewVersionOfItsOperation() async throws {
+        let card = Account.card("Карта")
+        let profileId = try await harness.profile(accounts: [card])
+        let id = try await harness.repository.save(Draft(type: .expense, timestamp: RepositoryHarness.start, accountId: card.id, amountMinor: 100), profileId: profileId)
+        try await harness.database.writer.write { db in try db.execute(sql: "DELETE FROM syncOutgoing") }
+
+        harness.clock.set(RepositoryHarness.start + 7_000)
+        try await harness.repository.save(Draft(type: .expense, timestamp: RepositoryHarness.start, accountId: card.id, amountMinor: 250, id: id), profileId: profileId)
+        let ref = SyncRecordRef(zone: .own(profileId), type: .operation, id: id)
+        #expect(try await sync.outgoing().map(\.ref) == [ref])
+        #expect(try await sync.record(ref)?.updatedAt == RepositoryHarness.start + 7_000)
     }
 
     @Test func aPostponedChangeIsNotDueBeforeTheServerSaid() async throws {

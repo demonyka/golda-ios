@@ -10,6 +10,8 @@ enum Schema {
         migrator.registerMigration("v1", migrate: v1)
         // Sync (stage 5b): the queue, the journal the triggers fill, the zones, the inbox.
         migrator.registerMigration("v2", migrate: SyncSchema.v2)
+        // Postings travel inside their operation's record (D58).
+        migrator.registerMigration("v3", migrate: SyncSchema.v3)
         return migrator
     }
 

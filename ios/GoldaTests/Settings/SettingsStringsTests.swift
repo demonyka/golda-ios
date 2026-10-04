@@ -61,6 +61,21 @@ import UIKit
         #expect(SettingsText.restoreWarning.text(in: ru) == "Всё, что сейчас в Golda, заменится содержимым файла. Ключ Gemini останется.")
     }
 
+    /// With sync, erasing deletes the profiles' zones and restoring overwrites them, so other
+    /// devices and the people a profile is shared with lose or see it change too: the warning says
+    /// so, in both languages.
+    @Test func eraseAndRestoreWarnThatICloudAndSharedProfilesChangeToo() {
+        let ru = Locale(identifier: "ru"), en = Locale(identifier: "en")
+        for (warning, sync) in [(SettingsText.eraseWarning, SettingsText.eraseSyncWarning), (SettingsText.restoreWarning, SettingsText.restoreSyncWarning)] {
+            #expect(SettingsText.message(warning, sync: sync, syncs: false, in: ru) == warning.text(in: ru))
+            let synced = SettingsText.message(warning, sync: sync, syncs: true, in: ru)
+            #expect(synced.hasPrefix(warning.text(in: ru)))
+            #expect(synced.contains("iCloud"))
+            #expect(synced.contains("поделились"))
+            #expect(SettingsText.message(warning, sync: sync, syncs: true, in: en).contains("shared them with"))
+        }
+    }
+
     @Test func everySymbolExists() {
         for name in SettingsSymbols.all {
             #expect(UIImage(systemName: name) != nil, "no SF Symbol “\(name)”")

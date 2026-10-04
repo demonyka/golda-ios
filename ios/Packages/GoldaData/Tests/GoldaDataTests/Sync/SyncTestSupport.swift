@@ -25,15 +25,36 @@ enum SyncFixture {
         ]
     }
 
-    /// A transfer of [amount] from [from] to [to]: the header and both legs.
+    /// A transfer of [amount] from [from] to [to]: one record with both legs.
     static func transfer(
-        _ amount: Int64, from: UUID, to: UUID, zone: SyncZone, at time: Int64, id: UUID = UUID()
-    ) -> (header: SyncRecord, out: SyncRecord, into: SyncRecord) {
-        let operation = GoldaCore.Operation(id: id, type: .transfer, timestamp: time)
-        return (
-            record(.operation(operation, postingCount: 2), zone: zone, at: time),
-            record(.posting(Posting(operationId: id, accountId: from, amountMinor: -amount, rubMinor: -amount)), zone: zone, at: time),
-            record(.posting(Posting(operationId: id, accountId: to, amountMinor: amount, rubMinor: amount)), zone: zone, at: time)
+        _ amount: Int64, from: UUID, to: UUID, zone: SyncZone, at time: Int64, id: UUID = UUID(), note: String = ""
+    ) -> SyncRecord {
+        let operation = GoldaCore.Operation(id: id, type: .transfer, timestamp: time, note: note)
+        return record(
+            .operation(operation, postings: [
+                Posting(operationId: id, accountId: from, amountMinor: -amount, rubMinor: -amount),
+                Posting(operationId: id, accountId: to, amountMinor: amount, rubMinor: amount),
+            ]),
+            zone: zone, at: time
         )
+    }
+
+    /// [record], an operation, as another version of it: written at [time] with [type], [note] and
+    /// [postings].
+    static func edited(
+        _ record: SyncRecord, at time: Int64, type: OpType? = nil, note: String? = nil, postings: [Posting]? = nil
+    ) -> SyncRecord {
+        guard case .operation(var operation, let stored) = record.payload else { return record }
+        operation.type = type ?? operation.type
+        operation.note = note ?? operation.note
+        var edited = record
+        edited.payload = .operation(operation, postings: postings ?? stored)
+        edited.updatedAt = time
+        return edited
+    }
+
+    static func postings(_ record: SyncRecord) -> [Posting] {
+        guard case .operation(_, let postings) = record.payload else { return [] }
+        return postings
     }
 }

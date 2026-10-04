@@ -1,3 +1,4 @@
+import CloudKit
 import Foundation
 import GoldaCore
 import GoldaData
@@ -191,5 +192,11 @@ import Testing
         try await sync(bob)
         await eventually { bob.model.profiles.map(\.name) == [AppModel.firstProfileName] }
         #expect(alice.model.profiles.map(\.id) == [family])
+    }
+
+    /// Read-only is not offered yet: the app would let such a participant edit, and the server
+    /// would refuse every change (D58).
+    @Test func anInvitationOffersOnlyReadAndWrite() {
+        #expect(ProfileInvitation.sharingOptions.allowedParticipantPermissionOptions == .readWrite)
     }
 }

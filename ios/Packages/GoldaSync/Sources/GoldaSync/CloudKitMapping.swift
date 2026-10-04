@@ -77,7 +77,7 @@ public enum CloudKitMapping {
             values["paymentMinor"] = account.paymentMinor
             values["graceUntil"] = account.graceUntil
             values["reconciledAt"] = account.reconciledAt
-        case .operation(let op, let postingCount):
+        case .operation(let op, let postings):
             values["type"] = op.type.rawValue
             values["timestamp"] = op.timestamp
             values["categoryKey"] = op.categoryKey
@@ -88,12 +88,7 @@ public enum CloudKitMapping {
             values["isEstimate"] = flag(op.isEstimate)
             values["cbrFrom"] = op.cbrFrom
             values["cbrTo"] = op.cbrTo
-            values["postingCount"] = Int64(postingCount)
-        case .posting(let posting):
-            values["operationId"] = id(posting.operationId)
-            values["accountId"] = id(posting.accountId)
-            values["amountMinor"] = posting.amountMinor
-            values["rubMinor"] = posting.rubMinor
+            values["postings"] = PostingWire.encode(postings)
         case .obligation(let obligation, let createdAt):
             values["name"] = obligation.name
             values["amountMinor"] = obligation.amountMinor
@@ -142,6 +137,7 @@ public enum CloudKitMapping {
         func int(_ key: String) -> Int64? { values[key] as? Int64 }
         func double(_ key: String) -> Double? { values[key] as? Double }
         func string(_ key: String) -> String? { values[key] as? String }
+        func data(_ key: String) -> Data? { values[key] as? Data }
         func uuid(_ key: String) -> UUID? { string(key).flatMap(UUID.init(uuidString:)) }
         func flag(_ key: String) -> Bool { (int(key) ?? 0) != 0 }
     }
@@ -175,8 +171,10 @@ public enum CloudKitMapping {
                 graceUntil: v.int("graceUntil"), reconciledAt: v.int("reconciledAt")
             ))
         case .operation:
+            // An operation of the first 5b builds has no postings in it, only their count: skipped,
+            // and its author sends it again in this shape once updated (`SyncSchema.v3`).
             guard let type = v.string("type").flatMap(OpType.init(rawValue:)), let timestamp = v.int("timestamp"),
-                  let postingCount = v.int("postingCount")
+                  let postings = v.data("postings").flatMap({ PostingWire.decode($0, operationId: ref.id) })
             else { return nil }
             return .operation(
                 GoldaCore.Operation(
@@ -185,13 +183,8 @@ public enum CloudKitMapping {
                     purchaseAmountMinor: v.int("purchaseAmountMinor"), purchaseCurrency: v.string("purchaseCurrency"),
                     isEstimate: v.flag("isEstimate"), cbrFrom: v.double("cbrFrom"), cbrTo: v.double("cbrTo")
                 ),
-                postingCount: Int(postingCount)
+                postings: postings
             )
-        case .posting:
-            guard let operationId = v.uuid("operationId"), let accountId = v.uuid("accountId"),
-                  let amountMinor = v.int("amountMinor"), let rubMinor = v.int("rubMinor")
-            else { return nil }
-            return .posting(Posting(id: ref.id, operationId: operationId, accountId: accountId, amountMinor: amountMinor, rubMinor: rubMinor))
         case .obligation:
             guard let name = v.string("name"), let amountMinor = v.int("amountMinor"), let currency = v.string("currency"),
                   let day = v.int("dayOfMonth")
@@ -218,6 +211,34 @@ public enum CloudKitMapping {
                 id: ref.id, title: title, amountMinor: amountMinor, currency: currency, createdAt: createdAt,
                 decideAt: decideAt, status: status, decidedAt: v.int("decidedAt")
             ))
+        }
+    }
+
+    /// An operation's postings inside its record, as JSON in one encrypted field: a list keeps
+    /// the ledger's order, and the record stays one unit for conflicts (D58). Ids are lowercase
+    /// strings, money minor units.
+    private struct PostingWire: Codable {
+        var id: String
+        var accountId: String
+        var amountMinor: Int64
+        var rubMinor: Int64
+
+        static func encode(_ postings: [Posting]) -> Data {
+            let wire = postings.map {
+                PostingWire(id: CloudKitMapping.id($0.id), accountId: CloudKitMapping.id($0.accountId), amountMinor: $0.amountMinor, rubMinor: $0.rubMinor)
+            }
+            // Encoding plain strings and integers cannot fail.
+            return (try? JSONEncoder().encode(wire)) ?? Data("[]".utf8)
+        }
+
+        static func decode(_ data: Data, operationId: UUID) -> [Posting]? {
+            guard let wire = try? JSONDecoder().decode([PostingWire].self, from: data) else { return nil }
+            var postings: [Posting] = []
+            for item in wire {
+                guard let id = UUID(uuidString: item.id), let accountId = UUID(uuidString: item.accountId) else { return nil }
+                postings.append(Posting(id: id, operationId: operationId, accountId: accountId, amountMinor: item.amountMinor, rubMinor: item.rubMinor))
+            }
+            return postings
         }
     }
 

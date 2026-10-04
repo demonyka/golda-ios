@@ -194,9 +194,7 @@ public final class SyncStore: Sendable {
             case .account:
                 payload = try store.account(ref.id, profileId: profileId).map(SyncPayload.account)
             case .operation:
-                payload = try store.operation(ref.id, profileId: profileId).map { .operation($0.op, postingCount: $0.postings.count) }
-            case .posting:
-                payload = try PostingRecord.owned(by: profileId).filter(id: ref.id).fetchOne(db).map { .posting($0.posting) }
+                payload = try store.operation(ref.id, profileId: profileId).map { .operation($0.op, postings: $0.postings) }
             case .obligation:
                 payload = try ObligationRecord.owned(by: profileId).filter(id: ref.id).fetchOne(db).map {
                     .obligation($0.obligation, createdAt: $0.createdAt ?? 0)
@@ -224,8 +222,8 @@ public final class SyncStore: Sendable {
     ///
     /// A local delete still waiting to be sent stands; a remote delete removes the row and any
     /// local wish for it. What wins goes to the inbox first and into the books once it can stand
-    /// there: an operation with all its postings (`postingCount`), a posting with its account,
-    /// everything with its profile. None of it is queued again.
+    /// there: an operation with the accounts of its postings, everything with its profile. None of
+    /// it is queued again.
     @discardableResult
     public func apply(_ incoming: [SyncRecord], deletions: [SyncRecordRef] = []) async throws -> [SyncRecordRef] {
         try await writer.write { db in
@@ -299,15 +297,48 @@ public final class SyncStore: Sendable {
     /// Another iCloud account signed in, or none is: what sync knew belongs to the old account.
     /// Profiles shared with the old account leave this phone (they live on with their owner); the
     /// phone's own books stay, and go to the new account's zones once it signs in.
+    ///
+    /// What this phone still owes the server for its own books stays: deletes not yet sent and
+    /// own zones of deleted profiles. Signing out and in again with the same Apple ID fetches
+    /// everything afresh, and without them deleted records and profiles would come back here and
+    /// never leave the other devices. With another Apple ID they find nothing and are done. They
+    /// are handed to the new session again; the saves are queued again by `registerProfiles`.
     public func resetForAccountChange() async throws {
         try await writer.write { db in
             let shared = try UUID.fetchAll(db, sql: "SELECT profileId FROM syncZone WHERE scope = ?", arguments: [SyncScope.shared.rawValue])
             for profileId in shared { try Store(db: db).deleteProfile(profileId) }
             if !shared.isEmpty { try keepAProfile(db) }
             try SyncLedger.discardJournal(db)
-            for table in ["syncZone", "syncOutgoing", "syncSystemFields", "syncEngineState", "syncInbox"] {
+            let owedDeletes = try SyncLedger.allOutgoing(db).filter { $0.kind == .delete && $0.ref.zone.isOwned }
+            for table in ["syncOutgoing", "syncSystemFields", "syncEngineState", "syncInbox"] {
                 try db.execute(sql: "DELETE FROM \(table)")
             }
+            try db.execute(
+                sql: "DELETE FROM syncZone WHERE removing = 0 OR scope = ?", arguments: [SyncScope.shared.rawValue]
+            )
+            for var change in owedDeletes {
+                change.handedRevision = nil
+                try SyncLedger.putOutgoing(change, db)
+            }
+        }
+    }
+
+    /// The server refused a change of [ref] for good (the owner made the profile read-only):
+    /// [serverVersion], what the server has, replaces this phone's version, nil meaning the server
+    /// has no such record and the row goes. Without this the phone would keep a change no one
+    /// else ever sees, and its books would differ from everyone else's for good.
+    public func refused(_ ref: SyncRecordRef, serverVersion: SyncRecord?) async throws {
+        try await writer.write { db in
+            try db.execute(sql: "DELETE FROM syncOutgoing WHERE key = ?", arguments: [ref.key])
+            if let serverVersion {
+                // Not a conflict to resolve: the local version has no way to the server.
+                try db.execute(sql: "DELETE FROM syncMeta WHERE tableName = ? AND id = ?", arguments: [ref.type.tableName, ref.id])
+                try SyncInbox.put(serverVersion, db)
+                try SyncInbox.promote(ref.zone.profileId, db)
+            } else {
+                try SyncInbox.delete(ref, propagate: false, db)
+            }
+            try SyncLedger.discardJournal(db)
         }
     }
 

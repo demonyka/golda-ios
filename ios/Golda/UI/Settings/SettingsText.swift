@@ -89,6 +89,10 @@ enum SettingsText {
         "Everything in Golda now will be replaced by the file. The Gemini key stays.",
         "Confirmation before restoring: what happens to the current data and the key."
     )
+    static let restoreSyncWarning = resource(
+        "With iCloud sync, the file also replaces the profiles on your other devices and for everyone you shared them with; profiles not in the file are deleted there too.",
+        "Confirmation before restoring, added when the app syncs: the change reaches iCloud and the people a profile is shared with."
+    )
     static let backupSaved = resource("Backup saved", "Message after the backup file was written.")
     static let backupFailed = resource("Could not save the file", "Message when the backup file could not be written.")
     static let restoreFailed = resource("That file did not fit; nothing changed", "Message when a file could not be restored.")
@@ -130,6 +134,10 @@ enum SettingsText {
         "Every profile with its accounts, operations and goals, this iPhone's settings and the Gemini key will be gone for good.",
         "Confirmation before erasing: what goes."
     )
+    static let eraseSyncWarning = resource(
+        "With iCloud sync, the profiles are also deleted from iCloud, from your other devices and for everyone you shared them with.",
+        "Confirmation before erasing, added when the app syncs: the profiles go from iCloud and from the people they are shared with."
+    )
     static let erase = resource("Erase", "Confirms erasing everything.")
     static let eraseFailed = resource("Not everything was erased. Try again.", "Message when erasing stopped half way.")
 
@@ -163,6 +171,15 @@ enum SettingsText {
         LocalizedStringResource("Back to \(name)", table: table, comment: "Gemini model sheet: puts the default model's name back.")
     }
 
+    /// A confirmation's message: what happens here, and, when this app syncs, that it reaches
+    /// iCloud too. Erasing deletes the profiles' zones, which takes them from the other devices and
+    /// from everyone they are shared with; restoring sends every row again over theirs.
+    static func message(
+        _ warning: LocalizedStringResource, sync: LocalizedStringResource, syncs: Bool, in locale: Locale
+    ) -> String {
+        syncs ? warning.text(in: locale) + " " + sync.text(in: locale) : warning.text(in: locale)
+    }
+
     /// "Восстановлено: 3 счёта, 14 операций".
     static func restored(_ counts: String) -> LocalizedStringResource {
         LocalizedStringResource("Restored: \(counts)", table: table, comment: "Message after a backup was restored, with what came back, “2 accounts, 14 operations”.")
@@ -189,11 +206,11 @@ enum SettingsText {
         profiles, profilesFooter,
         voice, geminiKey, keySaved, keyMissing, pasteKey, keyFooter, removeKey, keyStored, keyRemoved, keyFailed,
         model, modelTitle, modelFooter, voiceConsent, voiceFooter,
-        data, saveBackup, saveBackupDetail, restore, restoreDetail, restoreQuestion, restoreWarning,
+        data, saveBackup, saveBackupDetail, restore, restoreDetail, restoreQuestion, restoreWarning, restoreSyncWarning,
         backupSaved, backupFailed, restoreFailed, reconcileReminder, reconcileReminderDetail,
         language, appLanguage, languageFooter,
         about, version, licences, goldaCredit, grdbCredit, tailwindCredit,
-        eraseEverything, eraseQuestion, eraseWarning, erase, eraseFailed,
+        eraseEverything, eraseQuestion, eraseWarning, eraseSyncWarning, erase, eraseFailed,
     ]
 
     private static let table = "Settings"

@@ -1332,6 +1332,40 @@
           }
         }
       }
+    },
+    "With iCloud sync, the file also replaces the profiles on your other devices and for everyone you shared them with; profiles not in the file are deleted there too." : {
+      "comment" : "Confirmation before restoring, added when the app syncs: the change reaches iCloud and the people a profile is shared with.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "With iCloud sync, the file also replaces the profiles on your other devices and for everyone you shared them with; profiles not in the file are deleted there too."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "При синхронизации с iCloud файл заменит профили и на других ваших устройствах, и у всех, с кем вы ими поделились; профили, которых нет в файле, удалятся и там."
+          }
+        }
+      }
+    },
+    "With iCloud sync, the profiles are also deleted from iCloud, from your other devices and for everyone you shared them with." : {
+      "comment" : "Confirmation before erasing, added when the app syncs: the profiles go from iCloud and from the people they are shared with.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "With iCloud sync, the profiles are also deleted from iCloud, from your other devices and for everyone you shared them with."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "При синхронизации с iCloud профили удалятся и из iCloud, с других ваших устройств и у всех, с кем вы ими поделились."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

@@ -87,8 +87,9 @@ private func profileRecord(_ name: String, at time: Int64, by device: String) ->
     }
 
     @Test func everyTableOfTheBooksHasItsRecordType() {
-        #expect(SyncRecordType.allCases.map(\.rawValue) == ["Profile", "Account", "Operation", "Posting", "Obligation", "Goal", "Wish"])
-        #expect(Set(SyncRecordType.allCases.map(\.tableName)) == Set(SyncSchema.syncedColumns.keys))
+        #expect(SyncRecordType.allCases.map(\.rawValue) == ["Profile", "Account", "Operation", "Obligation", "Goal", "Wish"])
+        // Postings travel inside their operation's record.
+        #expect(Set(SyncRecordType.allCases.map(\.tableName)) == Set(SyncSchema.syncedColumns.keys).subtracting(["posting"]))
     }
 
     @Test func recordNamesThisVersionDoesNotKnowAreNotRead() {
@@ -96,6 +97,8 @@ private func profileRecord(_ name: String, at time: Int64, by device: String) ->
         #expect(SyncRecordRef(recordName: "cloudkit.zoneshare", zone: zone) == nil)
         #expect(SyncRecordRef(recordName: "Budget.11111111-2222-3333-4444-555555555555", zone: zone) == nil)
         #expect(SyncRecordRef(recordName: "Operation.42", zone: zone) == nil)
+        // Postings of the first 5b builds, which travelled as records of their own.
+        #expect(SyncRecordRef(recordName: "Posting.11111111-2222-3333-4444-555555555555", zone: zone) == nil)
     }
 
     @Test func theLaterWriterWinsAndEqualTimesFallToTheLargerDevice() {

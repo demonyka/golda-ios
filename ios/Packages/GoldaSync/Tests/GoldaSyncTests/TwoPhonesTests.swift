@@ -18,7 +18,7 @@ import Testing
 
     /// Alice sets «Семья» up (income, payday, two accounts, an expense, a payment, a goal, a wish)
     /// and shares it; Bob, who has his own profile, joins.
-    private func sharedFamily() async throws -> (alice: Phone, bob: Phone, family: UUID) {
+    private func sharedFamily(readOnly: Bool = false) async throws -> (alice: Phone, bob: Phone, family: UUID) {
         let alice = try await Phone("alice", cloud: cloud, clock: clock)
         let bob = try await Phone("bob", cloud: cloud, clock: clock)
         await alice.launch()
@@ -41,7 +41,7 @@ import Testing
         try await alice.repository.think(Consider(title: "Велосипед", amountMinor: 4_000_000, currency: "RUB"), profileId: family)
         try await alice.sync()
 
-        await cloud.share(family, of: "alice", with: "bob")
+        await cloud.share(family, of: "alice", with: "bob", readOnly: readOnly)
         try await bob.sync()
         return (alice, bob, family)
     }
@@ -162,6 +162,66 @@ import Testing
         #expect(notes.contains("Кофе"))
         #expect(notes.contains("Долг вернули"))
         try await expectSameBooks(alice, bob, family)
+    }
+
+    /// The review's interleaving: Bob turns a transfer into an expense, Alice, offline, then edits
+    /// its note. The operation and its postings are one record, so Alice's later version wins
+    /// whole on both phones: never a transfer with one leg, never an entry waiting for good.
+    @Test func concurrentEditsOfOneOperationSettleOnOneWholeVersion() async throws {
+        let (alice, bob, family) = try await sharedFamily()
+        let transfer = try await alice.repository.save(
+            Draft(type: .transfer, timestamp: now, accountId: card.id, amountMinor: 1_000_000, toAccountId: cash.id), profileId: family
+        )
+        try await alice.sync()
+        try await bob.sync()
+
+        clock.advance(1_000)
+        try await bob.repository.save(Draft(type: .expense, timestamp: now, accountId: card.id, amountMinor: 1_000_000, id: transfer), profileId: family)
+        try await bob.sync()
+        clock.advance(1_000)
+        try await alice.repository.save(
+            Draft(type: .transfer, timestamp: now, accountId: card.id, amountMinor: 1_000_000, toAccountId: cash.id, note: "В копилку", id: transfer),
+            profileId: family
+        )
+        for _ in 0..<2 {
+            try await alice.sync()
+            try await bob.sync()
+            clock.advance(OutgoingQueue.undoWindow)
+        }
+
+        let operation = try #require(try await bob.books(family)?.operations.first { $0.op.id == transfer })
+        #expect(operation.op.type == .transfer)
+        #expect(operation.op.note == "В копилку")
+        #expect(operation.postings.count == 2)
+        try await expectSameBooks(alice, bob, family)
+        #expect(try await alice.store.waitingCount() == 0)
+        #expect(try await bob.store.waitingCount() == 0)
+    }
+
+    /// A participant the owner made read-only cannot change the books on the server; their phone
+    /// takes the server's version back instead of keeping a change no one else will see.
+    @Test func aReadOnlyParticipantsChangesGiveWayToTheOwnersBooks() async throws {
+        let (alice, bob, family) = try await sharedFamily(readOnly: true)
+        let expense = try #require(try await bob.books(family)?.operations.first { $0.op.type == .expense })
+        clock.advance(1_000)
+        try await bob.repository.save(
+            Draft(type: .expense, timestamp: expense.op.timestamp, accountId: cash.id, amountMinor: 1, note: "Не моё", id: expense.op.id),
+            profileId: family
+        )
+        try await bob.repository.save(Draft(type: .income, timestamp: now, accountId: cash.id, amountMinor: 9_000_000), profileId: family)
+        try await bob.repository.renameProfile(family, to: "Моё")
+        try await bob.sync()
+        clock.advance(OutgoingQueue.undoWindow)
+        try await bob.repository.deleteOperation(expense.op.id, profileId: family)
+        clock.advance(OutgoingQueue.undoWindow)
+        try await bob.sync()
+        try await alice.sync()
+
+        #expect(await bob.transport.lastProblem == .notPermitted)
+        #expect(try await bob.books(family)?.profile.name == "Семья")
+        try await expectSameBooks(alice, bob, family)
+        #expect(try await bob.store.outgoing().isEmpty)
+        #expect(try await alice.service.participants(family).first { $0.name == "bob" }?.canWrite == false)
     }
 
     @Test func profileSettingsAndGoalsGoBothWays() async throws {

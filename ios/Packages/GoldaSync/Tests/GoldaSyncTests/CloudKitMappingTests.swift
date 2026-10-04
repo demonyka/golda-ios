@@ -34,10 +34,12 @@ import Testing
                     voiceText: "хинкали двадцать пять лари", purchaseAmountMinor: 9000, purchaseCurrency: "GEL", isEstimate: true,
                     cbrFrom: 29.5, cbrTo: 1
                 ),
-                postingCount: 2
+                postings: [
+                    Posting(operationId: operationId, accountId: Self.accountId, amountMinor: Int64.min + 1, rubMinor: -1),
+                    Posting(operationId: operationId, accountId: UUID(), amountMinor: Int64.max, rubMinor: 0),
+                ]
             ),
-            .operation(GoldaCore.Operation(type: .opening, timestamp: 0), postingCount: 1),
-            .posting(Posting(operationId: operationId, accountId: Self.accountId, amountMinor: Int64.min + 1, rubMinor: -1)),
+            .operation(GoldaCore.Operation(type: .opening, timestamp: 0), postings: []),
             .obligation(Obligation(name: "Аренда", amountMinor: 3_000_000, currency: "RUB", dayOfMonth: 5), createdAt: 4),
             .goal(Goal(name: "Отпуск", targetMinor: 1, currency: "USD", accountId: Self.accountId, savedMinor: 7, isMain: true), createdAt: 2),
             .goal(Goal(name: "Без счёта", targetMinor: 1, currency: "USD"), createdAt: 3),
@@ -55,7 +57,7 @@ import Testing
         #expect(zone.zoneID == CKRecordZone.ID(zoneName: "profile-6f9619ff-8b86-d011-b42d-00c04fc964ff", ownerName: "_owner"))
         #expect(SyncZone(zoneID: zone.zoneID, scope: .shared) == zone)
         #expect(zone.shareRecordID.recordName == CKRecordNameZoneWideShare)
-        let ref = SyncRecordRef(zone: zone, type: .posting, id: Self.accountId)
+        let ref = SyncRecordRef(zone: zone, type: .wish, id: Self.accountId)
         #expect(SyncRecordRef(recordID: ref.recordID, scope: .shared) == ref)
     }
 
@@ -88,6 +90,13 @@ import Testing
         #expect(CloudKitMapping.syncRecord(from: CloudKitMapping.ckRecord(for: stray, systemFields: nil), scope: .private) == nil)
         let bare = CKRecord(recordType: "Operation", recordID: SyncRecordRef(zone: zone, type: .operation, id: UUID()).recordID)
         #expect(CloudKitMapping.syncRecord(from: bare, scope: .private) == nil)
+        // An operation of the first 5b builds: a count of postings sent apart, not the postings.
+        let legacy = CloudKitMapping.ckRecord(for: record(everyKind[4]), systemFields: nil)
+        legacy.encryptedValues["postings"] = nil
+        legacy.encryptedValues["postingCount"] = Int64(1)
+        #expect(CloudKitMapping.syncRecord(from: legacy, scope: .private) == nil)
+        let posting = CKRecord(recordType: "Posting", recordID: CKRecord.ID(recordName: "Posting.\(UUID().uuidString.lowercased())", zoneID: zone.zoneID))
+        #expect(CloudKitMapping.syncRecord(from: posting, scope: .private) == nil)
     }
 
     @Test func systemFieldsComeBackAsTheSameRecord() throws {

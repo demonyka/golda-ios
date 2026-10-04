@@ -3,7 +3,8 @@ import GoldaData
 
 /// A CloudKit stand-in for tests: zones owned by people, shares that let others in, change tags
 /// that turn a stale save into a conflict, one change counter per server, so phones can fetch
-/// what changed since they last looked, and refusals with a time to wait, as a full quota gives.
+/// what changed since they last looked, refusals with a time to wait, as a full quota gives, and
+/// read-only participants, whose changes the server refuses.
 /// No network and no iCloud.
 public actor InMemoryCloud {
     struct ZoneKey: Hashable {
@@ -22,6 +23,8 @@ public actor InMemoryCloud {
         var tombstones: [String: (ref: SyncRecordRef, seq: Int)] = [:]
         /// Each participant with the moment they joined: a newcomer receives the whole zone.
         var participants: [String: Int] = [:]
+        /// Participants who may only read.
+        var readOnly: Set<String> = []
         var createdSeq: Int
     }
 
@@ -30,6 +33,8 @@ public actor InMemoryCloud {
         case conflict(server: SyncRecord, tag: Int)
         case zoneNotFound
         case retryLater(seconds: Int)
+        /// The person may only read the zone (CloudKit's `permissionFailure`).
+        case permissionFailure
     }
 
     public struct Changes: Sendable {
@@ -78,6 +83,10 @@ public actor InMemoryCloud {
         return key.owner == user || zone.participants[user] != nil
     }
 
+    private func canWrite(_ key: ZoneKey, _ user: String) -> Bool {
+        key.owner == user || zones[key]?.readOnly.contains(user) == false
+    }
+
     // MARK: Zones and shares
 
     func createZone(_ zone: SyncZone, by user: String) {
@@ -86,9 +95,10 @@ public actor InMemoryCloud {
     }
 
     /// [owner] shares the zone of [profileId] and [participant] accepts, in one step.
-    public func share(_ profileId: UUID, of owner: String, with participant: String) {
+    public func share(_ profileId: UUID, of owner: String, with participant: String, readOnly: Bool = false) {
         let key = ZoneKey(owner: owner, zoneName: SyncZone.own(profileId).zoneName)
         zones[key]?.participants[participant] = tick()
+        if readOnly { zones[key]?.readOnly.insert(participant) }
     }
 
     /// Whether the server has a zone for [profileId] of [owner]: for tests.
@@ -126,7 +136,7 @@ public actor InMemoryCloud {
         guard canSee(key, user), let stored = zones[key], !stored.participants.isEmpty else { return [] }
         let owner = SyncParticipant(id: key.owner, name: key.owner, isOwner: true, isCurrentUser: key.owner == user, status: .joined, canWrite: true)
         return [owner] + stored.participants.keys.sorted().map {
-            SyncParticipant(id: $0, name: $0, isOwner: false, isCurrentUser: $0 == user, status: .joined, canWrite: true)
+            SyncParticipant(id: $0, name: $0, isOwner: false, isCurrentUser: $0 == user, status: .joined, canWrite: !stored.readOnly.contains($0))
         }
     }
 
@@ -145,6 +155,7 @@ public actor InMemoryCloud {
         }
         let key = key(record.zone, for: user)
         guard canSee(key, user), var zone = zones[key] else { return .zoneNotFound }
+        guard canWrite(key, user) else { return .permissionFailure }
         let name = record.ref.recordName
         if let stored = zone.records[name], stored.tag != baseTag {
             return .conflict(server: view(stored.record, in: key, for: user), tag: stored.tag)
@@ -159,14 +170,22 @@ public actor InMemoryCloud {
         return .saved(tag: nextTag)
     }
 
-    /// Removes the record; false when the zone is not there for [user].
-    func delete(_ ref: SyncRecordRef, by user: String) -> Bool {
+    /// Removes the record.
+    func delete(_ ref: SyncRecordRef, by user: String) -> SaveResult {
         let key = key(ref.zone, for: user)
-        guard canSee(key, user) else { return false }
+        guard canSee(key, user) else { return .zoneNotFound }
+        guard canWrite(key, user) else { return .permissionFailure }
         if zones[key]?.records.removeValue(forKey: ref.recordName) != nil {
             zones[key]?.tombstones[ref.recordName] = (ref, tick())
         }
-        return true
+        return .saved(tag: 0)
+    }
+
+    /// The server's copy of [ref] as [user] sees it, with its tag; nil when there is none.
+    func fetch(_ ref: SyncRecordRef, for user: String) -> (record: SyncRecord, tag: Int)? {
+        let key = key(ref.zone, for: user)
+        guard canSee(key, user), let stored = zones[key]?.records[ref.recordName] else { return nil }
+        return (view(stored.record, in: key, for: user), stored.tag)
     }
 
     /// What [user] may see that changed after [cursor].
@@ -255,7 +274,10 @@ public actor InMemorySyncTransport: SyncTransport {
     private func send(_ kind: OutgoingKind, _ ref: SyncRecordRef) async throws {
         switch kind {
         case .delete:
-            _ = await cloud.delete(ref, by: user)
+            if case .permissionFailure = await cloud.delete(ref, by: user) {
+                try await refused(ref)
+                return
+            }
             try await store.setSystemFields(nil, for: ref)
             try await store.confirm(.delete, of: ref)
         case .save:
@@ -280,8 +302,19 @@ public actor InMemorySyncTransport: SyncTransport {
                 // As `CloudKitSyncTransport` does with `retryAfterSeconds`: not a moment before.
                 lastProblem = .retryLater(seconds: seconds)
                 try await store.postpone([ref], until: now() + Int64(seconds) * 1000)
+            case .permissionFailure:
+                try await refused(ref)
             }
         }
+    }
+
+    /// As `CloudKitSyncTransport` does with `permissionFailure`: the change will never be taken,
+    /// so the server's version replaces it here.
+    private func refused(_ ref: SyncRecordRef) async throws {
+        lastProblem = .notPermitted
+        let server = await cloud.fetch(ref, for: user)
+        if let server { try await store.setSystemFields(Data(String(server.tag).utf8), for: ref) }
+        try await store.refused(ref, serverVersion: server?.record)
     }
 
     public func fetchNow() async throws {

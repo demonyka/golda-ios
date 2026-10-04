@@ -384,8 +384,15 @@ struct SettingsScreen: View {
 
     @ViewBuilder private func promptMessage(_ prompt: Prompt) -> some View {
         switch prompt {
-        case .restore: Text(verbatim: SettingsText.restoreWarning.text(in: locale))
-        case .erase: Text(verbatim: SettingsText.eraseWarning.text(in: locale))
+        // Whenever this run syncs, even before iCloud is back: the zones go once it is.
+        case .restore:
+            Text(verbatim: SettingsText.message(
+                SettingsText.restoreWarning, sync: SettingsText.restoreSyncWarning, syncs: model.sync.availability != .off, in: locale
+            ))
+        case .erase:
+            Text(verbatim: SettingsText.message(
+                SettingsText.eraseWarning, sync: SettingsText.eraseSyncWarning, syncs: model.sync.availability != .off, in: locale
+            ))
         case .failure: EmptyView()
         }
     }

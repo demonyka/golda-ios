@@ -1,14 +1,15 @@
 import Foundation
 import GoldaCore
 
-/// The kinds of record a profile's zone holds, one per table of the books. The raw values are
-/// CloudKit record types, so they are part of the server schema and never change. Rates are not
-/// here: they are the same for everyone and every phone fetches its own.
+/// The kinds of record a profile's zone holds, one per table of the books except `posting`: an
+/// operation's postings travel inside its record (D58), so the two are one unit for conflicts. The
+/// raw values are CloudKit record types, so they are part of the server schema and never change
+/// (`Posting` records of the first 5b builds are no longer read). Rates are not here: they are the
+/// same for everyone and every phone fetches its own.
 public enum SyncRecordType: String, Codable, Sendable, CaseIterable {
     case profile = "Profile"
     case account = "Account"
     case operation = "Operation"
-    case posting = "Posting"
     case obligation = "Obligation"
     case goal = "Goal"
     case wish = "Wish"
@@ -19,7 +20,6 @@ public enum SyncRecordType: String, Codable, Sendable, CaseIterable {
         case .profile: "profile"
         case .account: "account"
         case .operation: "operation"
-        case .posting: "posting"
         case .obligation: "obligation"
         case .goal: "goal"
         case .wish: "wish"
@@ -68,10 +68,10 @@ public enum SyncPayload: Equatable, Codable, Sendable {
     /// Its `sort` travels but is not applied: the order of profiles is each phone's own.
     case profile(Profile)
     case account(Account)
-    /// An operation's header. [postingCount] lets a receiver hold the operation back until all its
-    /// postings have arrived, since CloudKit may deliver them in different batches.
-    case operation(GoldaCore.Operation, postingCount: Int)
-    case posting(Posting)
+    /// An operation with all its postings, in the order the ledger wrote them. One record, so a
+    /// receiver never sees half a transfer, and last writer wins for the whole: two phones editing
+    /// one operation never mix the legs of one version with the header of another.
+    case operation(GoldaCore.Operation, postings: [Posting])
     /// A monthly payment with its place in the creation order (payments of one day are listed in it).
     case obligation(Obligation, createdAt: Int64)
     /// A goal with its place in the creation order (the oldest becomes main, D27).
@@ -83,7 +83,6 @@ public enum SyncPayload: Equatable, Codable, Sendable {
         case .profile: .profile
         case .account: .account
         case .operation: .operation
-        case .posting: .posting
         case .obligation: .obligation
         case .goal: .goal
         case .wish: .wish
@@ -95,7 +94,6 @@ public enum SyncPayload: Equatable, Codable, Sendable {
         case .profile(let profile): profile.id
         case .account(let account): account.id
         case .operation(let operation, _): operation.id
-        case .posting(let posting): posting.id
         case .obligation(let obligation, _): obligation.id
         case .goal(let goal, _): goal.id
         case .wish(let wish): wish.id

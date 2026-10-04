@@ -79,8 +79,8 @@ enum SyncSchema {
             t.primaryKey("scope", .text)
             t.column("data", .blob).notNull()
         }
-        // Records that arrived but cannot be shown yet: an operation before all its postings
-        // (`postingCount`), a posting before its account, anything before its profile.
+        // Records that arrived but cannot be shown yet: an operation before its accounts, anything
+        // before its profile. [operationId] served postings sent apart, which `v3` ended; unused.
         try db.create(table: "syncInbox") { t in
             t.primaryKey("key", .text)
             t.column("profileId", .blob).notNull().indexed()
@@ -100,6 +100,46 @@ enum SyncSchema {
                 CREATE TRIGGER "syncJournal_\(table)_update" AFTER UPDATE ON "\(table)" WHEN \(changed) BEGIN \(journal("NEW", deleted: false)) END;
                 CREATE TRIGGER "syncJournal_\(table)_delete" AFTER DELETE ON "\(table)" BEGIN \(journal("OLD", deleted: true)) END;
                 """)
+        }
+    }
+
+    /// Postings travel inside their operation's record (D58): with records of their own, last
+    /// writer won per posting, and two phones editing one operation could leave a transfer with
+    /// one leg. So a change of a posting journals its operation, which goes again whole and stamped
+    /// now. `OR IGNORE`: when the operation itself is deleted in the same transaction (its postings
+    /// go by cascade, before or after its own trigger), the operation's delete stands.
+    ///
+    /// What the first 5b builds left goes: postings' queue entries, fields and stamps, and inbox
+    /// records in the old shape, which this version cannot read. Every operation of a profile sync
+    /// knows is sent again in the new shape; the other phones do the same once they update.
+    static func v3(_ db: Database) throws {
+        let columns = syncedColumns["posting"] ?? []
+        let changed = columns.map { "OLD.\"\($0)\" IS NOT NEW.\"\($0)\"" }.joined(separator: " OR ")
+        func journal(_ row: String) -> String {
+            "INSERT OR IGNORE INTO syncJournal (tableName, id, profileId, deleted) VALUES ('operation', \(row).operationId, \(row).profileId, 0);"
+        }
+        try db.execute(sql: """
+            DROP TRIGGER "syncJournal_posting_insert";
+            DROP TRIGGER "syncJournal_posting_update";
+            DROP TRIGGER "syncJournal_posting_delete";
+            CREATE TRIGGER "syncJournal_posting_insert" AFTER INSERT ON "posting" BEGIN \(journal("NEW")) END;
+            CREATE TRIGGER "syncJournal_posting_update" AFTER UPDATE ON "posting" WHEN \(changed) BEGIN \(journal("NEW")) \(journal("OLD")) END;
+            CREATE TRIGGER "syncJournal_posting_delete" AFTER DELETE ON "posting" BEGIN \(journal("OLD")) END;
+            DELETE FROM syncOutgoing WHERE key LIKE '%|Posting.%';
+            DELETE FROM syncSystemFields WHERE key LIKE '%|Posting.%';
+            DELETE FROM syncInbox WHERE type IN ('Operation', 'Posting');
+            DELETE FROM syncMeta WHERE tableName = 'posting';
+            DELETE FROM syncJournal;
+            """)
+        let operations = try Row.fetchAll(db, sql: """
+            SELECT operation.id, operation.profileId FROM operation
+            JOIN syncZone ON syncZone.profileId = operation.profileId AND syncZone.removing = 0
+            ORDER BY operation.rowid
+            """)
+        for row in operations {
+            let profileId: UUID = row["profileId"]
+            guard let zone = try SyncLedger.zoneRow(profileId, db)?.zone else { continue }
+            try SyncLedger.enqueue(.save, SyncRecordRef(zone: zone, type: .operation, id: row["id"]), profileId: profileId, now: 0, db)
         }
     }
 }
