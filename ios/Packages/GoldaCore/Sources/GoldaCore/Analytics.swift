@@ -68,11 +68,15 @@ public enum Analytics {
             return !day.isBefore(period.from) && !day.isAfter(period.to)
         }
         let expenses = inPeriod.filter { $0.op.type == .expense }
-        func cost(_ full: OperationFull) -> Int64 { -full.postings.reduce(0) { $0 + $1.rubMinor } }
+        // Sums held at ±Int64.max, so a stored row too big to add up cannot crash the report (D59).
+        func cost(_ full: OperationFull) -> Int64 { -full.postings.moneySum(\.rubMinor) }
 
         var byDay: [LocalDate: Int64] = [:]
-        for full in expenses { byDay[Ledger.localDate(full.op.timestamp, zone), default: 0] += cost(full) }
-        let spent = expenses.reduce(0) { $0 + cost($1) }
+        for full in expenses {
+            let day = Ledger.localDate(full.op.timestamp, zone)
+            byDay[day] = Money.add(byDay[day] ?? 0, cost(full))
+        }
+        let spent = expenses.moneySum(cost)
         let lastCounted = min(period.to, today)
         let countedDays = max(Int64(LocalDate.daysBetween(period.from, lastCounted)) + 1, 1)
 
@@ -99,7 +103,7 @@ public enum Analytics {
         for full in expenses {
             let key = full.op.categoryKey
             if totals[key] == nil { order.append(key) }
-            totals[key, default: 0] += cost(full)
+            totals[key] = Money.add(totals[key] ?? 0, cost(full))
         }
         let categories = order
             .map { CategorySpend(categoryKey: $0, rubMinor: totals[$0] ?? 0) }
@@ -111,7 +115,7 @@ public enum Analytics {
             spentRub: spent,
             averagePerDayRub: spent / countedDays,
             categories: categories,
-            incomeRub: inPeriod.filter { $0.op.type == .income }.reduce(0) { sum, full in sum + full.postings.reduce(0) { $0 + $1.rubMinor } },
+            incomeRub: inPeriod.filter { $0.op.type == .income }.moneySum { $0.postings.moneySum(\.rubMinor) },
             fxLossRub: Money.roundHalfUp(loss * 100),
             fxVolumeRub: Money.roundHalfUp(volume * 100)
         )

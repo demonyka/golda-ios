@@ -46,7 +46,7 @@ public enum Goals {
         } else {
             fromAccount = 0
         }
-        return max(fromAccount + goal.savedMinor, 0)
+        return max(Money.add(fromAccount, goal.savedMinor), 0)
     }
 
     public static func targetRub(_ goal: Goal, _ rates: Rates) -> Int64? {

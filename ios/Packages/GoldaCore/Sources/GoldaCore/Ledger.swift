@@ -118,8 +118,9 @@ public enum Ledger {
             let own = byAccount[account.id] ?? []
             result[account.id] = AccountState(
                 account: account,
-                balanceMinor: own.reduce(0) { $0 + $1.amountMinor },
-                rubMinor: own.reduce(0) { $0 + $1.rubMinor }
+                // Held at ±Int64.max: a stored row too big to add up shows a wrong figure, not a crash (D59).
+                balanceMinor: own.moneySum(\.amountMinor),
+                rubMinor: own.moneySum(\.rubMinor)
             )
         }
         return result
@@ -132,7 +133,7 @@ public enum Ledger {
         let covered = balance > 0 ? min(minor, balance) : 0
         let fromBasis = covered > 0 ? Money.roundHalfUp(Double(state.rubMinor) * Double(covered) / Double(balance)) : 0
         let rest = minor - covered
-        return fromBasis + (rest > 0 ? rates.rubMinor(rest, state.currency) ?? 0 : 0)
+        return Money.add(fromBasis, rest > 0 ? rates.rubMinor(rest, state.currency) ?? 0 : 0)
     }
 
     public static func inflowRub(_ account: Account, _ minor: Int64, _ rates: Rates) -> Int64 {
@@ -210,19 +211,19 @@ public enum Budget {
     ) -> Today {
         let free = states.values.filter(\.account.includeInFree)
         let freeIds = Set(free.map(\.account.id))
-        let freeRub = free.reduce(0) { $0 + $1.rubMinor }
+        let freeRub = free.moneySum(\.rubMinor)
         let spentToday = operations
             .filter { $0.op.type == .expense && Ledger.localDate($0.op.timestamp, zone) == today }
             .flatMap(\.postings)
             .filter { freeIds.contains($0.accountId) }
-            .reduce(0) { $0 - $1.rubMinor }
+            .reduce(0) { Money.subtract($0, $1.rubMinor) }
         let payday = settings.nextPayday(today)
         let days = max(LocalDate.daysBetween(today, payday), 1)
         let due = dueRub(obligations, before: payday, from: today, rates: rates)
-        let perDay = (freeRub + spentToday - due) / Int64(days)
+        let perDay = Money.subtract(Money.add(freeRub, spentToday), due) / Int64(days)
         return Today(
             freeRub: freeRub, obligationsRub: due, spentTodayRub: spentToday, daysLeft: days,
-            perDayRub: perDay, leftTodayRub: perDay - spentToday, nextPayday: payday
+            perDayRub: perDay, leftTodayRub: Money.subtract(perDay, spentToday), nextPayday: payday
         )
     }
 
@@ -253,17 +254,17 @@ public enum Budget {
             full.postings.filter { freeIds.contains($0.accountId) }.map { (time: full.op.timestamp, posting: $0) }
         }
         if !free.contains(where: { $0.time < start }) { return nil }
-        let freeThen = free.filter { $0.time < end }.reduce(0) { $0 + $1.posting.rubMinor }
+        let freeThen = free.filter { $0.time < end }.moneySum(\.posting.rubMinor)
         let due = dueRub(obligations, before: next, from: last, rates: rates)
         let days = max(LocalDate.daysBetween(last, next), 1)
-        return today.perDayRub - (freeThen - due) / Int64(days)
+        return Money.subtract(today.perDayRub, Money.subtract(freeThen, due) / Int64(days))
     }
 
     private static func dueRub(_ obligations: [Obligation], before limit: LocalDate, from date: LocalDate, rates: Rates?) -> Int64 {
         obligations
             .filter { nextDue($0.dayOfMonth, date).isBefore(limit) }
-            .reduce(0) { sum, o in
-                sum + (o.currency == "RUB" ? o.amountMinor : rates?.rubMinor(o.amountMinor, o.currency) ?? 0)
+            .moneySum { o in
+                (o.currency == "RUB" ? o.amountMinor : rates?.rubMinor(o.amountMinor, o.currency) ?? 0)
             }
     }
 
@@ -286,8 +287,9 @@ public enum Budget {
         var minimum: Int64?
         for (op, posting) in moves {
             let before = op.type == .opening || Ledger.localDate(op.timestamp, zone) < monthStart
-            balance += posting.amountMinor
-            if !before { minimum = min(minimum ?? (balance - posting.amountMinor), balance) }
+            let previous = balance
+            balance = Money.add(balance, posting.amountMinor)
+            if !before { minimum = min(minimum ?? previous, balance) }
         }
         let base = max(min(minimum ?? balance, balance), 0)
         return Money.roundHalfUp(Double(base) * rate / 100 * Double(today.lengthOfMonth) / 365)

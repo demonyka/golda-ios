@@ -46,13 +46,19 @@ import Testing
 
         let pending = center.requests
         let headphones = try await wish("Наушники"), bike = try await wish("Велосипед")
-        #expect(Set(pending.keys) == ["wish.\(headphones.id)", "wish.\(bike.id)", "payment.\(loan)", "reconcile"])
-        let payment = try #require(pending["payment.\(loan)"])
+        // Every reminder of the next two payments, each its own request (D49).
+        let payments = ["2026-10-22", "2026-10-25", "2026-11-22", "2026-11-25"].map { "payment.\(loan).\($0)" }
+        #expect(Set(pending.keys) == Set(["wish.\(headphones.id)", "wish.\(bike.id)", "reconcile"] + payments))
+        let payment = try #require(pending[payments[0]])
         #expect(payment.title == "Кредит")
         #expect(payment.body == "Через 3 дня платёж: 10\u{202F}000 ₽")
         #expect(payment.subtitle == "Личный", "two profiles: each says whose")
         #expect(payment.trigger == .day(LocalDate(2026, 10, 22), hour: 10, minute: 0))
         #expect(payment.tap == ReminderTap(profileId: personal, destination: .accounts))
+        // The day's own reminder is already there: it does not wait for the app to run after the first.
+        let dueDay = try #require(pending[payments[1]])
+        #expect(dueDay.body == "Сегодня платёж: 10\u{202F}000 ₽")
+        #expect(dueDay.trigger == .day(LocalDate(2026, 10, 25), hour: 10, minute: 0))
         #expect(pending["wish.\(bike.id)"]?.tap == ReminderTap(profileId: family, destination: .wish(bike.id)))
         #expect(pending["wish.\(bike.id)"]?.subtitle == "Семья")
         #expect(pending["reconcile"]?.tap == ReminderTap(profileId: nil, destination: .reconcile))
@@ -74,7 +80,7 @@ import Testing
         let added = center.addedCount
         await scheduler.replan()
         #expect(center.addedCount == added)
-        #expect(center.requests.count == 4)
+        #expect(center.requests.count == 7)
     }
 
     @Test func aDecidedWishAndASwitchedOffReconcileAreTakenBack() async throws {
@@ -87,7 +93,7 @@ import Testing
         await scheduler.replan()
         #expect(center.requests["wish.\(headphones.id)"] == nil)
         #expect(center.requests["reconcile"] == nil)
-        #expect(center.requests.count == 2)
+        #expect(center.requests.count == 5)
     }
 
     @Test func oneProfileNeedsNoName() async throws {
@@ -104,7 +110,7 @@ import Testing
         center.allow()
         scheduler.debounce = .milliseconds(10)
         scheduler.start()
-        await eventually { center.requests.count == 4 }
+        await eventually { center.requests.count == 7 }
 
         let wish = try await harness.repository.think(Consider(title: "Самокат", amountMinor: 3_000_000, currency: "RUB"), profileId: family)
         await eventually { center.requests["wish.\(wish.id)"] != nil }
@@ -119,7 +125,7 @@ import Testing
         _ = try await twoProfiles()
         await scheduler.askPermission()
         #expect(center.askedCount == 1)
-        #expect(center.requests.count == 4)
+        #expect(center.requests.count == 7)
         await scheduler.askPermission()
         #expect(center.askedCount == 1, "asked already")
     }

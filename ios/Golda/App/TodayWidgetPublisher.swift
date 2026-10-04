@@ -13,18 +13,18 @@ extension TodaySnapshot {
         self.init(
             profileName: data.profile.name,
             namesProfile: namesProfile,
-            days: [today, today.plusDays(1)].map { Day(HomeHero(data: data, today: $0), on: $0, base: data.base) }
+            days: [today, today.plusDays(1)].map { Day(HomeHero(data: data, today: $0), on: $0) }
         )
     }
 }
 
 extension TodaySnapshot.Day {
-    init(_ hero: HomeHero, on date: LocalDate, base: Base) {
+    init(_ hero: HomeHero, on date: LocalDate) {
         self.init(
             date: date.description,
             currency: hero.currency,
             leftMinor: hero.leftMinor,
-            perDayMinor: base.minor(hero.budget.perDayRub),
+            perDay: hero.perDay,
             others: hero.others,
             daysToPayday: hero.daysLeft,
             progress: hero.progress,

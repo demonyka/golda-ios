@@ -118,7 +118,8 @@ extension Repository {
             guard var goal = context.mainGoal else { return SkipOutcome(wish: wish, goal: nil, addedMinor: nil) }
             let rub = Goals.rubOf(consider.amountMinor, consider.currency, context.rates)
             let added = Goals.minorOfRub(rub, goal.currency, context.rates)
-            goal.savedMinor += added
+            // Held at Int64.max: savings already that big (an old backup) must not trap (D59).
+            goal.savedMinor = Money.add(goal.savedMinor, added)
             try store.save(goal, profileId: profileId)
             return SkipOutcome(wish: wish, goal: goal, addedMinor: added)
         }
@@ -186,7 +187,7 @@ extension Repository {
         return try await database.read { store in
             guard let full = try store.operation(operationId, profileId: profileId), full.op.type == .expense else { return nil }
             let context = try Self.budgetContext(store, profileId: profileId, device: device, now: now, zone: zone)
-            let cost = -full.postings.reduce(0) { $0 + $1.rubMinor }
+            let cost = -full.postings.moneySum(\.rubMinor)
             let hourNet = context.settings.hourNet
             return Impact(
                 costRub: cost,

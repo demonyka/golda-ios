@@ -219,6 +219,13 @@ import Testing
         #expect(try await wish(outcome.wish.id) == outcome.wish)
     }
 
+    /// A goal's savings already at Int64.max (an old backup): a refusal adds to it without trapping (D59).
+    @Test func skippingOntoAHugeGoalDoesNotTrap() async throws {
+        try await repository.saveGoal(Goal(id: StoreFixture.id(50), name: "Дом", targetMinor: 5_000_000, currency: "RUB", savedMinor: .max), profileId: profileId)
+        let outcome = try await repository.skip(Consider(title: "Бургер", amountMinor: 5_000, currency: "RUB"), profileId: profileId)
+        #expect(outcome.goal?.savedMinor == .max)
+    }
+
     @Test func skippingAWaitingWishPutsTheMoneyTowardsTheMainGoal() async throws {
         try await repository.saveGoal(Goal(id: StoreFixture.id(50), name: "Велосипед", targetMinor: 5_000_000, currency: "RUB", savedMinor: 100), profileId: profileId)
         let consider = Consider(title: "Бургер", amountMinor: 5_000, currency: "USD")

@@ -52,7 +52,7 @@ extension TodaySnapshot.Day {
     static var sample: TodaySnapshot.Day {
         TodaySnapshot.Day(
             date: LocalDate(epochMillis: Int64(Date.now.timeIntervalSince1970 * 1000), in: .current).description,
-            currency: "RUB", leftMinor: 184_900, perDayMinor: 264_800, others: "", daysToPayday: 8,
+            currency: "RUB", leftMinor: 184_900, perDay: "2\u{202F}648 ₽", others: "", daysToPayday: 8,
             progress: 0.7, isOverspent: false
         )
     }

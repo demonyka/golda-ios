@@ -189,6 +189,17 @@ import Testing
         #expect(try await harness.snapshot(profileId).accounts.first?.reconciledAt == RepositoryHarness.start)
     }
 
+    /// A balance held at Int64.max (rows too big to add up, from an old Android backup or another
+    /// phone): reconciling to a negative figure books the difference without trapping (D59).
+    @Test func reconcilingAHugeBalanceDoesNotTrap() async throws {
+        try await repository.save(Draft(type: .opening, timestamp: 0, accountId: rub.id, amountMinor: .max), profileId: profileId)
+        try await repository.save(Draft(type: .opening, timestamp: 1, accountId: rub.id, amountMinor: .max), profileId: profileId)
+        #expect(try await harness.state(rub.id, profileId).balanceMinor == .max)
+        let adjustment = try #require(try await repository.reconcile(accountId: rub.id, actualMinor: -Money.maxMinor, profileId: profileId))
+        let full = try #require(try await harness.operation(adjustment, profileId))
+        #expect(full.postings.map(\.amountMinor) == [-.max])
+    }
+
     @Test func aMatchBooksNothingButTheTime() async throws {
         try await repository.save(Draft(type: .opening, timestamp: 0, accountId: usd.id, amountMinor: 10_000), profileId: profileId)
         harness.clock.set(RepositoryHarness.start + 3_600_000)

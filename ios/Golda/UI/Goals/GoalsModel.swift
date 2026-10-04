@@ -14,7 +14,8 @@ struct SkippedTotal: Equatable, Sendable {
     let amount: String
 
     init(wishes: [Wish], rates: Rates, base: Base) {
-        rubMinor = wishes.filter { $0.status == .skipped }.reduce(0) { $0 + Goals.rubOf($1.amountMinor, $1.currency, rates) }
+        // Held at Int64.max: refusals too big to add up show a wrong figure, not a crash (D59).
+        rubMinor = wishes.filter { $0.status == .skipped }.moneySum { Goals.rubOf($0.amountMinor, $0.currency, rates) }
         amount = (rubMinor > 0 ? "+" : "") + base.approx(rubMinor)
     }
 

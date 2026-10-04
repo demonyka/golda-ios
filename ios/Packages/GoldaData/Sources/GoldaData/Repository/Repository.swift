@@ -220,7 +220,8 @@ public actor Repository {
                 throw RepositoryError.unknownAccount(accountId)
             }
             let state = Ledger.states([account], try store.postings(profileId: profileId))[accountId]
-            let delta = actualMinor - (state?.balanceMinor ?? 0)
+            // Held at ±Int64.max: a balance too big to add up must not trap here either (D59).
+            let delta = Money.subtract(actualMinor, state?.balanceMinor ?? 0)
             var adjustment: UUID?
             if delta != 0 {
                 let draft = Draft(type: .adjustment, timestamp: now, accountId: accountId, amountMinor: delta)

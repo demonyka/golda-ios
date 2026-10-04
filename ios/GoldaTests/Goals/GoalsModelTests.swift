@@ -71,6 +71,13 @@ import Testing
         #expect(skipped.amount == "+93,8 $")
     }
 
+    /// Refusals too big to add up (an old Android backup) hold at Int64.max instead of trapping (D59).
+    @Test func hugeRefusalsDoNotTrap() {
+        let fixture = GoalsFixture()
+        let huge = (1...2).map { Wish(title: "\($0)", amountMinor: .max, currency: "RUB", createdAt: 0, decideAt: 0, status: .skipped) }
+        #expect(SkippedTotal(wishes: huge, rates: fixture.data.rates, base: fixture.data.base).rubMinor == .max)
+    }
+
     @Test func goalsWithoutAMainOneAskToPickIt() {
         var fixture = GoalsFixture()
         fixture.bike.isMain = false

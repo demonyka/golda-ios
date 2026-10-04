@@ -63,31 +63,46 @@ import Testing
 
     // MARK: Debt payments
 
+    func paymentId(_ n: Int, _ date: LocalDate) -> String { "payment.\(uid(n).uuidString).\(date)" }
+    func graceId(_ n: Int, _ date: LocalDate) -> String { "grace.\(uid(n).uuidString).\(date)" }
+
+    /// Every reminder of the next two payments is planned at once, each a request of its own: the
+    /// system shows them without the app, which may not run again before the day (a background
+    /// refresh comes when iOS decides, never after a force quit), as Android's daily worker would.
     @Test func aPaymentRemindsThreeDaysBeforeAndOnTheDay() {
         let book = books([loan()])
         let early = plan([book], now: at(2026, 10, 3, 12, in: utc))
-        #expect(early.map(\.event) == [.payment(accountId: uid(1), accountName: "Кредит", amountMinor: 1_000_000, currency: "RUB", daysLeft: 3)])
-        #expect(early.map(\.time) == [.day(LocalDate(2026, 10, 22), hour: 10, minute: 0)])
-        #expect(early.map(\.fireAt) == [at(2026, 10, 22, 10, in: utc)])
-        #expect(early.map(\.id) == ["payment.\(uid(1).uuidString)"])
+        #expect(early.map(\.event) == [3, 0, 3, 0].map {
+            .payment(accountId: uid(1), accountName: "Кредит", amountMinor: 1_000_000, currency: "RUB", daysLeft: $0)
+        })
+        let days = [LocalDate(2026, 10, 22), LocalDate(2026, 10, 25), LocalDate(2026, 11, 22), LocalDate(2026, 11, 25)]
+        #expect(early.map(\.time) == days.map { .day($0, hour: 10, minute: 0) })
+        #expect(early.map(\.fireAt) == days.map { $0.atTimeMillis(hour: 10, in: utc) })
+        #expect(early.map(\.id) == days.map { paymentId(1, $0) })
 
-        // Past the three-day one, the day itself is next.
+        // Past the three-day one, the day itself stays planned: nothing waits for the app to run.
         let threeDaysBefore = plan([book], now: at(2026, 10, 22, 10, 30, in: utc))
-        #expect(threeDaysBefore.map(\.time) == [.day(LocalDate(2026, 10, 25), hour: 10, minute: 0)])
-        #expect(threeDaysBefore.map(\.event) == [.payment(accountId: uid(1), accountName: "Кредит", amountMinor: 1_000_000, currency: "RUB", daysLeft: 0)])
+        #expect(threeDaysBefore.map(\.time) == days.dropFirst().map { .day($0, hour: 10, minute: 0) })
 
-        // On the day before ten it still comes; after it, next month's payment is the nearest.
-        #expect(plan([book], now: at(2026, 10, 25, 9, in: utc)).map(\.fireAt) == [at(2026, 10, 25, 10, in: utc)])
+        // On the day before ten it still comes; after it, the next two payments are November's and December's.
+        #expect(plan([book], now: at(2026, 10, 25, 9, in: utc)).first?.fireAt == at(2026, 10, 25, 10, in: utc))
         let afterwards = plan([book], now: at(2026, 10, 25, 10, 1, in: utc))
-        #expect(afterwards.map(\.time) == [.day(LocalDate(2026, 11, 22), hour: 10, minute: 0)])
+        #expect(afterwards.map(\.time) == [
+            LocalDate(2026, 11, 22), LocalDate(2026, 11, 25), LocalDate(2026, 12, 22), LocalDate(2026, 12, 25),
+        ].map { .day($0, hour: 10, minute: 0) })
     }
 
     @Test func aPaymentDayPastTheMonthsEndFallsOnItsLastDay() {
         let book = books([loan(paymentDay: 31)])
-        #expect(plan([book], now: at(2027, 2, 1, 12, in: utc)).map(\.time) == [.day(LocalDate(2027, 2, 25), hour: 10, minute: 0)])
-        #expect(plan([book], now: at(2027, 2, 26, 12, in: utc)).map(\.time) == [.day(LocalDate(2027, 2, 28), hour: 10, minute: 0)])
+        #expect(Array(plan([book], now: at(2027, 2, 1, 12, in: utc)).map(\.time).prefix(2)) == [
+            .day(LocalDate(2027, 2, 25), hour: 10, minute: 0), .day(LocalDate(2027, 2, 28), hour: 10, minute: 0),
+        ])
+        #expect(plan([book], now: at(2027, 2, 26, 12, in: utc)).first?.time == .day(LocalDate(2027, 2, 28), hour: 10, minute: 0))
         // March has the 31st again: three days before it is the 28th.
-        #expect(plan([book], now: at(2027, 2, 28, 12, in: utc)).map(\.time) == [.day(LocalDate(2027, 3, 28), hour: 10, minute: 0)])
+        #expect(plan([book], now: at(2027, 2, 28, 12, in: utc)).map(\.time) == [
+            .day(LocalDate(2027, 3, 28), hour: 10, minute: 0), .day(LocalDate(2027, 3, 31), hour: 10, minute: 0),
+            .day(LocalDate(2027, 4, 27), hour: 10, minute: 0), .day(LocalDate(2027, 4, 30), hour: 10, minute: 0),
+        ])
     }
 
     @Test func onlyADebtStillOwedWithAPaymentIsReminded() {
@@ -103,9 +118,9 @@ import Testing
 
     @Test func debtRemindersFallAtTenWhereverThePhoneIs() {
         let planned = plan([books([loan()])], now: at(2026, 10, 3, 12, in: moscow), zone: moscow)
-        #expect(planned.map(\.time) == [.day(LocalDate(2026, 10, 22), hour: 10, minute: 0)])
+        #expect(planned.first?.time == .day(LocalDate(2026, 10, 22), hour: 10, minute: 0))
         // Ten in Moscow is seven in UTC.
-        #expect(planned.map(\.fireAt) == [at(2026, 10, 22, 7, in: utc)])
+        #expect(planned.first?.fireAt == at(2026, 10, 22, 7, in: utc))
     }
 
     // MARK: Interest-free period
@@ -113,19 +128,20 @@ import Testing
     @Test func theGracePeriodRemindsAWeekADayAndOnItsLastDay() {
         let book = books([card(graceUntil: LocalDate(2026, 10, 20))], owed: 4_210_050)
         func next(_ now: Int64) -> [Reminder] { plan([book], now: now) }
+        func event(_ daysLeft: Int) -> Reminder.Event {
+            .gracePeriod(accountId: uid(2), accountName: "Кредитка", owedMinor: 4_210_050, currency: "RUB", daysLeft: daysLeft)
+        }
+        let days = [LocalDate(2026, 10, 13), LocalDate(2026, 10, 19), LocalDate(2026, 10, 20)]
 
+        // All three at once: the last day's must come even if the app never runs after the first.
         let week = next(at(2026, 10, 3, 12, in: utc))
-        #expect(week.map(\.event) == [.gracePeriod(accountId: uid(2), accountName: "Кредитка", owedMinor: 4_210_050, currency: "RUB", daysLeft: 7)])
-        #expect(week.map(\.time) == [.day(LocalDate(2026, 10, 13), hour: 10, minute: 0)])
-        #expect(week.map(\.id) == ["grace.\(uid(2).uuidString)"])
+        #expect(week.map(\.event) == [event(7), event(1), event(0)])
+        #expect(week.map(\.time) == days.map { .day($0, hour: 10, minute: 0) })
+        #expect(week.map(\.id) == days.map { graceId(2, $0) })
 
-        let day = next(at(2026, 10, 13, 11, in: utc))
-        #expect(day.map(\.time) == [.day(LocalDate(2026, 10, 19), hour: 10, minute: 0)])
-        #expect(day.map(\.event) == [.gracePeriod(accountId: uid(2), accountName: "Кредитка", owedMinor: 4_210_050, currency: "RUB", daysLeft: 1)])
-
-        let last = next(at(2026, 10, 19, 10, 30, in: utc))
-        #expect(last.map(\.time) == [.day(LocalDate(2026, 10, 20), hour: 10, minute: 0)])
-        #expect(last.map(\.event) == [.gracePeriod(accountId: uid(2), accountName: "Кредитка", owedMinor: 4_210_050, currency: "RUB", daysLeft: 0)])
+        #expect(next(at(2026, 10, 13, 11, in: utc)).map(\.event) == [event(1), event(0)])
+        #expect(next(at(2026, 10, 19, 10, 30, in: utc)).map(\.event) == [event(0)])
+        #expect(next(at(2026, 10, 19, 10, 30, in: utc)).map(\.time) == [.day(LocalDate(2026, 10, 20), hour: 10, minute: 0)])
 
         // Once the last reminder has gone off, the period is over and nothing is left.
         #expect(next(at(2026, 10, 20, 10, in: utc)).isEmpty)
@@ -136,18 +152,35 @@ import Testing
         #expect(plan([books([card(graceUntil: LocalDate(2026, 10, 20))], owed: 0)], now: at(2026, 10, 3, 12, in: utc)).isEmpty)
     }
 
-    // MARK: Nearest only
+    // MARK: Every debt reminder planned
 
-    /// A card both pays monthly and has an interest-free period: Android posts both under two ids
-    /// of its own (100 000 + id and 200 000 + id). Each keeps only its next reminder, so a debt
-    /// takes two of the 64 places at most, never a month of them.
-    @Test func eachDebtPlansOnlyTheNearestReminderOfEachKind() {
+    /// A card both pays monthly and has an interest-free period: Android posts both kinds (under
+    /// 100 000 + id and 200 000 + id). Each reminder is a request of its own, so a debt takes at most
+    /// seven of the places (four for two payments, three for the period); the plan's limit keeps the
+    /// soonest when there are more.
+    @Test func eachDebtPlansEveryReminderStillToCome() {
         let both = card(paymentDay: 25, graceUntil: LocalDate(2026, 10, 25))
         let planned = plan([books([both, loan(3)])], now: at(2026, 10, 3, 12, in: utc))
         #expect(planned.map(\.id) == [
-            "grace.\(uid(2).uuidString)", "payment.\(uid(2).uuidString)", "payment.\(uid(3).uuidString)",
+            graceId(2, LocalDate(2026, 10, 18)),
+            paymentId(2, LocalDate(2026, 10, 22)), paymentId(3, LocalDate(2026, 10, 22)),
+            graceId(2, LocalDate(2026, 10, 24)),
+            graceId(2, LocalDate(2026, 10, 25)), paymentId(2, LocalDate(2026, 10, 25)), paymentId(3, LocalDate(2026, 10, 25)),
+            paymentId(2, LocalDate(2026, 11, 22)), paymentId(3, LocalDate(2026, 11, 22)),
+            paymentId(2, LocalDate(2026, 11, 25)), paymentId(3, LocalDate(2026, 11, 25)),
         ])
-        #expect(planned.map(\.fireAt) == [at(2026, 10, 18, 10, in: utc), at(2026, 10, 22, 10, in: utc), at(2026, 10, 22, 10, in: utc)])
+        #expect(Set(planned.map(\.id)).count == planned.count, "every request has an id of its own")
+    }
+
+    /// Many debts: the limit keeps the soonest, so the nearer reminders of every debt come first.
+    @Test func manyDebtsKeepTheSoonestWithinTheLimit() {
+        let loans = (1...20).map { loan($0) }
+        let planned = plan([books(loans)], now: at(2026, 10, 3, 12, in: utc))
+        #expect(planned.count == Reminders.limit)
+        // 20 debts, four payment reminders each: the three nearest days of every debt are kept.
+        for day in [LocalDate(2026, 10, 22), LocalDate(2026, 10, 25), LocalDate(2026, 11, 22)] {
+            #expect(planned.filter { $0.time == .day(day, hour: 10, minute: 0) }.count == 20)
+        }
     }
 
     // MARK: Reconcile
@@ -187,8 +220,8 @@ import Testing
         let now = at(2026, 10, 3, 12, in: utc)
         let wish = Wish(id: uid(9), title: "Велосипед", amountMinor: 8_000_000, currency: "RUB", createdAt: now, decideAt: now + 24 * 3_600_000)
         let planned = plan([books([loan(1)], id: 100), books([], wishes: [wish], id: 200)], reconcile: true, now: now)
-        #expect(planned.map(\.id) == ["wish.\(uid(9).uuidString)", "reconcile", "payment.\(uid(1).uuidString)"])
-        #expect(planned.map(\.booksId) == [uid(200), nil, uid(100)])
+        #expect(Array(planned.prefix(3).map(\.id)) == ["wish.\(uid(9).uuidString)", "reconcile", paymentId(1, LocalDate(2026, 10, 22))])
+        #expect(planned.map(\.booksId) == [uid(200), nil, uid(100), uid(100), uid(100), uid(100)])
     }
 
     /// iOS keeps 64 pending notifications and drops the rest without a word, so the plan stops

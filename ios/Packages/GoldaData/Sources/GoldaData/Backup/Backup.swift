@@ -128,6 +128,8 @@ public enum BackupError: Error, Equatable, Sendable {
     case duplicateId(String)
     /// A row points at something the file does not hold, or holds in another profile.
     case danglingReference(String)
+    /// An amount past `Money.maxMinor`, which nothing in the app can write (D59).
+    case amountOutOfRange(String)
 }
 
 extension Backup {
@@ -159,9 +161,27 @@ extension Backup {
                             "posting \(posting.id) is on an account that is not in profile \(snapshot.profile.id)"
                         )
                     }
+                    try requireInRange(posting.amountMinor, "posting \(posting.id)")
                 }
+                try requireInRange(full.op.purchaseAmountMinor, "operation \(full.op.id)")
             }
+            for account in snapshot.accounts { try requireInRange(account.paymentMinor, "account \(account.id)") }
+            for obligation in snapshot.obligations { try requireInRange(obligation.amountMinor, "obligation \(obligation.id)") }
+            for goal in snapshot.goals {
+                try requireInRange(goal.targetMinor, "goal \(goal.id)")
+                try requireInRange(goal.savedMinor, "goal \(goal.id)")
+            }
+            for wish in snapshot.wishes { try requireInRange(wish.amountMinor, "wish \(wish.id)") }
         }
+    }
+
+    /// Every amount in a currency's own minor units stays within what the app could have written.
+    /// Swift traps on Int64 overflow where Kotlin's Long wraps, so one row near Int64.max (Android
+    /// took up to Long.MAX_VALUE, a file can be edited) would otherwise crash every launch once the
+    /// sums ran (D59). Ruble values are left alone: the sums hold at ±Int64.max for them.
+    private func requireInRange(_ minor: Int64?, _ row: String) throws {
+        guard let minor, minor.magnitude > Money.maxMinor.magnitude else { return }
+        throw BackupError.amountOutOfRange("\(row): \(minor)")
     }
 
     private func requireUnique(_ ids: [UUID], _ kind: String) throws {

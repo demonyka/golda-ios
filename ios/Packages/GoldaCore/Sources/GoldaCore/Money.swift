@@ -13,6 +13,35 @@ public enum Money {
         let rounded = x - floor >= 0.5 ? floor + 1 : floor
         return rounded >= limit ? .max : Int64(rounded)
     }
+
+    /// The biggest amount the app takes, in minor units of its own currency: 10^15, ten trillion
+    /// rubles or dollars, far past anyone's books. Swift traps on Int64 overflow where Kotlin's Long
+    /// wraps, so an amount near Int64.max (a slip of the finger, a crafted backup) would crash the
+    /// app at every launch as soon as the sums ran. Kept at this size, even the dearest currency
+    /// in kopecks stays a thousand times below Int64.max (D59).
+    public static let maxMinor: Int64 = 1_000_000_000_000_000
+
+    /// [a] + [b], held at ±Int64.max instead of trapping. Symmetric, so negating a sum never traps
+    /// either: a stored row that is too big shows a wrong figure, never a crash (D59).
+    public static func add(_ a: Int64, _ b: Int64) -> Int64 {
+        let (sum, overflow) = a.addingReportingOverflow(b)
+        if overflow { return b > 0 ? .max : -.max }
+        return sum == .min ? -.max : sum
+    }
+
+    /// [a] − [b], held at ±Int64.max like `add`.
+    public static func subtract(_ a: Int64, _ b: Int64) -> Int64 {
+        let (difference, overflow) = a.subtractingReportingOverflow(b)
+        if overflow { return b < 0 ? .max : -.max }
+        return difference == .min ? -.max : difference
+    }
+}
+
+extension Sequence {
+    /// The sum of [value] over the elements, held at ±Int64.max (`Money.add`).
+    public func moneySum(_ value: (Element) throws -> Int64) rethrows -> Int64 {
+        try reduce(0) { Money.add($0, try value($1)) }
+    }
 }
 
 public enum Currencies {
@@ -123,7 +152,7 @@ public enum Fmt {
     }
 
     /// Accepts "15", "15,5", "1 500.25". Nil for anything that is not a non-negative amount, and for
-    /// amounts too big to hold.
+    /// amounts past `Money.maxMinor` (Kotlin takes up to Long.MAX_VALUE; D59).
     public static func parseMinor(_ text: String, _ code: String) -> Int64? {
         let clean = text
             .replacingOccurrences(of: " ", with: "")
@@ -137,7 +166,7 @@ public enum Fmt {
         var scaled = value * Decimal(Currencies.integerFactor(code))
         var rounded = Decimal()
         NSDecimalRound(&rounded, &scaled, 0, .plain) // half up, like BigDecimal's HALF_UP
-        guard !rounded.isNaN, rounded <= Decimal(Int64.max) else { return nil }
+        guard !rounded.isNaN, rounded <= Decimal(Money.maxMinor) else { return nil }
         return NSDecimalNumber(decimal: rounded).int64Value
     }
 

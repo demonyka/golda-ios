@@ -159,7 +159,7 @@ struct InsightsContent: Equatable, Sendable {
             )
         }
         if !rest.isEmpty {
-            let folded = rest.reduce(0) { $0 + $1.rubMinor }
+            let folded = rest.moneySum(\.rubMinor)
             // A lone folded category keeps its own name: "Everything else" would hide what it is.
             slices.append(InsightsSlice(
                 id: slices.count, title: rest.count == 1 ? CategoryTitle(rest[0].categoryKey) : .rest, rubMinor: folded,

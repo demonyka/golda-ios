@@ -547,6 +547,37 @@ import Testing
                     p["operations"] = operations
                 }
             }),
+            // Past `Money.maxMinor`: Swift traps where Kotlin wraps, so such a row would crash every launch (D59).
+            ("amount past the cap", try tampered {
+                try profile(&$0, 0) { p in
+                    var operations = p["operations"] as? [[String: Any]] ?? []
+                    var postings = operations[0]["postings"] as? [[String: Any]] ?? []
+                    postings[0]["amountMinor"] = Int64.max
+                    operations[0]["postings"] = postings
+                    p["operations"] = operations
+                }
+            }),
+            ("negative amount past the cap", try tampered {
+                try profile(&$0, 0) { p in
+                    var operations = p["operations"] as? [[String: Any]] ?? []
+                    var postings = operations[0]["postings"] as? [[String: Any]] ?? []
+                    postings[0]["amountMinor"] = -Money.maxMinor - 1
+                    operations[0]["postings"] = postings
+                    p["operations"] = operations
+                }
+            }),
+            ("goal savings past the cap", try tampered {
+                try profile(&$0, 0) { p in
+                    var goals = p["goals"] as? [[String: Any]] ?? []
+                    goals[0]["savedMinor"] = Money.maxMinor + 1
+                    p["goals"] = goals
+                }
+            }),
+            ("v1 amount past the cap", try BackupFixtures.edit(android) { file in
+                var postings = try #require(file["postings"] as? [[String: Any]])
+                postings[0]["amountMinor"] = Int64.max
+                file["postings"] = postings
+            }),
             ("profile without a name", try tampered { try profile(&$0, 1) { $0.removeValue(forKey: "name") } }),
             ("id that is not a UUID", try tampered {
                 try profile(&$0, 0) { p in

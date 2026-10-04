@@ -6,13 +6,14 @@ import GoldaCore
 /// tomorrow being what Home would show then if nothing more were recorded (the budget needs only
 /// the balances and the day), so the widget turns over at midnight by itself (`TodayTimeline`).
 ///
-/// Compiled into the widgets too. Amounts are minor units of the main currency, written here with
-/// the app's `Fmt`, so the widget and Home always agree.
+/// Compiled into the widgets too. The big number is in minor units of the main currency, written
+/// with the app's `Fmt`; the day's share is Home's own text, so the widget and Home always agree.
 struct TodaySnapshot: Codable, Equatable, Sendable {
     /// The «Можно сегодня» widget's kind, the one the app asks WidgetKit to reload.
     static let widgetKind = "com.f4studio.golda.today"
-    /// Bumped when the shape changes: a widget reads only the shape it knows.
-    static let currentVersion = 1
+    /// Bumped when the shape changes: a widget reads only the shape it knows. 2: the day's share
+    /// became Home's text instead of minor units.
+    static let currentVersion = 2
     var version = TodaySnapshot.currentVersion
     /// The profile the figures are of.
     let profileName: String
@@ -34,8 +35,10 @@ struct TodaySnapshot: Codable, Equatable, Sendable {
         let currency: String
         /// What is left that day, in minor units of [currency]; negative once overspent.
         let leftMinor: Int64
-        /// The day's share, in minor units of [currency].
-        let perDayMinor: Int64
+        /// "2 648 ₽", the day's share as Home writes it (`Base.approx`), taken from Home and not
+        /// formatted again: rounded to minor units first, "5,649 $" would be "5,65" and then "5,7 $"
+        /// where Home writes "5,6 $".
+        let perDay: String
         /// "52,2 ₾ · 20 $", the other currencies as Home writes them; empty when there are none.
         let others: String
         let daysToPayday: Int
@@ -48,9 +51,6 @@ struct TodaySnapshot: Codable, Equatable, Sendable {
 
         /// "1 849 ₽", the big number as Home writes it (`Base.whole`).
         var left: String { Fmt.split(leftMinor, currency).whole + " " + Currencies.symbol(currency) }
-
-        /// "2 648 ₽", the day's share as Home writes it (`Base.approx`).
-        var perDay: String { Fmt.approx(Currencies.toMajor(perDayMinor, currency), currency) }
     }
 }
 

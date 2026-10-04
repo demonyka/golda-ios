@@ -33,7 +33,7 @@ import Testing
         #expect(today.currency == "RUB")
         // (19 500 + 500) ₽ over 8 days is 2 500 ₽ a day; 500 ₽ of it is gone.
         #expect(today.leftMinor == 200_000)
-        #expect(today.perDayMinor == 250_000)
+        #expect(today.perDay == "2\u{202F}500 ₽")
         #expect(today.daysToPayday == 8)
         #expect(today.progress == 0.8)
         #expect(!today.isOverspent)
@@ -52,7 +52,7 @@ import Testing
         let hero = HomeHero(data: data, today: F.today.plusDays(1))
 
         // 19 500 ₽ over the 7 days left.
-        #expect(tomorrow.perDayMinor == 278_571)
+        #expect(tomorrow.perDay == "2\u{202F}786 ₽")
         #expect(tomorrow.leftMinor == 278_571)
         #expect(tomorrow.daysToPayday == 7)
         #expect(tomorrow.progress == 1)
@@ -89,6 +89,25 @@ import Testing
         #expect(today.left == hero.left)
         #expect(today.perDay == hero.perDay)
         #expect(today.others == hero.others)
+    }
+
+    /// A main currency with decimals: Home rounds the exact share once ("5,6 $" for 5.649). The
+    /// widget must not round it to cents first and then again ("5,65" → "5,7 $"), so it carries
+    /// Home's own text. Shares from 49 000 to 50 999 kopecks a day, at 88 ₽ a dollar, cross many
+    /// of those boundaries.
+    @Test func theDaysShareIsWrittenExactlyAsHomeWritesIt() throws {
+        var mismatches: [String] = []
+        for kopecks in Int64(49_000)..<51_000 {
+            var books = HomeFixture()
+            books.device.baseCurrency = "USD"
+            // 8 days to payday, nothing spent: the share is the opening over 8.
+            books.operations = [F.operation(.opening, at: F.at(LocalDate(2026, 9, 1), hour: 9), [(books.rub, kopecks * 8, kopecks * 8)])]
+            let data = books.data
+            let today = try #require(TodaySnapshot(data: data, today: F.today, namesProfile: false).days.first)
+            let hero = HomeHero(data: data, today: F.today)
+            if today.perDay != hero.perDay { mismatches.append("\(kopecks): \(today.perDay) ≠ \(hero.perDay)") }
+        }
+        #expect(mismatches.isEmpty, "\(mismatches.prefix(5))")
     }
 
     // MARK: The App Group
@@ -138,7 +157,7 @@ import Testing
 
     private func day(_ date: String, left: Int64) -> TodaySnapshot.Day {
         TodaySnapshot.Day(
-            date: date, currency: "RUB", leftMinor: left, perDayMinor: 250_000, others: "", daysToPayday: 8,
+            date: date, currency: "RUB", leftMinor: left, perDay: "2\u{202F}500 ₽", others: "", daysToPayday: 8,
             progress: 0.5, isOverspent: false
         )
     }
