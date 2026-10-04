@@ -40,11 +40,14 @@ jobs:
           xcodegen generate
 
       # Unsigned: CI has no certificates, and the simulator does not need them. Runs the hosted
-      # unit tests and the UI scenarios.
+      # unit tests and the UI scenarios. The hosted runner is several times slower than a Mac, and a
+      # different UI scenario ran out of time on each run (a toast, a banner, a swipe), while each
+      # passes on its own: a failed test gets two more tries before it fails the build.
       - name: Test the app
         working-directory: ios
         run: |
           xcodebuild test \
             -project Golda.xcodeproj -scheme Golda \
             -destination 'platform=iOS Simulator,name=iPhone 17' \
+            -retry-tests-on-failure -test-iterations 3 \
             CODE_SIGNING_ALLOWED=NO
