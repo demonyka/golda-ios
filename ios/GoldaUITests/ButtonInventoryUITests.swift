@@ -117,9 +117,15 @@ final class ButtonInventoryUITests: XCTestCase {
         XCTAssertTrue(second.waitForExistence(timeout: 5))
         walk.shoot("charged")
         second.tap()
-        XCTAssertTrue(app.textFields["entry.second.field"].waitForExistence(timeout: 5))
+        let charge = app.textFields["entry.second.field"]
+        XCTAssertTrue(charge.waitForExistence(timeout: 5))
+        XCTAssertTrue(waitUntil { charge.value(forKey: "hasKeyboardFocus") as? Bool == true }, "the charge opens to be typed")
+        // The bank's figure over the estimate. Typing is also what brings the keyboard on screen
+        // to be put away (`Walk.dismissKeyboard`).
+        charge.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: (charge.value as? String ?? "").count) + "5")
         walk.dismissKeyboard()
         XCTAssertTrue(second.waitForExistence(timeout: 5), "the charge folds back into its line")
+        XCTAssertTrue(second.label.hasPrefix("5 "), "the bank's figure, not the estimate: \(second.label)")
 
         // The day: a calendar with a way back.
         let date = app.buttons["entry.date"]

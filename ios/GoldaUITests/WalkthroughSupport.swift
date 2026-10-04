@@ -113,7 +113,11 @@ struct Walk {
         app.navigationBars.buttons.element(boundBy: 0).tap()
     }
 
-    /// A short drag on a form puts the keyboard away: it goes as soon as the form scrolls.
+    /// A short drag on a form puts the keyboard away: it goes as soon as the form scrolls. Only a
+    /// keyboard on screen goes, and a field's focus with it. While the Mac's keyboard is connected
+    /// to the simulator (Simulator's default), iOS keeps the on-screen one below the edge until
+    /// something is typed, so a field that was only tapped keeps its focus through the drag: type
+    /// into it first.
     func dismissKeyboard() {
         guard app.keyboards.firstMatch.exists else { return }
         let from = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.42))
