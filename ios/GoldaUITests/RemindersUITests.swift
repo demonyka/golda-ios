@@ -47,7 +47,10 @@ final class RemindersUITests: XCTestCase {
     /// brings the samples' waiting wish to a few seconds ahead. Its banner comes over the home
     /// screen, and tapping it opens the wish.
     @MainActor
-    func testARealReminderComesAndItsTapOpensTheWish() {
+    func testARealReminderComesAndItsTapOpensTheWish() throws {
+        // The hosted CI simulator never shows the banner or Notification Center (three tries out
+        // of three on each run); the scheduling and the tap have their own tests that run there.
+        try XCTSkipIf(ProcessInfo.processInfo.environment["GOLDA_CI"] != nil, "no notification UI on the CI runner")
         let app = launch(["-golda.remindSoon"])
         let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
         // Asked once per install; a run after an earlier one finds the answer given. The alert is in

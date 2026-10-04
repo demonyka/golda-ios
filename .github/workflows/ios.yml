@@ -45,6 +45,9 @@ jobs:
       # passes on its own: a failed test gets two more tries before it fails the build.
       - name: Test the app
         working-directory: ios
+        # xcodebuild hands TEST_RUNNER_ variables to the tests without the prefix.
+        env:
+          TEST_RUNNER_GOLDA_CI: '1'
         run: |
           xcodebuild test \
             -project Golda.xcodeproj -scheme Golda \
