@@ -30,6 +30,14 @@ import Testing
         #expect(draft.accountId == uid(7))
     }
 
+    /// «Полтора» next to the amounts made the model hear «1000 песо» as "1500" now and then (owner,
+    /// on the iPhone): the prompt gives no example that multiplies what was said.
+    @Test func noExampleTurnsAnAmountIntoOneAndAHalf() {
+        let prompt = VoicePrompt.system(accounts: [], categories: Category.builtIn, settings: Settings(), today: LocalDate(2026, 10, 4))
+        #expect(!prompt.contains("полтор"))
+        #expect(!prompt.contains("\"1.5\""))
+    }
+
     @Test func unnamedPurchasesGetTheCallersTitle() {
         let item = VoiceItem(intent: "consider", amount: "50", currency: "USD", note: "  ")
         let actions = VoiceMapper.actions(VoiceResult(transcript: "", items: [item]), accounts: [], categories: [], settings: Settings(), rates: Rates([:], markup: 0), recordedAt: 0, zone: utc, unnamedPurchase: "Покупка")
