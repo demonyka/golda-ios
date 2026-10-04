@@ -29,8 +29,7 @@ struct CurrencyPickSheet: View {
                             pick(code)
                         } label: {
                             HStack {
-                                Text(verbatim: SettingsCurrencies.label(code))
-                                    .foregroundStyle(Theme.Color.text)
+                                CurrencyNameLabel(code: code)
                                 Spacer()
                                 if code == selected {
                                     // Graphite: what is picked (D34).
@@ -98,35 +97,49 @@ struct CurrencyPickSheet: View {
 
 // MARK: - Shown currencies
 
-/// A switch per currency, as Android's `DisplayCurrencyToggles`. Each flip is kept at once; the
-/// ruble cannot be hidden.
+/// A switch per currency, as Android's `DisplayCurrencyToggles`, for every currency there is: the
+/// popular ones, then the rest by name, with a search. Each flip is kept at once; the ruble cannot
+/// be hidden. Onboarding opens it too, from "Все валюты".
 struct ShownCurrenciesSheet: View {
     var onDismiss: () -> Void
 
     @Environment(AppModel.self) private var model
     @Environment(\.locale) private var locale
+    @State private var query = ""
 
     var body: some View {
+        let sections = SettingsCurrencies.shownSections(model.device, matching: query, in: locale)
         NavigationStack {
             List {
-                Section {
-                    ForEach(SettingsCurrencies.shownOptions(model.device)) { option in
-                        Toggle(isOn: Binding(get: { option.isOn }, set: { _ in model.toggleShownCurrency(option.code) })) {
-                            Text(verbatim: SettingsCurrencies.label(option.code))
-                                .foregroundStyle(Theme.Color.text)
-                        }
-                        .disabled(option.isLocked)
-                        .frame(minHeight: Theme.minimumTarget)
-                        .accessibilityIdentifier("settings.shown.\(option.code)")
+                if !sections.popular.isEmpty {
+                    Section {
+                        switches(sections.popular)
+                    } header: {
+                        Text(verbatim: CurrencyText.popular.text(in: locale))
+                    } footer: {
+                        Text(verbatim: SettingsText.shownCurrenciesFooter.text(in: locale))
                     }
-                } footer: {
-                    Text(verbatim: SettingsText.shownCurrenciesFooter.text(in: locale))
+                    .listRowBackground(Theme.Color.card)
                 }
-                .listRowBackground(Theme.Color.card)
+                if !sections.others.isEmpty {
+                    Section {
+                        switches(sections.others)
+                    } header: {
+                        Text(verbatim: CurrencyText.others.text(in: locale))
+                    }
+                    .listRowBackground(Theme.Color.card)
+                }
             }
             .listStyle(.insetGrouped)
             .scrollContentBackground(.hidden)
             .background(Theme.Color.page)
+            .overlay {
+                if sections.isEmpty { ContentUnavailableView.search(text: query) }
+            }
+            .searchable(
+                text: $query, placement: .navigationBarDrawer(displayMode: .always),
+                prompt: Text(verbatim: CurrencyText.search.text(in: locale))
+            )
             .navigationTitle(Text(verbatim: SettingsText.shownCurrencies.text(in: locale)))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -138,6 +151,18 @@ struct ShownCurrenciesSheet: View {
         }
         .presentationDetents([.large])
         .presentationBackground(Theme.Color.page)
+    }
+
+    private func switches(_ codes: [String]) -> some View {
+        ForEach(codes, id: \.self) { code in
+            let option = SettingsCurrencies.option(code, model.device)
+            Toggle(isOn: Binding(get: { option.isOn }, set: { _ in model.toggleShownCurrency(code) })) {
+                CurrencyNameLabel(code: code)
+            }
+            .disabled(option.isLocked)
+            .frame(minHeight: Theme.minimumTarget)
+            .accessibilityIdentifier("settings.shown.\(code)")
+        }
     }
 }
 

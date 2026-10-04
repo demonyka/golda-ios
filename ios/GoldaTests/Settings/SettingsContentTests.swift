@@ -32,22 +32,49 @@ import Testing
         #expect(SettingsCurrencies.pickOptions(device(shown: ["RUB", "USD", "USD"]), selected: "USD") == ["RUB", "USD"])
     }
 
-    @Test func everyCommonCurrencyHasASwitchInOneFixedOrderAndTheRubleIsLocked() {
-        let options = SettingsCurrencies.shownOptions(device(shown: ["RUB", "GEL", "USD"]))
-        #expect(options.map(\.code) == Currencies.common)
+    @Test func everyCurrencyHasASwitchInOneFixedOrderAndTheRubleIsLocked() {
+        let samples = device(shown: ["RUB", "GEL", "USD"])
+        let sections = SettingsCurrencies.shownSections(samples, matching: "", in: ru)
+        #expect(sections.popular == Currencies.popular)
+        #expect(sections.others == CurrencySections(matching: "", in: ru).others)
+        let options = (sections.popular + sections.others).map { SettingsCurrencies.option($0, samples) }
         #expect(options.filter(\.isOn).map(\.code) == ["RUB", "USD", "GEL"])
         #expect(options.filter(\.isLocked).map(\.code) == ["RUB"])
 
-        // A shown currency outside the common ones comes last, so it can be turned off.
-        let odd = SettingsCurrencies.shownOptions(device(shown: ["RUB", "GBP"]))
-        #expect(odd.last == SettingsCurrencies.ShownOption(code: "GBP", isOn: true, isLocked: false))
+        // A shown currency outside the catalogue comes last, so it can be turned off.
+        let odd = device(shown: ["RUB", "BGN"])
+        let last = SettingsCurrencies.shownSections(odd, matching: "", in: ru).others.last
+        #expect(last.map { SettingsCurrencies.option($0, odd) } == SettingsCurrencies.ShownOption(code: "BGN", isOn: true, isLocked: false))
     }
 
-    @Test func showingACurrencyPutsItInTheCommonOrder() {
+    @Test func theSwitchesAreFoundByNameOrCode() {
+        let samples = device(shown: ["RUB", "USD"])
+        let pesos = SettingsCurrencies.shownSections(samples, matching: "ARS", in: en)
+        #expect(pesos.popular.isEmpty)
+        #expect(pesos.others == ["ARS"])
+        #expect(SettingsCurrencies.shownSections(samples, matching: "доллар", in: ru).popular == ["USD"])
+    }
+
+    @Test func onboardingSwitchesThePopularOnesAndWhateverElseIsShown() {
+        #expect(SettingsCurrencies.inlineOptions(device(shown: ["RUB", "USD"])).map(\.code) == Currencies.popular)
+        let pesos = SettingsCurrencies.inlineOptions(device(shown: ["RUB", "USD", "MXN", "ARS"]))
+        #expect(pesos.map(\.code) == Currencies.popular + ["ARS", "MXN"])
+        #expect(pesos.suffix(2).map(\.isOn) == [true, true])
+    }
+
+    @Test func showingACurrencyPutsItInTheCatalogueOrder() {
         let shown = SettingsCurrencies.toggling("EUR", in: device(shown: ["RUB", "GEL", "USD"], local: "GEL", main: "USD"))
         #expect(shown.displayCurrencies == ["RUB", "USD", "EUR", "GEL"])
         #expect(shown.localCurrency == "GEL")
         #expect(shown.baseCurrency == "USD")
+        let pesos = SettingsCurrencies.toggling("ARS", in: shown)
+        #expect(pesos.displayCurrencies == ["RUB", "USD", "EUR", "GEL", "ARS"])
+    }
+
+    @Test func theMainCurrencyCanBeARareOne() {
+        // Picked out of the shown ones, so a peso turned on can be the main currency at once.
+        let pesos = SettingsCurrencies.toggling("ARS", in: device(shown: ["RUB", "USD"]))
+        #expect(SettingsCurrencies.pickOptions(pesos, selected: pesos.baseCurrency) == ["RUB", "USD", "ARS"])
     }
 
     @Test func hidingTheLocalOrMainCurrencyFallsBackToRubles() {

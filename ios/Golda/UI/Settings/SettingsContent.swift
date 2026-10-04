@@ -24,8 +24,7 @@ enum SettingsCurrencies {
         return shown.contains(selected) ? shown : shown + [selected]
     }
 
-    /// One switch per currency in the fixed order of `Currencies.common`, so nothing jumps when one
-    /// is flipped; a shown currency outside that list comes last, so it can still be turned off.
+    /// One switch per currency in a fixed order, so nothing jumps when one is flipped.
     struct ShownOption: Equatable, Identifiable, Sendable {
         let code: String
         let isOn: Bool
@@ -35,11 +34,20 @@ enum SettingsCurrencies {
         var id: String { code }
     }
 
-    static func shownOptions(_ device: DeviceSettings) -> [ShownOption] {
-        let extra = device.displayCurrencies.uniqued().filter { !Currencies.common.contains($0) }
-        return (Currencies.common + extra).map { code in
-            ShownOption(code: code, isOn: device.displayCurrencies.contains(code), isLocked: code == "RUB")
-        }
+    static func option(_ code: String, _ device: DeviceSettings) -> ShownOption {
+        ShownOption(code: code, isOn: device.displayCurrencies.contains(code), isLocked: code == "RUB")
+    }
+
+    /// Every currency's switch: the popular ones, then the rest by name, narrowed to [query]; a
+    /// shown currency outside the catalogue comes last, so it can still be turned off.
+    static func shownSections(_ device: DeviceSettings, matching query: String, in locale: Locale) -> CurrencySections {
+        CurrencySections(extra: device.displayCurrencies, matching: query, in: locale)
+    }
+
+    /// The switches onboarding shows in its list: the popular currencies and whatever else is shown
+    /// (turned on in the full list), in the catalogue's order. The rest wait behind "Все валюты".
+    static func inlineOptions(_ device: DeviceSettings) -> [ShownOption] {
+        Currencies.ordered(Currencies.popular + device.displayCurrencies).map { option($0, device) }
     }
 
     /// [device] with [code] shown or hidden by `CurrencyDisplay.toggleDisplayCurrency`: the ruble

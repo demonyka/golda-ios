@@ -101,20 +101,9 @@ struct AccountFormSheet: View {
     @ViewBuilder private var currencyRow: some View {
         let title = Text("Currency", tableName: "AccountForm", comment: "Account form: the account's currency.")
         if form.isNew {
-            Picker(selection: Binding(get: { form.currency }, set: { form.pickCurrency($0) })) {
-                ForEach(form.preferredCurrencies, id: \.self) { code in
-                    Text(verbatim: AccountFormModel.currencyLabel(code)).tag(code)
-                }
-                Section {
-                    ForEach(form.otherCurrencies, id: \.self) { code in
-                        Text(verbatim: AccountFormModel.currencyLabel(code)).tag(code)
-                    }
-                }
-            } label: {
-                title
+            CurrencyPickRow(title: title, selection: form.currency, yours: form.preferredCurrencies, identifier: "accountForm.currency") {
+                form.pickCurrency($0)
             }
-            .pickerStyle(.menu)
-            .accessibilityIdentifier("accountForm.currency")
         } else {
             LabeledContent {
                 Text(verbatim: AccountFormModel.currencyLabel(form.currency))

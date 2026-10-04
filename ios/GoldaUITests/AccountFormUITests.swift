@@ -53,6 +53,46 @@ final class AccountFormUITests: XCTestCase {
         app.descendants(matching: .any)["account.hero"]
     }
 
+    /// Any currency, searched for in the full list: pesos, whose rate the offline samples lack, so the
+    /// account also shows how a currency without a rate behaves.
+    @MainActor
+    func testANewAccountCanBeInAnyCurrency() {
+        let app = launch()
+        openAccounts(app)
+        let name = openNewAccountForm(app)
+        name.tap()
+        name.typeText("Pesos")
+
+        let currency = app.buttons["accountForm.currency"]
+        XCTAssertTrue(currency.label.contains("₾ GEL"), currency.label)
+        currency.tap()
+        // The person's own currencies first, the local one ticked.
+        let lari = app.buttons["accountForm.currency.GEL"]
+        XCTAssertTrue(lari.waitForExistence(timeout: 5))
+        XCTAssertTrue(lari.isSelected)
+        let search = app.searchFields.firstMatch
+        XCTAssertTrue(search.waitForExistence(timeout: 5))
+        search.tap()
+        search.typeText("peso")
+        let pesos = app.buttons["accountForm.currency.ARS"]
+        XCTAssertTrue(pesos.waitForExistence(timeout: 5))
+        XCTAssertTrue(pesos.label.contains("Argentine Peso"), pesos.label)
+        XCTAssertTrue(app.buttons["accountForm.currency.MXN"].exists)
+        XCTAssertFalse(lari.exists, "the search narrows the list")
+        pesos.tap()
+        XCTAssertTrue(name.waitForExistence(timeout: 5), "a pick goes back to the form")
+        XCTAssertTrue(eventually { currency.label.contains("ARS") }, currency.label)
+
+        let opening = app.textFields["accountForm.opening"]
+        opening.tap()
+        opening.typeText("1000")
+        app.buttons["accountForm.save"].tap()
+        XCTAssertTrue(eventually { !name.exists }, "the form closes")
+        let created = row(app, "Pesos")
+        scrollTo(created, in: app)
+        XCTAssertTrue(created.label.contains("Argentine pesos"), created.label)
+    }
+
     @MainActor
     func testAddAnAccountThenEditAndDeleteItFromItsPage() {
         let app = launch()

@@ -1,0 +1,74 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Name or code" : {
+      "comment" : "Currency lists: the prompt of the search field, which finds a currency by its name or its code.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name or code"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Название или код"
+          }
+        }
+      }
+    },
+    "Other currencies" : {
+      "comment" : "Currency lists: the header over every other currency, by name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other currencies"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Другие валюты"
+          }
+        }
+      }
+    },
+    "Popular" : {
+      "comment" : "Currency lists: the header over the popular currencies (ruble, dollar, euro, lari…).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Popular"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Популярные"
+          }
+        }
+      }
+    },
+    "Your currencies" : {
+      "comment" : "Currency list of a form: the header over the person's own currencies, the local and the shown ones.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your currencies"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Твои валюты"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

@@ -229,10 +229,9 @@ import Testing
 
     // MARK: Currency
 
-    @Test func theLocalAndShownCurrenciesComeFirstThenTheRest() {
+    @Test func theLocalAndShownCurrenciesComeFirst() {
         let form = newForm()
         #expect(form.preferredCurrencies == ["GEL", "RUB", "USD"])
-        #expect(form.otherCurrencies == ["EUR", "THB", "TRY", "KZT", "AMD", "CNY", "AED", "VND", "IDR"])
     }
 
     @Test func amountsAreReadInTheCurrencyPicked() throws {
@@ -334,7 +333,6 @@ import Testing
         let lira = Account(name: "Лиры", currency: "TRY", type: .cash, includeInFree: true)
         let form = AccountFormModel(accounts: accounts + [lira], settings: settings, editing: lira)
         #expect(form.preferredCurrencies == ["GEL", "RUB", "USD", "TRY"])
-        #expect(!form.otherCurrencies.contains("TRY"))
     }
 
     @Test func editingKeepsTheGroupAndTheGracePeriod() throws {

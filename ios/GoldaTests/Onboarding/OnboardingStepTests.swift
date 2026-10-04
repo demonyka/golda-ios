@@ -52,7 +52,10 @@ import Testing
             #expect(step.note.text(in: en) != step.note.text(in: ru), "\(step)")
         }
         #expect(OnboardingStep.income.note.text(in: ru).contains("«можно сегодня»"))
-        #expect(OnboardingStep.currencies.note.text(in: en).contains("The ruble is the main one"))
+        // The main currency is picked on this step, so the note no longer says it is the ruble.
+        #expect(OnboardingStep.currencies.note.text(in: en).contains("Big numbers and totals are in the main one"))
+        #expect(!OnboardingStep.currencies.note.text(in: ru).contains("Рубль"))
+        #expect(OnboardingStep.mainHeader.text(in: ru) == "Основная валюта — в ней крупные цифры и итоги")
     }
 
     @Test func theBarIsReadAsAPositionInWords() {

@@ -88,20 +88,10 @@ struct GoalFormSheet: View {
             )
             // The amount is centred; the line under it starts at the row's edge, not at the digits.
             .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
-            Picker(selection: $form.currency) {
-                ForEach(form.preferredCurrencies, id: \.self) { code in
-                    Text(verbatim: AccountFormModel.currencyLabel(code)).tag(code)
-                }
-                Section {
-                    ForEach(form.otherCurrencies, id: \.self) { code in
-                        Text(verbatim: AccountFormModel.currencyLabel(code)).tag(code)
-                    }
-                }
-            } label: {
-                Text(verbatim: GoalFormModel.currencyTitle.text(in: locale))
-            }
-            .pickerStyle(.menu)
-            .accessibilityIdentifier("goalForm.currency")
+            CurrencyPickRow(
+                title: Text(verbatim: GoalFormModel.currencyTitle.text(in: locale)), selection: form.currency,
+                yours: form.preferredCurrencies, identifier: "goalForm.currency"
+            ) { form.currency = $0 }
         } header: {
             Text(verbatim: GoalFormModel.targetCaption.text(in: locale))
         }

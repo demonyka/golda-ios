@@ -30,9 +30,8 @@ struct GoalFormModel: Equatable, Sendable {
     /// The id a new goal gets, fixed for the life of the form so a second tap saves the same goal.
     let goalId: UUID
     /// Offered first, in the app's one order: the local currency, the shown ones, an edited goal's own.
+    /// Every other currency follows them in the list (`CurrencySections`).
     let preferredCurrencies: [String]
-    /// The rest of the common currencies.
-    let otherCurrencies: [String]
     let accounts: [AccountChoice]
     /// The profile's main goal when it is another one.
     let otherMainGoal: Goal?
@@ -63,9 +62,7 @@ struct GoalFormModel: Equatable, Sendable {
         // A new goal starts in the first shown currency that is not the ruble, as on Android: what
         // you save up for abroad is priced there.
         let start = editing?.currency ?? settings.displayCurrencies.first { $0 != "RUB" } ?? "RUB"
-        let preferred = CurrencyDisplay.currencyChoices(settings: settings, extra: [start])
-        preferredCurrencies = preferred
-        otherCurrencies = Currencies.common.filter { !preferred.contains($0) }
+        preferredCurrencies = CurrencyDisplay.currencyChoices(settings: settings, extra: [start])
         self.accounts = accounts.map { AccountChoice(id: $0.id, name: $0.name) }
 
         name = editing?.name ?? ""

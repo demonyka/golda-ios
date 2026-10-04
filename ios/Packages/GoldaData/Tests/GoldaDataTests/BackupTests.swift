@@ -71,6 +71,33 @@ import Testing
         #expect(got.geminiModel == "gemini-3.5-flash" && !got.reconcileReminder)
     }
 
+    @Test func anyCurrencyCodeComesBack() async throws {
+        // Pesos from the full catalogue and a code no list knows (a lev from before the euro, a typo
+        // from another app): neither is checked against a list, so neither is lost.
+        let source = try BackupHarness()
+        let family = StoreFixture.id(900)
+        try await source.database.write { store in
+            try store.save(Profile(id: family, name: "Семья", sort: 0))
+            try store.save(Account(id: StoreFixture.id(901), name: "Песо", currency: "ARS", type: .cash, includeInFree: true), profileId: family)
+            try store.save(Account(id: StoreFixture.id(902), name: "Левы", currency: "BGN", type: .cash, includeInFree: true), profileId: family)
+            try store.save([RateRecord(code: "ARS", rubPerUnit: 0.055, date: "2026-10-03")])
+        }
+        source.device.update {
+            $0.displayCurrencies = ["RUB", "ARS", "ZZZ"]
+            $0.localCurrency = "ARS"
+            $0.baseCurrency = "ZZZ"
+        }
+        let file = try await source.backups.export()
+
+        let target = try BackupHarness()
+        try await target.backups.import(file, personalProfileName: "Не нужен")
+        #expect(try await target.onlySnapshot().accounts.map(\.currency) == ["ARS", "BGN"])
+        #expect(try await target.rates().contains(RateRecord(code: "ARS", rubPerUnit: 0.055, date: "2026-10-03")))
+        let device = target.device.current
+        #expect(device.displayCurrencies == ["RUB", "ARS", "ZZZ"])
+        #expect(device.localCurrency == "ARS" && device.baseCurrency == "ZZZ")
+    }
+
     @Test func nothingIsRoundedOnTheWay() async throws {
         let source = try await livedIn()
         let target = try BackupHarness()

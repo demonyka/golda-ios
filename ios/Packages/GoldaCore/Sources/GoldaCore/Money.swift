@@ -16,8 +16,30 @@ public enum Money {
 }
 
 public enum Currencies {
-    /// Offered in pickers. Any code the CBR publishes works.
-    public static let common = ["RUB", "USD", "EUR", "GEL", "THB", "TRY", "KZT", "AMD", "CNY", "AED", "VND", "IDR"]
+    /// First in every list: Android's twelve, where people who count in rubles live and travel,
+    /// with the pound after the euro.
+    public static let popular = ["RUB", "USD", "EUR", "GBP", "GEL", "THB", "TRY", "KZT", "AMD", "CNY", "AED", "VND", "IDR"]
+
+    /// Every currency that can be picked: the popular ones, then the rest of ISO 4217 by code. Funds,
+    /// metals, units of account and test codes are left out, as are the currencies withdrawn since
+    /// (the kuna, the lev, the Antillean guilder…) and two that nobody pays in: the Salvadoran colón,
+    /// gone with the dollar in 2001, and Venezuela's digital bolívar. A code outside the list still
+    /// works everywhere (an old backup can bring one); it just is not offered.
+    public static let all = popular + """
+        AFN ALL AOA ARS AUD AWG AZN BAM BBD BDT BHD BIF BMD BND BOB BRL BSD BTN BWP BYN BZD CAD CDF CHF CLP COP CRC \
+        CUP CVE CZK DJF DKK DOP DZD EGP ERN ETB FJD FKP GHS GIP GMD GNF GTQ GYD HKD HNL HTG HUF ILS INR IQD IRR ISK \
+        JMD JOD JPY KES KGS KHR KMF KPW KRW KWD KYD LAK LBP LKR LRD LSL LYD MAD MDL MGA MKD MMK MNT MOP MRU MUR MVR \
+        MWK MXN MYR MZN NAD NGN NIO NOK NPR NZD OMR PAB PEN PGK PHP PKR PLN PYG QAR RON RSD RWF SAR SBD SCR SDG SEK \
+        SGD SHP SLE SOS SRD SSP STN SYP SZL TJS TMT TND TOP TTD TWD TZS UAH UGX UYU UZS VES VUV WST XAF XCD XCG XOF \
+        XPF YER ZAR ZMW ZWG
+        """.split(separator: " ").map(String.init)
+
+    /// [codes] each once in the catalogue's order: the popular ones as listed, then the rest by code.
+    /// By code and not by name, so a stored list does not depend on the interface language.
+    public static func ordered(_ codes: [String]) -> [String] {
+        let wanted = Set(codes)
+        return popular.filter(wanted.contains) + wanted.subtracting(popular).sorted()
+    }
 
     private static let symbols: [String: String] = [
         "RUB": "₽", "USD": "$", "EUR": "€", "GEL": "₾", "THB": "฿", "TRY": "₺",

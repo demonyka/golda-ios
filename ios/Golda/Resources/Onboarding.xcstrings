@@ -52,6 +52,23 @@
         }
       }
     },
+    "All currencies" : {
+      "comment" : "Onboarding, currencies step: the row under the popular currencies that opens every currency, with search.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All currencies"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все валюты"
+          }
+        }
+      }
+    },
     "Back" : {
       "comment" : "Onboarding: the button to the previous step.",
       "localizations" : {
@@ -104,7 +121,7 @@
       }
     },
     "Currency" : {
-      "comment" : "Onboarding, currencies step: the label of the local currency's menu.",
+      "comment" : "Onboarding, currencies step: the label of the local and the main currency menus.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -137,19 +154,19 @@
         }
       }
     },
-    "Every amount shows in all the chosen currencies at once. The ruble is the main one." : {
-      "comment" : "Onboarding, currencies step: what the shown currencies do.",
+    "Every amount shows in all the chosen currencies at once. Big numbers and totals are in the main one." : {
+      "comment" : "Onboarding, currencies step: what the shown currencies and the main one do.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Every amount shows in all the chosen currencies at once. The ruble is the main one."
+            "value" : "Every amount shows in all the chosen currencies at once. Big numbers and totals are in the main one."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Любая сумма будет видна сразу во всех выбранных валютах. Рубль — основная."
+            "value" : "Любая сумма будет видна сразу во всех выбранных валютах. Крупные цифры и итоги — в основной."
           }
         }
       }
@@ -184,6 +201,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Местная валюта — в ней суммы без валюты"
+          }
+        }
+      }
+    },
+    "Main currency, for big numbers and totals" : {
+      "comment" : "Onboarding, currencies step: the header over the choice of the main currency.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Main currency, for big numbers and totals"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Основная валюта — в ней крупные цифры и итоги"
           }
         }
       }

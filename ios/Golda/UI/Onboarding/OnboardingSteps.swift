@@ -62,41 +62,65 @@ struct OnboardingIncomeStep: View {
     }
 }
 
-/// Currencies: what every amount is shown in, then the local currency, out of those. The main
-/// currency stays the ruble here, as on Android, and moves in settings.
+/// Currencies: what every amount is shown in, then the local and the main currency, out of those.
+/// The popular currencies have their switches here and every other one waits behind "Все валюты",
+/// the searchable list of settings. Android left the main currency to settings; here it is picked
+/// at once, since someone who lives in pesos wants the big numbers in pesos from the first day.
 struct OnboardingCurrenciesStep: View {
     @Environment(AppModel.self) private var model
     @Environment(\.locale) private var locale
+    @State private var isShowingAll = false
 
     var body: some View {
         Section {
-            ForEach(SettingsCurrencies.shownOptions(model.device)) { option in
+            ForEach(SettingsCurrencies.inlineOptions(model.device)) { option in
                 Toggle(isOn: Binding(get: { option.isOn }, set: { _ in model.toggleShownCurrency(option.code) })) {
-                    Text(verbatim: SettingsCurrencies.label(option.code))
-                        .foregroundStyle(Theme.Color.text)
+                    CurrencyNameLabel(code: option.code)
                 }
                 .disabled(option.isLocked)
                 .frame(minHeight: Theme.minimumTarget)
                 .accessibilityIdentifier("onboarding.shown.\(option.code)")
+            }
+            Button {
+                isShowingAll = true
+            } label: {
+                Text(verbatim: OnboardingStep.allCurrenciesTitle.text(in: locale))
+                    .frame(maxWidth: .infinity, minHeight: Theme.minimumTarget, alignment: .leading)
+                    .contentShape(.rect)
+            }
+            .accessibilityIdentifier("onboarding.allCurrencies")
+            .sheet(isPresented: $isShowingAll) {
+                ShownCurrenciesSheet { isShowingAll = false }
             }
         } header: {
             Text(verbatim: OnboardingStep.shownHeader.text(in: locale))
         }
         .listRowBackground(Theme.Color.card)
         Section {
-            Picker(selection: Binding(get: { model.device.localCurrency }, set: { model.setLocalCurrency($0) })) {
-                ForEach(SettingsCurrencies.pickOptions(model.device, selected: model.device.localCurrency), id: \.self) { code in
-                    Text(verbatim: SettingsCurrencies.label(code)).tag(code)
-                }
-            } label: {
-                Text(verbatim: OnboardingStep.localTitle.text(in: locale))
-            }
-            .pickerStyle(.menu)
-            .accessibilityIdentifier("onboarding.local")
+            menu(selected: model.device.localCurrency, identifier: "onboarding.local") { model.setLocalCurrency($0) }
         } header: {
             Text(verbatim: OnboardingStep.localHeader.text(in: locale))
         }
         .listRowBackground(Theme.Color.card)
+        Section {
+            menu(selected: model.device.baseCurrency, identifier: "onboarding.main") { model.setMainCurrency($0) }
+        } header: {
+            Text(verbatim: OnboardingStep.mainHeader.text(in: locale))
+        }
+        .listRowBackground(Theme.Color.card)
+    }
+
+    /// A menu of the shown currencies, as the pick sheets of settings offer them.
+    private func menu(selected: String, identifier: String, pick: @escaping (String) -> Void) -> some View {
+        Picker(selection: Binding(get: { selected }, set: pick)) {
+            ForEach(SettingsCurrencies.pickOptions(model.device, selected: selected), id: \.self) { code in
+                Text(verbatim: SettingsCurrencies.label(code)).tag(code)
+            }
+        } label: {
+            Text(verbatim: OnboardingStep.currencyTitle.text(in: locale))
+        }
+        .pickerStyle(.menu)
+        .accessibilityIdentifier(identifier)
     }
 }
 

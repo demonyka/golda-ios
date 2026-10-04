@@ -18,7 +18,6 @@ import Testing
         #expect(form.isNew)
         #expect(form.currency == "GEL")
         #expect(form.preferredCurrencies == ["GEL", "RUB", "USD"])
-        #expect(form.otherCurrencies == ["EUR", "THB", "TRY", "KZT", "AMD", "CNY", "AED", "VND", "IDR"])
         #expect(form.name.isEmpty && form.amountText.isEmpty && form.day == nil)
         #expect(form.output == nil)
         #expect(form.title.text(in: ru) == "Новый платёж")
@@ -106,7 +105,6 @@ import Testing
         let baht = Obligation(name: "Кондо", amountMinor: 1_500_000, currency: "THB", dayOfMonth: 28)
         let form = ObligationForm(editing: baht, settings: settings)
         #expect(form.preferredCurrencies == ["GEL", "RUB", "USD", "THB"])
-        #expect(!form.otherCurrencies.contains("THB"))
         #expect(form.amountText == "15\u{202F}000")
     }
 

@@ -61,14 +61,15 @@ public enum CurrencyDisplay {
     }
 
     /// Toggling a currency in the shown ones; the ruble always stays, and the local and main
-    /// currencies fall back to rubles when hidden.
+    /// currencies fall back to rubles when hidden. The list keeps the catalogue's order, so where a
+    /// currency stands does not depend on when it was turned on.
     public static func toggleDisplayCurrency(_ settings: Settings, _ code: String) -> Settings {
         if code == "RUB" { return settings }
         let list = settings.displayCurrencies.contains(code)
             ? settings.displayCurrencies.filter { $0 != code }
             : settings.displayCurrencies + [code]
         var result = settings
-        result.displayCurrencies = Currencies.common.filter { list.contains($0) }
+        result.displayCurrencies = Currencies.ordered(list)
         result.localCurrency = list.contains(settings.localCurrency) ? settings.localCurrency : "RUB"
         result.baseCurrency = list.contains(settings.baseCurrency) ? settings.baseCurrency : "RUB"
         return result

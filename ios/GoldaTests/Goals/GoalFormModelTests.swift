@@ -25,7 +25,6 @@ import Testing
         // Shown: RUB, USD, GEL; the ruble is skipped, as on Android.
         #expect(form.currency == "USD")
         #expect(form.preferredCurrencies == ["GEL", "RUB", "USD"])
-        #expect(!form.otherCurrencies.contains("USD"))
         #expect(form.accounts.map(\.name) == ["Карта ₽", "Наличные ₾", "Доллары", "Накопительный"])
         #expect(!form.canSave)
         #expect(form.title.text(in: F.ru) == "Новая цель")

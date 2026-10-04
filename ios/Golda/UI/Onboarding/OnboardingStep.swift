@@ -57,8 +57,8 @@ enum OnboardingStep: Int, CaseIterable, Sendable {
         "Onboarding, income step: what the income is for."
     )
     private static let currenciesNote = resource(
-        "Every amount shows in all the chosen currencies at once. The ruble is the main one.",
-        "Onboarding, currencies step: what the shown currencies do."
+        "Every amount shows in all the chosen currencies at once. Big numbers and totals are in the main one.",
+        "Onboarding, currencies step: what the shown currencies and the main one do."
     )
     private static let accountsNote = resource(
         "Cards, cash, savings and debts with their balances now. Rough numbers are easy to fix later by reconciling.",
@@ -77,7 +77,13 @@ enum OnboardingStep: Int, CaseIterable, Sendable {
     static let localHeader = resource(
         "Local currency, for amounts said without one", "Onboarding, currencies step: the header over the choice of the local currency."
     )
-    static let localTitle = resource("Currency", "Onboarding, currencies step: the label of the local currency's menu.")
+    static let mainHeader = resource(
+        "Main currency, for big numbers and totals", "Onboarding, currencies step: the header over the choice of the main currency."
+    )
+    static let currencyTitle = resource("Currency", "Onboarding, currencies step: the label of the local and the main currency menus.")
+    static let allCurrenciesTitle = resource(
+        "All currencies", "Onboarding, currencies step: the row under the popular currencies that opens every currency, with search."
+    )
 
     // MARK: Accounts step
 

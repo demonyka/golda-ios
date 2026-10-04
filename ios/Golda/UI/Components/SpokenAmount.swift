@@ -17,7 +17,7 @@ extension LocalizedStringResource {
 enum SpokenAmount {
     /// Currencies whose symbol `Fmt` writes instead of the code. A code with no symbol of its own
     /// is written as the code, and that is read back as the code.
-    private static let knownCodes = Currencies.common + ["GBP"]
+    private static let knownCodes = Currencies.popular
 
     /// [display] as written by `Fmt.amount`, `Fmt.approx` or `Base` ("−4 210,50 ₽", "52,2 ₾",
     /// "+150 000 ₽"), spoken in [locale]. Text that is not an amount comes back without the narrow

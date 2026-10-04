@@ -34,10 +34,8 @@ struct AccountFormModel: Equatable, Sendable {
     /// The groups the profile's accounts are in, in the order of the accounts.
     let existingGroups: [String]
     /// Offered first, in the app's one order: the local currency, the shown ones, and an edited
-    /// account's own.
+    /// account's own. Every other currency follows them in the list (`CurrencySections`).
     let preferredCurrencies: [String]
-    /// The rest of the common currencies, offered after the preferred ones.
-    let otherCurrencies: [String]
     /// A new account goes after the last one.
     let nextSort: Int
 
@@ -81,9 +79,7 @@ struct AccountFormModel: Equatable, Sendable {
         // A list read a moment before the account got its group still offers that group.
         if let own = editing?.groupName, !own.isBlank, !groups.contains(own) { groups.append(own) }
         existingGroups = groups
-        let preferred = CurrencyDisplay.currencyChoices(settings: settings, extra: editing.map { [$0.currency] } ?? [])
-        preferredCurrencies = preferred
-        otherCurrencies = Currencies.common.filter { !preferred.contains($0) }
+        preferredCurrencies = CurrencyDisplay.currencyChoices(settings: settings, extra: editing.map { [$0.currency] } ?? [])
         nextSort = (accounts.map(\.sort).max() ?? -1) + 1
 
         name = editing?.name ?? ""

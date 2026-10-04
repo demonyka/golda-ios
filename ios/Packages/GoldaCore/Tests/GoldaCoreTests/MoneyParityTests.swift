@@ -131,6 +131,6 @@ import Testing
         ]
         for (code, digits) in expected { #expect(Currencies.digits(code) == digits, "\(code)") }
         #expect(Currencies.digits("ZZZ") == 2) // unknown codes: two, as the Kotlin fallback does
-        for code in Currencies.common { #expect(expected[code] != nil, "\(code) is missing from the table") }
+        for code in Currencies.popular { #expect(expected[code] != nil, "\(code) is missing from the table") }
     }
 }

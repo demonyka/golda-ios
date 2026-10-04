@@ -75,20 +75,10 @@ struct ObligationSheet: View {
     }
 
     private var currencyPicker: some View {
-        Picker(selection: $form.currency) {
-            ForEach(form.preferredCurrencies, id: \.self) { code in
-                Text(verbatim: AccountFormModel.currencyLabel(code)).tag(code)
-            }
-            Section {
-                ForEach(form.otherCurrencies, id: \.self) { code in
-                    Text(verbatim: AccountFormModel.currencyLabel(code)).tag(code)
-                }
-            }
-        } label: {
-            Text(verbatim: ObligationForm.currencyTitle.text(in: locale))
-        }
-        .pickerStyle(.menu)
-        .accessibilityIdentifier("obligationForm.currency")
+        CurrencyPickRow(
+            title: Text(verbatim: ObligationForm.currencyTitle.text(in: locale)), selection: form.currency,
+            yours: form.preferredCurrencies, identifier: "obligationForm.currency"
+        ) { form.currency = $0 }
     }
 
     @ToolbarContentBuilder private var toolbar: some ToolbarContent {

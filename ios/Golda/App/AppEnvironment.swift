@@ -70,7 +70,8 @@ struct AppEnvironment: Sendable {
     }
 
     /// The real thing: the database in Application Support, the settings in the standard defaults,
-    /// the keys in the Keychain and the rates from the Bank of Russia.
+    /// the keys in the Keychain and the rates from the Bank of Russia, with the currencies it does
+    /// not publish filled in from the currency API.
     static func live(voiceProvider: (any VoiceProvider)? = nil, voiceSecrets: (any SecretStore)? = nil) throws -> AppEnvironment {
         AppEnvironment(
             database: try GoldaDatabase.open(
@@ -79,7 +80,7 @@ struct AppEnvironment: Sendable {
             ),
             deviceSettings: DeviceSettingsStore(defaults: .standard),
             secrets: KeychainSecretStore(),
-            ratesSource: CbrRatesSource(transport: URLSessionTransport()),
+            ratesSource: MergedRatesSource.live(),
             voiceQueue: .live,
             voiceProvider: voiceProvider,
             voiceSecrets: voiceSecrets,

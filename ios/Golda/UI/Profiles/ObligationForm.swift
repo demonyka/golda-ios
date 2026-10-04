@@ -12,9 +12,8 @@ struct ObligationForm: Equatable, Sendable {
     let obligationId: UUID
     /// Offered first, in the app's one order: the local currency, the shown ones, and an edited
     /// payment's own.
+    /// Every other currency follows them in the list (`CurrencySections`).
     let preferredCurrencies: [String]
-    /// The rest of the common currencies.
-    let otherCurrencies: [String]
 
     var name: String
     /// As typed; the big field groups thousands while typing, and reading ignores the grouping.
@@ -28,9 +27,7 @@ struct ObligationForm: Equatable, Sendable {
         self.editing = editing
         self.obligationId = editing?.id ?? obligationId
         let currency = editing?.currency ?? settings.localCurrency
-        let preferred = CurrencyDisplay.currencyChoices(settings: settings, extra: [currency])
-        preferredCurrencies = preferred
-        otherCurrencies = Currencies.common.filter { !preferred.contains($0) }
+        preferredCurrencies = CurrencyDisplay.currencyChoices(settings: settings, extra: [currency])
         self.currency = currency
         name = editing?.name ?? ""
         amountText = editing.flatMap { $0.amountMinor > 0 ? AmountInput.grouped(Fmt.editable($0.amountMinor, $0.currency)) : nil } ?? ""

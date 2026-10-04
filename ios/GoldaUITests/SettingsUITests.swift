@@ -118,6 +118,44 @@ final class SettingsUITests: XCTestCase {
         XCTAssertFalse(app.descendants(matching: .any)["settings.rate.GEL"].exists)
     }
 
+    /// Every currency is there, found by searching: Argentine pesos, which the twelve of Android
+    /// lacked, are shown and can then be the main currency.
+    @MainActor
+    func testARareCurrencyIsFoundBySearchingAndShown() {
+        let app = launch()
+        openSettings(app)
+        let shown = app.buttons["settings.shown"]
+        XCTAssertFalse(shown.label.contains("ARS"), shown.label)
+        shown.tap()
+        XCTAssertTrue(app.switches["settings.shown.RUB"].waitForExistence(timeout: 5))
+
+        let search = app.searchFields.firstMatch
+        XCTAssertTrue(search.waitForExistence(timeout: 5))
+        search.tap()
+        search.typeText("ARS")
+        let pesos = app.switches["settings.shown.ARS"]
+        XCTAssertTrue(pesos.waitForExistence(timeout: 5))
+        XCTAssertTrue(pesos.label.contains("Argentine Peso"), pesos.label)
+        XCTAssertTrue(app.switches["settings.shown.RUB"].waitForNonExistence(timeout: 5), "the search narrows the list")
+        XCTAssertEqual(pesos.value as? String, "0")
+        flip(pesos)
+        XCTAssertTrue(waitFor { pesos.value as? String == "1" })
+
+        // The search ends first: while it is open, the bar holds its field and the system's "Close"
+        // (an xmark on iOS 26), not "Done".
+        let done = app.buttons["settings.shown.done"]
+        if !done.isHittable { app.navigationBars.buttons["Close"].firstMatch.tap() }
+        XCTAssertTrue(waitFor { done.isHittable })
+        done.tap()
+        XCTAssertTrue(done.waitForNonExistence(timeout: 5))
+        XCTAssertTrue(waitFor { shown.label.contains("ARS") }, shown.label)
+
+        let main = app.buttons["settings.main"]
+        reveal(main, in: app)
+        main.tap()
+        XCTAssertTrue(app.buttons["settings.pick.ARS"].waitForExistence(timeout: 5), "shown, so it can be the main currency")
+    }
+
     @MainActor
     func testTheKeyIsSavedAndRemoved() {
         let app = launch()
@@ -389,6 +427,18 @@ final class SettingsUITests: XCTestCase {
         shown.tap()
         XCTAssertTrue(app.buttons["settings.shown.done"].waitForExistence(timeout: 5))
         try shoot("shown")
+        // The rest, by name: the first screen of them, then what a search for pesos finds.
+        app.swipeUp(velocity: .slow)
+        app.swipeUp(velocity: .slow)
+        try shoot("shown-others")
+        let search = app.searchFields.firstMatch
+        if search.waitForExistence(timeout: 5) {
+            search.tap()
+            search.typeText(russian ? "песо" : "peso")
+            try shoot("shown-search")
+            let cancel = app.navigationBars.buttons[russian ? "Закрыть" : "Close"].firstMatch
+            if cancel.exists && cancel.isHittable { cancel.tap() }
+        }
         app.buttons["settings.shown.done"].tap()
         XCTAssertTrue(app.buttons["settings.shown.done"].waitForNonExistence(timeout: 5))
 

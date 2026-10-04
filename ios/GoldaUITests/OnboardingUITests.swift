@@ -46,6 +46,15 @@ final class OnboardingUITests: XCTestCase {
         XCTAssertTrue(lariChoice.waitForExistence(timeout: 5))
         lariChoice.tap()
         XCTAssertTrue(waitUntil { local.label.contains("₾ GEL") }, local.label)
+        // The main currency, out of the shown ones too: the big numbers in lari from the first day.
+        let main = app.buttons["onboarding.main"]
+        reveal(main, above: next, in: app)
+        XCTAssertTrue(main.label.contains("₽ RUB"), main.label)
+        main.tap()
+        let mainLari = app.buttons.matching(NSPredicate(format: "label == %@", "₾ GEL")).firstMatch
+        XCTAssertTrue(mainLari.waitForExistence(timeout: 5))
+        mainLari.tap()
+        XCTAssertTrue(waitUntil { main.label.contains("₾ GEL") }, main.label)
         walk.shoot("currencies")
         next.tap()
 
@@ -78,6 +87,7 @@ final class OnboardingUITests: XCTestCase {
         XCTAssertTrue(walk.homeHero.waitForExistence(timeout: 10))
         XCTAssertFalse(app.buttons["onboarding.done"].exists)
         XCTAssertTrue(waitUntil { (firstWholeNumber(in: walk.homeHero.label) ?? 0) > 0 }, walk.homeHero.label)
+        XCTAssertTrue(walk.homeHero.label.localizedCaseInsensitiveContains("lari"), walk.homeHero.label)
         walk.openTab("Accounts", "Счета", waitingFor: "accounts.hero")
         XCTAssertTrue(walk.accountRow("Card").waitForExistence(timeout: 5))
     }
@@ -146,6 +156,10 @@ final class OnboardingUITests: XCTestCase {
         app.buttons["onboarding.next"].tap()
         XCTAssertTrue(app.staticTexts["Валюты"].waitForExistence(timeout: 5))
         XCTAssertEqual(app.buttons["onboarding.back"].label, "Назад")
+        // The ruble is no longer said to be the main one: the main currency is picked here.
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "итоги — в основной")).firstMatch.exists)
+        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "Рубль — основная")).firstMatch.exists)
+        XCTAssertTrue(app.switches["onboarding.shown.GEL"].label.contains("Грузинский лари"), app.switches["onboarding.shown.GEL"].label)
 
         app.buttons["onboarding.next"].tap()
         XCTAssertTrue(app.staticTexts["Счета"].waitForExistence(timeout: 5))
