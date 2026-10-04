@@ -16,7 +16,8 @@ import Testing
     private static let root = URL(fileURLWithPath: #filePath)
         .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
     private static let resources = root.appending(path: "Golda/Resources", directoryHint: .isDirectory)
-    private static let sources = root.appending(path: "Golda", directoryHint: .isDirectory)
+    /// The app's and the widgets', which share the `EntryPoints` table.
+    private static let sources = ["Golda", "GoldaWidgets"].map { root.appending(path: $0, directoryHint: .isDirectory) }
 
     /// Each table's keys with what the catalog says about them, by table name ("Localizable", "Entry").
     private static func catalogs() throws -> [String: [String: [String: Any]]] {
@@ -32,7 +33,7 @@ import Testing
 
     @Test func theCatalogsAreThere() throws {
         let tables = Set(try Self.catalogs().keys)
-        #expect(tables.isSuperset(of: ["Localizable", "InfoPlist", "Components", "Entry", "Goals", "Insights", "Profiles", "Settings", "Voice", "AccountForm", "Failure", "Onboarding"]), "\(tables)")
+        #expect(tables.isSuperset(of: ["Localizable", "InfoPlist", "Components", "Entry", "Goals", "Insights", "Profiles", "Settings", "Voice", "AccountForm", "Failure", "Onboarding", "EntryPoints", "AppShortcuts"]), "\(tables)")
     }
 
     // MARK: Both languages
@@ -97,8 +98,9 @@ import Testing
     @Test func everyKeyOfATableIsAskedFor() throws {
         let uses = try Self.uses()
         var problems: [String] = []
-        // The plist's keys are Info.plist keys, read by the system.
-        for (table, strings) in try Self.catalogs() where table != "InfoPlist" {
+        // The plist's keys are Info.plist keys, read by the system; Siri reads the phrases of
+        // `GoldaShortcuts` from AppShortcuts, which no call asks for.
+        for (table, strings) in try Self.catalogs() where table != "InfoPlist" && table != "AppShortcuts" {
             let asked = uses.filter { $0.table == table }.map(\.key)
             for key in strings.keys where !asked.contains(where: { Self.matches(key, $0) }) {
                 problems.append("\(table): “\(key)” is never asked for")
@@ -147,9 +149,11 @@ import Testing
     /// Every localized line the app's sources ask for by a literal key, and the tab titles, which
     /// are bare literals typed as `LocalizedStringResource`.
     private static func uses() throws -> [Use] {
-        let files = FileManager.default.enumerator(at: sources, includingPropertiesForKeys: nil)?
-            .compactMap { $0 as? URL }
-            .filter { $0.pathExtension == "swift" } ?? []
+        let files = sources.flatMap { folder in
+            FileManager.default.enumerator(at: folder, includingPropertiesForKeys: nil)?
+                .compactMap { $0 as? URL }
+                .filter { $0.pathExtension == "swift" } ?? []
+        }
         var result: [Use] = []
         for file in files {
             result += uses(in: try String(contentsOf: file, encoding: .utf8), file: file.lastPathComponent)

@@ -18,6 +18,24 @@
           }
         }
       }
+    },
+    "Say a purchase" : {
+      "comment" : "The quick action on the app icon that starts a voice note: UIApplicationShortcutItemTitle, looked up by its value.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Say a purchase"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Записать голосом"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

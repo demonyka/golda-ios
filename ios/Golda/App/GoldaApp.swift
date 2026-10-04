@@ -5,6 +5,8 @@ private let log = Logger(subsystem: "com.f4studio.golda", category: "Launch")
 
 @main
 struct GoldaApp: App {
+    /// The quick action on the app icon, which SwiftUI does not hear.
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @State private var options: LaunchOptions
     @State private var launch: AppLaunch
 
@@ -20,6 +22,10 @@ struct GoldaApp: App {
             case .opened(let model, let voice):
                 RootView(mic: voice)
                     .environment(model)
+                    // The voice widget's link: the tabs start the note (`VoiceEntryDelivery`).
+                    .onOpenURL { url in
+                        if VoiceEntry.isRequest(url) { VoiceEntryRequests.shared.post() }
+                    }
                     .task {
                         // A unit-test host stays idle: the tests build and drive their own models.
                         guard !options.isHostingTests else { return }

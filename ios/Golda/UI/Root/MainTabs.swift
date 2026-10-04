@@ -52,7 +52,7 @@ struct MainTabs: View {
         TabView(selection: $selection) {
             ForEach(AppTab.allCases, id: \.self) { tab in
                 Tab(value: tab) {
-                    TabRoot(tab: tab, data: data, mic: mic, isReconciling: $isReconciling, toast: $toast)
+                    TabRoot(tab: tab, data: data, mic: mic, isSelected: selection == tab, isReconciling: $isReconciling, toast: $toast)
                 } label: {
                     Label { Text(tab.title) } icon: { Image(systemName: tab.symbol) }
                 }
@@ -92,6 +92,8 @@ private struct TabRoot: View {
     let tab: AppTab
     let data: AppData
     let mic: any MicModel
+    /// The tab on screen: a voice note asked for from outside starts on its mic.
+    let isSelected: Bool
     @Binding var isReconciling: Bool
     @Binding var toast: UndoToast?
 
@@ -119,6 +121,7 @@ private struct TabRoot: View {
         }
         // A page pushed over the screen hides the screen's toast, so over a page it shows here.
         .undoToast(path.isEmpty ? .constant(nil) : $toast)
+        .modifier(VoiceEntryDelivery(mic: mic, isSelected: isSelected, path: $path))
         .sheet(item: $accountForm) { request in
             AccountFormSheet(
                 data: data, editing: request.account,

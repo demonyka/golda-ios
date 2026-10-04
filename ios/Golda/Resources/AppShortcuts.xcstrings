@@ -1,0 +1,27 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Add a purchase to ${applicationName}" : {
+      "comment" : "A Siri phrase that starts a voice note.",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add a purchase to ${applicationName}" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Добавить покупку в ${applicationName}" } }
+      }
+    },
+    "Record a purchase in ${applicationName}" : {
+      "comment" : "A Siri phrase that starts a voice note.",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Record a purchase in ${applicationName}" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Записать покупку в ${applicationName}" } }
+      }
+    },
+    "Say a purchase in ${applicationName}" : {
+      "comment" : "A Siri phrase that starts a voice note.",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Say a purchase in ${applicationName}" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Записать голосом в ${applicationName}" } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

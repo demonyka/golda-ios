@@ -35,6 +35,22 @@ targets:
       - package: GoldaCore
       - package: GoldaData
       - package: GoldaSync
+      - target: GoldaWidgets
+    # The voice's ways in from outside (`VoiceEntry`): the widget's link opens the `golda` scheme,
+    # and the quick action on the icon is there from the install on. The file is generated; its
+    # versions stay the build settings', which XcodeGen would otherwise write as 1.0 (1).
+    info:
+      path: Golda/Info.plist
+      properties:
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleURLTypes:
+          - CFBundleURLName: com.f4studio.golda
+            CFBundleURLSchemes: [golda]
+        UIApplicationShortcutItems:
+          - UIApplicationShortcutItemType: com.f4studio.golda.voice
+            UIApplicationShortcutItemTitle: Say a purchase
+            UIApplicationShortcutItemIconSymbolName: mic.fill
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.f4studio.golda
@@ -47,6 +63,31 @@ targets:
         INFOPLIST_KEY_NSMicrophoneUsageDescription: "Golda listens while you hold a purchase in your voice, to turn it into a record. The sound is sent to Google Gemini with your own key only after you agree."
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+
+  # The voice widget and Control Center's control. They show no data, so no App Group.
+  GoldaWidgets:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: GoldaWidgets
+      # Shared with the app: the intent the control runs, the link the widget opens, their labels.
+      - path: Golda/App/StartVoiceNoteIntent.swift
+      - path: Golda/App/VoiceEntry.swift
+      - path: Golda/Resources/EntryPoints.xcstrings
+    info:
+      path: GoldaWidgets/Info.plist
+      properties:
+        # An extension's versions must be its app's.
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.f4studio.golda.widgets
+        PRODUCT_NAME: GoldaWidgets
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Golda
 
   GoldaTests:
     type: bundle.unit-test
