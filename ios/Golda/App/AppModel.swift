@@ -217,6 +217,8 @@ final class AppModel {
     func finishOnboarding() {
         environment.deviceSettings.update { $0.onboarded = true }
         applyDeviceSettings()
+        // The Sunday reminder is on from the start, so its first need is now (D49).
+        if device.reconcileReminder { askForNotifications() }
     }
 
     // MARK: Books of the profile on screen

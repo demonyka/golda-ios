@@ -21,6 +21,7 @@ struct AccountFormSheet: View {
     @State private var form: AccountFormModel
     @State private var isBusy = false
     @State private var isConfirmingDelete = false
+    @State private var isPickingGraceEnd = false
     @State private var failure: Failure?
     @FocusState private var focus: Focus?
     /// The big amount field is a UIKit one, so its focus is a flag of its own.
@@ -177,12 +178,16 @@ struct AccountFormSheet: View {
                 }
                 .accessibilityIdentifier("accountForm.grace")
                 if let until = form.graceUntil {
-                    DatePicker(selection: graceDate(until), displayedComponents: .date) {
-                        Text("Interest-free until", tableName: "AccountForm", comment: "Account form: the last day of a credit card's grace period.")
+                    DateRowButton(title: Self.graceUntil.text(in: locale), date: InsightsDates.full(until, in: locale)) {
+                        isPickingGraceEnd = true
                     }
-                    // The picker shows days in the books' zone, the zone a day is turned back with.
-                    .environment(\.timeZone, data.zone)
                     .accessibilityIdentifier("accountForm.graceUntil")
+                    .sheet(isPresented: $isPickingGraceEnd) {
+                        DayCalendarSheet(
+                            title: Self.graceUntil.text(in: locale), date: graceDay(until), zone: data.zone,
+                            doneTitle: Self.done.text(in: locale), identifier: "accountForm.graceUntil"
+                        )
+                    }
                 }
             }
         }
@@ -354,13 +359,12 @@ struct AccountFormSheet: View {
 
     // MARK: Helpers
 
-    /// The day as the picker's midnight in the books' zone, and back.
-    private func graceDate(_ until: LocalDate) -> Binding<Date> {
-        let zone = data.zone
-        return Binding(
-            get: { Date(timeIntervalSince1970: Double(until.startOfDayMillis(in: zone)) / 1000) },
-            set: { form.graceUntil = LocalDate(epochMillis: Int64(($0.timeIntervalSince1970 * 1000).rounded(.down)), in: zone) }
-        )
+    private static let graceUntil = LocalizedStringResource("Interest-free until", table: "AccountForm", comment: "Account form: the last day of a credit card's grace period.")
+    private static let done = LocalizedStringResource("Done", table: "AccountForm", comment: "Closes a sheet over the account: the early repayment calculator, the grace period's calendar.")
+
+    /// The last interest-free day; the calendar works in the books' zone (`DayCalendarSheet`).
+    private func graceDay(_ until: LocalDate) -> Binding<LocalDate> {
+        Binding(get: { form.graceUntil ?? until }, set: { form.graceUntil = $0 })
     }
 
     private func failureText(_ failure: Failure) -> String {

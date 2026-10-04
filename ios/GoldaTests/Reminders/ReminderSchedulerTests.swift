@@ -154,6 +154,21 @@ import Testing
         await eventually { center.askedCount == 1 }
     }
 
+    /// The Sunday reminder is on from the start (D49): finishing onboarding is its first need.
+    @Test func finishingOnboardingAsksWhileTheSundayReminderIsOn() async throws {
+        try await model.beginOnboarding()
+        model.finishOnboarding()
+        await eventually { center.askedCount == 1 }
+    }
+
+    @Test func finishingOnboardingWithTheSundayReminderOffAsksNothing() async throws {
+        try await model.beginOnboarding()
+        harness.device.update { $0.reconcileReminder = false }
+        model.finishOnboarding()
+        try await Task.sleep(for: .milliseconds(50))
+        #expect(center.askedCount == 0)
+    }
+
     @Test func aDebtWithADateAsks() async throws {
         let personal = try await harness.profile("Личный")
         harness.onboard(active: personal)

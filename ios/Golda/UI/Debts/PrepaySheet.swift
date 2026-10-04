@@ -106,7 +106,7 @@ struct PrepaySheet: View {
         }
     }
 
-    static let doneTitle = LocalizedStringResource("Done", table: "AccountForm", comment: "Closes the early repayment calculator.")
+    static let doneTitle = LocalizedStringResource("Done", table: "AccountForm", comment: "Closes a sheet over the account: the early repayment calculator, the grace period's calendar.")
 
     private func row(_ title: LocalizedStringResource, money: String, id: String) -> some View {
         row(title, value: money, spoken: SpokenAmount.text(money, locale: locale), id: id)

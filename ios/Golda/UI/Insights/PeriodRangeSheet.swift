@@ -5,9 +5,7 @@ import SwiftUI
 /// calendar, and two dates with a calendar each is how Calendar's own start and end read. "Готово"
 /// takes the range, "Отмена" leaves the screen as it was.
 ///
-/// A row opens its calendar in a small sheet, as the operation form's day does. The compact
-/// `DatePicker` looked the same, but its button is UIKit's and read only "Date Picker" to
-/// VoiceOver: no label of SwiftUI's reaches it, and a row of our own says "From, 27 Sep 2026".
+/// A row opens its calendar in a small sheet, as the operation form's day does (`DateRowButton`).
 struct PeriodRangeSheet: View {
     let zone: TimeZone
     var onCancel: () -> Void
@@ -75,36 +73,10 @@ struct PeriodRangeSheet: View {
         }
     }
 
-    /// "С            27 сент. 2026 г.": the title, and the day in a pill as the system's pickers
-    /// show it. At the accessibility sizes the day goes under the title, where it has the width.
     private func row(_ end: End) -> some View {
-        let title = title(end)
-        let date = InsightsDates.full(end == .from ? draft.from : draft.to, in: locale)
-        let stacked = dynamicTypeSize.isAccessibilitySize
-        let layout = stacked
-            ? AnyLayout(VStackLayout(alignment: .leading, spacing: Theme.Gap.xs))
-            : AnyLayout(HStackLayout(spacing: Theme.Gap.s))
-        return Button {
+        DateRowButton(title: title(end), date: InsightsDates.full(end == .from ? draft.from : draft.to, in: locale)) {
             picking = end
-        } label: {
-            layout {
-                Text(verbatim: title)
-                    .foregroundStyle(Theme.Color.text)
-                if !stacked { Spacer(minLength: Theme.Gap.s) }
-                Text(verbatim: date)
-                    .monospacedDigit()
-                    .foregroundStyle(Theme.Color.text)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(Theme.Color.soft, in: Capsule())
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .contentShape(.rect)
         }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text(verbatim: title))
-        .accessibilityValue(Text(verbatim: date))
-        .accessibilityAddTraits(.isButton)
         .accessibilityIdentifier("insights.range.\(end.rawValue)")
     }
 

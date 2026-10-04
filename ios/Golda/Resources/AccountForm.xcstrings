@@ -397,7 +397,7 @@
       }
     },
     "Done" : {
-      "comment" : "Closes the early repayment calculator.",
+      "comment" : "Closes a sheet over the account: the early repayment calculator, the grace period's calendar.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
