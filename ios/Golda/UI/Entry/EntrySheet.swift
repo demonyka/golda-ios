@@ -64,7 +64,10 @@ private struct EntryForm: View {
             }
             .scrollDismissesKeyboard(.immediately)
             .background(Theme.Color.page)
-            .safeAreaInset(edge: .bottom) { bottomActions }
+            // A bar, not a bare inset: the form scrolls clear of it, and what passes under it fades
+            // as under any iOS bar. At the accessibility sizes the stacked answers are a quarter of
+            // the screen, and crisp text under them read as covered.
+            .safeAreaBar(edge: .bottom) { bottomActions }
             .navigationTitle(Text(verbatim: title.text(in: locale)))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { toolbar }
@@ -155,9 +158,11 @@ private struct EntryForm: View {
                 Text(verbatim: EntryText.typeTitle(type).text(in: locale)).tag(type)
             }
         } label: {
-            Text(verbatim: title.text(in: locale))
+            Text(verbatim: EntryText.type.text(in: locale))
         }
         .pickerStyle(.segmented)
+        // A segmented picker shows no label, and VoiceOver had none to read either.
+        .accessibilityLabel(Text(verbatim: EntryText.type.text(in: locale)))
         .accessibilityIdentifier("entry.type")
     }
 
@@ -222,6 +227,8 @@ private struct EntryForm: View {
         .submitLabel(.done)
         .focused($focus, equals: .note)
         .onSubmit { if !form.isDeciding { save() } }
+        // A field with a prompt hides its label from VoiceOver: once filled, it read only the note.
+        .accessibilityLabel(Text(verbatim: EntryText.note.text(in: locale)))
         .accessibilityIdentifier("entry.note")
         .padding(.horizontal, Theme.Gap.m)
         .frame(minHeight: 52)

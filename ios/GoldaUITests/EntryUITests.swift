@@ -31,9 +31,13 @@ final class EntryUITests: XCTestCase {
         XCTAssertTrue(app.buttons["entry.account"].value as? String == "Мультивалютная GEL")
         XCTAssertTrue(app.staticTexts["entry.underLine"].label.hasPrefix("about "), app.staticTexts["entry.underLine"].label)
         let note = app.textFields["entry.note"]
+        // VoiceOver names the switch and the note, whatever the note's placeholder says.
+        XCTAssertEqual(app.segmentedControls["entry.type"].label, "Type")
+        XCTAssertEqual(note.label, "Note")
         note.tap()
         note.typeText("Pizza")
         dismissKeyboard(app)
+        XCTAssertEqual(note.label, "Note")
         app.buttons["entry.category.eating_out"].tap()
         XCTAssertTrue(app.buttons["entry.category.eating_out"].isSelected)
         XCTAssertEqual(save.label, "Save")
@@ -246,6 +250,35 @@ final class EntryUITests: XCTestCase {
         XCTAssertTrue(eventually { self.firstOperation(app).label.hasPrefix("Sneakers, ") }, firstOperation(app).label)
     }
 
+    // MARK: The largest text size
+
+    /// At the largest text size the bars over the form, "Not sure" and then its three answers, cover
+    /// what is under them until the form is scrolled; the last category and the note at the end
+    /// always scroll clear of them.
+    @MainActor
+    func testAtTheLargestSizeEverythingScrollsClearOfTheBars() {
+        let app = launch(contentSize: "UICTContentSizeCategoryAccessibilityXXXL")
+        let amount = openNewEntry(app)
+        amount.typeText("12")
+        dismissKeyboard(app)
+
+        // The grid draws only the tiles near the screen: at the bottom, the last one drawn is the last.
+        let consider = app.buttons["entry.consider"]
+        let categories = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "entry.category."))
+        for _ in 0..<10 { app.swipeUp(velocity: .fast) }
+        let lastCategory = categories.allElementsBoundByIndex.last
+        XCTAssertNotNil(lastCategory)
+        if let lastCategory { XCTAssertLessThan(lastCategory.frame.maxY, consider.frame.minY, "the last category clears “Not sure”") }
+
+        consider.tap()
+        XCTAssertTrue(app.navigationBars["Not sure"].waitForExistence(timeout: 5))
+        let skip = app.buttons["entry.skip"], buy = app.buttons["entry.buy"]
+        XCTAssertLessThanOrEqual(skip.frame.maxY, buy.frame.minY, "the answers stack at this size")
+        let note = app.textFields["entry.note"]
+        for _ in 0..<6 { app.swipeUp(velocity: .fast) }
+        XCTAssertLessThan(note.frame.maxY, skip.frame.minY, "the note clears the answers")
+    }
+
     // MARK: Screenshots
 
     /// Not a check: pictures for a human. Runs only when `GOLDA_SHOTS_DIR` is set for the runner
@@ -346,12 +379,15 @@ final class EntryUITests: XCTestCase {
     // MARK: Helpers
 
     /// The language arguments go first: the defaults system reads arguments in pairs, and the
-    /// single `-golda.*` flags after them must not take a language away.
+    /// single `-golda.*` flags after them must not take a language away. [contentSize] is a text
+    /// size for this launch only ("UICTContentSizeCategoryAccessibilityXXXL"), so the simulator's
+    /// own setting stays as it is.
     @MainActor
-    private func launch(language: String = "en") -> XCUIApplication {
+    private func launch(language: String = "en", contentSize: String? = nil) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchArguments = [
             "-AppleLanguages", "(\(language))", "-AppleLocale", language == "ru" ? "ru_RU" : "en_US",
+        ] + (contentSize.map { ["-UIPreferredContentSizeCategoryName", $0] } ?? []) + [
             "-golda.inMemory", "-golda.samples",
         ]
         app.launch()

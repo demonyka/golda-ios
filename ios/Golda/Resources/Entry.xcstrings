@@ -534,6 +534,23 @@
         }
       }
     },
+    "Note.label" : {
+      "comment" : "VoiceOver: the note field of the operation form, whatever its placeholder says. Russian “Комментарий”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Комментарий"
+          }
+        }
+      }
+    },
     "OK" : {
       "comment" : "Closes a message.",
       "localizations" : {
@@ -853,6 +870,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Перевод"
+          }
+        }
+      }
+    },
+    "Type" : {
+      "comment" : "VoiceOver: the switch between expense, income and transfer at the top of the operation form.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тип операции"
           }
         }
       }

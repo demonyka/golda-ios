@@ -67,7 +67,9 @@ struct OnboardingView: View {
         .background(Theme.Color.page)
         // A new step starts at its top, not where the last one was scrolled to.
         .id(step)
-        .safeAreaInset(edge: .bottom) { bottomBar }
+        // A bar, not a bare inset: the list scrolls clear of it, and a row passing under it fades
+        // as under any iOS bar instead of reading as covered.
+        .safeAreaBar(edge: .bottom) { bottomBar }
         .sensoryFeedback(.selection, trigger: step)
         .sheet(item: $incomeEdit) { edit in
             incomeSheet(edit, settings: data.profile.settings)

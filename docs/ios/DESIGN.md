@@ -60,7 +60,7 @@
 | `Switch` с галочкой | `Toggle` |
 | Группа `ToggleButton` (до 5 вариантов) | `Picker` с `.segmented`; больше — ряд чипов с переносом |
 | `DropdownMenu` | `Menu` |
-| `DatePickerDialog`, период | `DatePicker` (compact/graphical) |
+| `DatePickerDialog`, период | `DayCalendarSheet`: `DatePicker` (graphical) в небольшом листе; его открывает строка или пилюля с датой. Compact-`DatePicker` VoiceOver читает «Date Picker» без имени |
 | `HorizontalFloatingToolbar` | `TabView` + плавающая кнопка микрофона |
 | `HorizontalPager` | нет |
 | `SwipeToDismissBox` | `swipeActions` |
@@ -101,6 +101,7 @@ SF Symbols вместо Iconoteka. Стартовое соответствие (
 ## Доступность
 
 - Dynamic Type до `accessibility5` не обрезает ключевые экраны (Главная, форма операции, Счета).
+- Кнопки внизу поверх прокрутки (форма операции, онбординг) — `safeAreaBar`, не `safeAreaInset`: содержимое прокручивается из-под них, а проходящее под ними размывается краевым эффектом, как под любой панелью iOS.
 - Все элементы озвучиваются VoiceOver; суммы читаются полной строкой («пятнадцать лари»), а не по цифрам.
 - Цели касания не меньше 44 пт; текст не светлее 4,5:1 к фону.
 - «Уменьшить движение» и «Уменьшить прозрачность» отключают волну и стекло.

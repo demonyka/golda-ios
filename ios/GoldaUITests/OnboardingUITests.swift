@@ -82,6 +82,24 @@ final class OnboardingUITests: XCTestCase {
         XCTAssertTrue(walk.accountRow("Card").waitForExistence(timeout: 5))
     }
 
+    /// At the largest text size the bar with "Next" covers the first step's last row until the list
+    /// is scrolled, as a toolbar over a list does; the row always scrolls clear of it. The text size
+    /// is this launch's only, so the simulator's own setting stays.
+    @MainActor
+    func testAtTheLargestSizeTheLastRowScrollsClearOfTheBar() {
+        let app = XCUIApplication()
+        app.launchArguments = [
+            "-AppleLanguages", "(en)", "-AppleLocale", "en_US",
+            "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL", "-golda.inMemory",
+        ]
+        app.launch()
+        let next = app.buttons["onboarding.next"]
+        XCTAssertTrue(next.waitForExistence(timeout: 30))
+        let payday = app.buttons["onboarding.payday"]
+        reveal(payday, above: next, in: app)
+        XCTAssertTrue(payday.isHittable)
+    }
+
     /// Scrolls the step's list until [element] stands clear of the bottom bar: the list draws only the
     /// rows near the screen, and a row under the bar would be tapped through it.
     @MainActor

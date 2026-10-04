@@ -42,7 +42,8 @@ struct EntryUnderLine: View {
     }
 
     private func quiet(_ text: String, spoken: String) -> some View {
-        Text(verbatim: text)
+        // At the large sizes the line wraps; "1 104" stays with its "₽".
+        Text(verbatim: text.keepingMarksOnTheLine)
             .font(.body)
             .tabularDigits()
             .foregroundStyle(Theme.Color.muted)
@@ -80,7 +81,7 @@ struct EntryUnderLine: View {
                 isEditingSecond = true
             } label: {
                 HStack(spacing: Theme.Gap.s) {
-                    Text(verbatim: text)
+                    Text(verbatim: text.keepingMarksOnTheLine)
                         .font(font)
                         .tabularDigits()
                         .multilineTextAlignment(.center)
@@ -114,6 +115,7 @@ struct EntryAccountPill: View {
     var onPick: (UUID) -> Void
 
     @Environment(\.locale) private var locale
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         Menu {
@@ -136,6 +138,7 @@ struct EntryAccountPill: View {
             )
         }
         .buttonStyle(.glass)
+        .buttonBorderShape(EntryPillLabel.shape(dynamicTypeSize))
         .accessibilityLabel(Text(verbatim: EntryText.account.text(in: locale)))
         .accessibilityValue(Text(verbatim: account?.name ?? ""))
         .accessibilityIdentifier("entry.account")
@@ -146,14 +149,14 @@ struct EntryAccountPill: View {
     }
 }
 
-/// "Сегодня ⌄": the day, with the calendar in a small sheet of its own. A popover from the pill
-/// at the edge of the screen cut the calendar off; a sheet always has room for it.
+/// "Сегодня ⌄": the day, with the calendar in a small sheet of its own (`DayCalendarSheet`).
 struct EntryDatePill: View {
     @Binding var date: LocalDate
     let today: LocalDate
     let zone: TimeZone
 
     @Environment(\.locale) private var locale
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var isPicking = false
 
     var body: some View {
@@ -163,50 +166,16 @@ struct EntryDatePill: View {
             EntryPillLabel(symbol: "calendar", text: DayLabel(date, today: today).text(in: locale))
         }
         .buttonStyle(.glass)
+        .buttonBorderShape(EntryPillLabel.shape(dynamicTypeSize))
         .accessibilityLabel(Text(verbatim: EntryText.date.text(in: locale)))
         .accessibilityValue(Text(verbatim: DayLabel(date, today: today).text(in: locale)))
         .accessibilityIdentifier("entry.date")
         .sheet(isPresented: $isPicking) {
-            NavigationStack {
-                ScrollView {
-                    DatePicker(selection: day, displayedComponents: .date) {
-                        Text(verbatim: EntryText.date.text(in: locale))
-                    }
-                    .datePickerStyle(.graphical)
-                    // Days in the books' zone, the zone a day is turned back with.
-                    .environment(\.timeZone, zone)
-                    .padding(.horizontal, Theme.Gap.m)
-                    .accessibilityIdentifier("entry.datePicker")
-                }
-                .scrollBounceBehavior(.basedOnSize)
-                .navigationTitle(Text(verbatim: EntryText.date.text(in: locale)))
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    // A picked day closes the calendar; keeping the day shown needs a way back too.
-                    ToolbarItem(placement: .confirmationAction) {
-                        ConfirmButton(title: EntryText.done.text(in: locale)) { isPicking = false }
-                            .accessibilityIdentifier("entry.date.done")
-                    }
-                }
-            }
-            .presentationDetents([.medium, .large])
-            .presentationBackground(Theme.Color.page)
+            DayCalendarSheet(
+                title: EntryText.date.text(in: locale), date: $date, zone: zone,
+                doneTitle: EntryText.done.text(in: locale), identifier: "entry.date"
+            )
         }
-    }
-
-    /// The day as the picker's midnight in the books' zone, and back; a picked day closes the calendar.
-    private var day: Binding<Date> {
-        let zone = zone
-        return Binding(
-            get: { Date(timeIntervalSince1970: Double(date.startOfDayMillis(in: zone)) / 1000) },
-            set: {
-                let picked = LocalDate(epochMillis: Int64(($0.timeIntervalSince1970 * 1000).rounded(.down)), in: zone)
-                if picked != date {
-                    date = picked
-                    isPicking = false
-                }
-            }
-        )
     }
 }
 
@@ -218,13 +187,15 @@ struct EntryPillLabel: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
+        let wraps = dynamicTypeSize.isAccessibilitySize
         HStack(spacing: Theme.Gap.s) {
             Image(systemName: symbol)
                 .foregroundStyle(Theme.Color.muted)
             // One line, cut in the middle so the currency at the end stays; at the accessibility
-            // sizes the pill has the whole width and the name wraps instead.
-            Text(verbatim: text)
-                .lineLimit(dynamicTypeSize.isAccessibilitySize ? 3 : 1)
+            // sizes the pill has the whole width and the name wraps instead, the "· ₾" with its
+            // last word.
+            Text(wraps ? Self.unhyphenated(text.replacingOccurrences(of: " · ", with: "\u{00A0}·\u{00A0}")) : AttributedString(text))
+                .lineLimit(wraps ? nil : 1)
                 .truncationMode(.middle)
                 .multilineTextAlignment(.leading)
             Image(systemName: "chevron.down")
@@ -234,6 +205,24 @@ struct EntryPillLabel: View {
         .font(.body)
         .foregroundStyle(Theme.Color.text)
         .frame(minHeight: 32)
+    }
+
+    /// [text] with no hyphenation. SwiftUI sizes Russian text as if a word too long for the line
+    /// were broken anywhere, then draws it hyphenated, which can take a line more than it was
+    /// given: "Мультивалютная GEL · ₾" came out "Мульти-валют…EL · ₾". A language without
+    /// Russian hyphenation keeps the two in step; the pill speaks through its own label, so the
+    /// language is never heard.
+    private static func unhyphenated(_ text: String) -> AttributedString {
+        var string = AttributedString(text)
+        string.languageIdentifier = "en"
+        return string
+    }
+
+    /// A capsule while the pill is one line; at the accessibility sizes, where a name takes
+    /// several, a rounded rectangle, as the undo toast has: a tall capsule's round ends crowd the
+    /// first and last lines.
+    static func shape(_ size: DynamicTypeSize) -> ButtonBorderShape {
+        size.isAccessibilitySize ? .roundedRectangle(radius: Theme.Radius.toast) : .automatic
     }
 }
 

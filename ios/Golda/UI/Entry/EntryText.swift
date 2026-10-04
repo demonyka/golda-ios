@@ -34,7 +34,9 @@ enum EntryText {
     static let think = LocalizedStringResource("Think", table: "Entry", comment: "“Not sure”: put it on the wishlist for a while. Russian “Подумаю”.")
     static let buy = LocalizedStringResource("Buy", table: "Entry", comment: "“Not sure”: buy it; the expense is recorded. Russian “Беру”.")
 
+    static let type = LocalizedStringResource("Type", table: "Entry", comment: "VoiceOver: the switch between expense, income and transfer at the top of the operation form.")
     static let amount = LocalizedStringResource("Amount", table: "Entry", comment: "VoiceOver: the big amount field of the operation form.")
+    static let note = LocalizedStringResource("Note.label", defaultValue: "Note", table: "Entry", comment: "VoiceOver: the note field of the operation form, whatever its placeholder says. Russian “Комментарий”.")
     static let currency = LocalizedStringResource("Currency", table: "Entry", comment: "Operation form: the menu of the currency the price is in.")
     static let account = LocalizedStringResource("Account", table: "Entry", comment: "Operation form: the account pill when no account is picked, and its VoiceOver name.")
     static let date = LocalizedStringResource("Date", table: "Entry", comment: "VoiceOver: the date pill of the operation form.")

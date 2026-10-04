@@ -180,6 +180,10 @@ final class DesignShotsUITests: XCTestCase {
             let next = walk.app.buttons[index == 2 ? "onboarding.done" : "onboarding.next"]
             guard appear(next, name) else { break }
             shoot(walk, name)
+            // The step's last row clears the bar with "Next" over the list.
+            walk.app.swipeUp(velocity: .fast)
+            walk.app.swipeUp(velocity: .fast)
+            shoot(walk, name + "-bottom")
             if index < 2 { next.tapIfThere() }
         }
         walk.app.terminate()
@@ -200,7 +204,9 @@ final class DesignShotsUITests: XCTestCase {
         }
 
         // The operation form: an operation of Home, then a new one in each type, then "Not sure".
+        // At the largest sizes the hero fills Home and the first row is below the screen.
         let operation = walk.operations.firstMatch
+        walk.reveal(operation)
         if appear(operation, "operation") {
             operation.tapIfThere()
             if appear(app.buttons["entry.cancel"], "entry-edit") {
@@ -208,6 +214,7 @@ final class DesignShotsUITests: XCTestCase {
                 app.buttons["entry.cancel"].tapIfThere()
             }
         }
+        toTop(walk)
         walk.tapToolbar("add")
         let amount = app.textFields["entry.amount"]
         if appear(amount, "entry-new") {
@@ -215,7 +222,12 @@ final class DesignShotsUITests: XCTestCase {
             shoot(walk, "entry-new")
             walk.dismissKeyboard()
             shoot(walk, "entry-new-no-keyboard")
+            // The last category clears "Not sure" over the form.
+            app.swipeUp(velocity: .fast)
+            app.swipeUp(velocity: .fast)
+            shoot(walk, "entry-new-bottom")
             let types = app.segmentedControls["entry.type"]
+            walk.reveal(types)
             for (english, russian) in [("Income", "Доход"), ("Transfer", "Перевод")] {
                 types.buttons[walk.text(english, russian)].tapIfThere()
                 shoot(walk, "entry-" + english.lowercased())
@@ -224,7 +236,13 @@ final class DesignShotsUITests: XCTestCase {
             let consider = app.buttons["entry.consider"]
             walk.reveal(consider)
             consider.tapIfThere()
-            if appear(app.buttons["entry.buy"], "entry-not-sure") { shoot(walk, "entry-not-sure") }
+            if appear(app.buttons["entry.buy"], "entry-not-sure") {
+                shoot(walk, "entry-not-sure")
+                // The note at the end clears the three answers over the facts.
+                app.swipeUp(velocity: .fast)
+                app.swipeUp(velocity: .fast)
+                shoot(walk, "entry-not-sure-bottom")
+            }
             app.buttons["entry.back"].tapIfThere()
             app.buttons["entry.cancel"].tapIfThere()
         }

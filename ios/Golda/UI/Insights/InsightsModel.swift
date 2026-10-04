@@ -334,11 +334,24 @@ struct PeriodRangeDraft: Equatable, Sendable {
 enum InsightsDates {
     /// "10 сент.", "Sep 10": the day and the abbreviated month, in the order [locale] puts them.
     static func short(_ date: LocalDate, in locale: Locale) -> String {
+        noon(date).formatted(style(in: locale).day().month(.abbreviated))
+    }
+
+    /// "27 сент. 2026 г.", "Sep 27, 2026": a day with its year, as the system's date pickers write it.
+    static func full(_ date: LocalDate, in locale: Locale) -> String {
+        noon(date).formatted(style(in: locale).day().month(.abbreviated).year())
+    }
+
+    /// The day's noon in UTC, read back in UTC: no zone can move it to the day before or after.
+    private static func noon(_ date: LocalDate) -> Date {
+        Date(timeIntervalSince1970: Double(date.epochDay) * 86_400 + 12 * 3_600)
+    }
+
+    private static func style(in locale: Locale) -> Date.FormatStyle {
         let utc = TimeZone(secondsFromGMT: 0)!
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = utc
-        let instant = Date(timeIntervalSince1970: Double(date.epochDay) * 86_400 + 12 * 3_600)
-        return instant.formatted(Date.FormatStyle(locale: locale, calendar: calendar, timeZone: utc).day().month(.abbreviated))
+        return Date.FormatStyle(locale: locale, calendar: calendar, timeZone: utc)
     }
 
     /// "Пт", "Fri"; with [letters] only that many, still capitalised: "Fr".

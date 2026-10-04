@@ -166,7 +166,19 @@ final class InsightsUITests: XCTestCase {
         period(app).buttons["Custom range"].tap()
         let done = app.buttons["insights.range.done"]
         XCTAssertTrue(done.waitForExistence(timeout: 5))
-        XCTAssertTrue(app.datePickers["insights.range.from"].exists || app.buttons["insights.range.from"].exists || app.descendants(matching: .any)["insights.range.from"].exists)
+        // VoiceOver hears which end each day is, not "Date Picker".
+        let from = app.buttons["insights.range.from"]
+        XCTAssertEqual(from.label, "From")
+        XCTAssertFalse((from.value as? String ?? "").isEmpty)
+        XCTAssertEqual(app.buttons["insights.range.to"].label, "To")
+        // Each opens its calendar in a sheet of its own, and "Done" there goes back to the dates.
+        from.tap()
+        let calendarDone = app.buttons["insights.range.from.done"]
+        XCTAssertTrue(calendarDone.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.datePickers["insights.range.fromPicker"].exists)
+        calendarDone.tap()
+        XCTAssertTrue(calendarDone.waitForNonExistence(timeout: 5))
+        XCTAssertTrue(done.exists)
         app.buttons["insights.range.cancel"].tap()
         XCTAssertTrue(done.waitForNonExistence(timeout: 5))
 

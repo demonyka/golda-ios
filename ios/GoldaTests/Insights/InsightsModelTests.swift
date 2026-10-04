@@ -347,6 +347,14 @@ import Testing
         #expect(InsightsDates.short(LocalDate(2026, 1, 3), in: F.ru) == "3 янв.")
     }
 
+    /// The ends of a period of your own carry the year, as the system's date pickers write a day.
+    @Test func aFullDayCarriesTheYear() {
+        // A narrow no-break space keeps "г." with its year.
+        #expect(InsightsDates.full(LocalDate(2026, 9, 27), in: F.ru) == "27 сент. 2026\u{202F}г.")
+        #expect(InsightsDates.full(LocalDate(2026, 9, 27), in: F.en) == "Sep 27, 2026")
+        #expect(InsightsDates.full(LocalDate(2027, 1, 3), in: F.en) == "Jan 3, 2027")
+    }
+
     @Test func weekdaysAreCapitalisedAndCanBeCutToTwoLetters() {
         // 2026-10-02 is a Friday.
         let friday = LocalDate(2026, 10, 2)
