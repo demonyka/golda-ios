@@ -1,0 +1,78 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%@ a day" : {
+      "comment" : "Home hero: today's budget share, “2 648 ₽ a day”.",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%@ a day" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "%@ в день" } }
+      }
+    },
+    "%lld days to payday" : {
+      "comment" : "Home hero: days until the next salary, “8 days to payday”.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld day to payday" } },
+              "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld days to payday" } }
+            }
+          }
+        },
+        "ru" : {
+          "variations" : {
+            "plural" : {
+              "few" : { "stringUnit" : { "state" : "translated", "value" : "%lld дня до зарплаты" } },
+              "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld дней до зарплаты" } },
+              "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld день до зарплаты" } },
+              "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld дня до зарплаты" } }
+            }
+          }
+        }
+      }
+    },
+    "Add by hand" : {
+      "comment" : "The widget's “+”: the form for a new operation.",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add by hand" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Записать вручную" } }
+      }
+    },
+    "Open Golda to start" : {
+      "comment" : "The widget before the app is set up: no figure to show yet.",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Open Golda to start" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Открой Golda, чтобы начать" } }
+      }
+    },
+    "Open Golda to update" : {
+      "comment" : "The widget instead of the figure once its days are over and the app has not been opened since.",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Open Golda to update" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Открой Golda, чтобы обновить" } }
+      }
+    },
+    "Safe to spend today" : {
+      "comment" : "Home hero caption over the big number: what can be spent today.",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Safe to spend today" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Можно сегодня" } }
+      }
+    },
+    "Safe to spend today: %@" : {
+      "comment" : "The Lock Screen's line over the clock: the caption and the figure, “Можно сегодня: 1 849 ₽”.",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Safe to spend today: %@" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Можно сегодня: %@" } }
+      }
+    },
+    "What you can spend today, with the mic at hand" : {
+      "comment" : "The «Можно сегодня» widget in the widget gallery.",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "What you can spend today, with the mic at hand" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Сколько можно потратить сегодня, и микрофон под рукой" } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

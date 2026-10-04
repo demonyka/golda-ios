@@ -38,8 +38,12 @@ struct VoiceWidgetTimeline: TimelineProvider {
 }
 
 /// The plain mic glyph on the system's background: gold lives only in the app icon (D34), and the
-/// glyph takes the tint of a tinted Home Screen like the system's own widgets.
+/// glyph takes the tint of a tinted Home Screen like the system's own widgets. On the Lock Screen,
+/// among other apps' circles, the app's coin in one colour says whose it is; a bare mic did not.
 struct VoiceWidgetView: View {
+    /// The coin as a custom symbol in the widgets' asset catalog, made by `tools/coin_symbol.py`.
+    static let coinSymbol = "golda.coin"
+
     @Environment(\.widgetFamily) private var family
 
     var body: some View {
@@ -55,8 +59,8 @@ struct VoiceWidgetView: View {
         case .accessoryCircular:
             ZStack {
                 AccessoryWidgetBackground()
-                Image(systemName: "mic.fill")
-                    .font(.title2)
+                Image(Self.coinSymbol)
+                    .font(.system(size: 30))
                     .widgetAccentable()
             }
             .containerBackground(.clear, for: .widget)

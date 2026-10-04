@@ -39,6 +39,8 @@ final class AppModel {
     @ObservationIgnored let environment: AppEnvironment
     /// The local notifications of every profile (`AppModel+Reminders`).
     let reminders: ReminderScheduler
+    /// The snapshot the «Можно сегодня» widgets read (`AppModel+Widgets`).
+    @ObservationIgnored let widgets: TodayWidgetPublisher
 
     /// By `sort`, then id.
     private(set) var profiles: [Profile] = []
@@ -66,6 +68,7 @@ final class AppModel {
     init(environment: AppEnvironment) {
         self.environment = environment
         reminders = ReminderScheduler(environment: environment)
+        widgets = TodayWidgetPublisher(environment: environment)
         device = environment.deviceSettings.current
     }
 
@@ -292,6 +295,8 @@ final class AppModel {
                     guard let self else { return }
                     if self.profiles != profiles { self.profiles = profiles }
                     self.resolveActiveProfile()
+                    // Another profile makes the widgets name the one on screen.
+                    self.publishWidgets()
                 }
             } catch {
                 guard !Task.isCancelled else { return }
@@ -382,6 +387,7 @@ final class AppModel {
             return
         }
         data = AppData(snapshot: snapshot, device: device, rates: rateTable, zone: environment.zone())
+        publishWidgets()
     }
 
     private func reloadProfiles() async {

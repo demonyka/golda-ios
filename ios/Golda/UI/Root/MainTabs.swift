@@ -87,6 +87,19 @@ struct MainTabs: View {
         // A tapped reminder, once its profile's books are the ones on screen.
         .onChange(of: model.reminders.pendingTap, initial: true) { showTappedReminder() }
         .onChange(of: data.profile.id) { showTappedReminder() }
+        // A widget's "+" or a tap beside its buttons; the form waits for a screen over the tabs.
+        .onChange(of: links.pending, initial: true) { followLink() }
+        .onChange(of: router.presented == nil) { followLink() }
+    }
+
+    private var links: AppLinkRequests { .shared }
+
+    private func followLink() {
+        switch links.take(over: router.presented) {
+        case .showHome: selection = .home
+        case .newOperation: router.present(.entry(EntryRequest()))
+        case nil: break
+        }
     }
 
     /// Payments and grace periods open Accounts, the Sunday reminder Accounts in reconcile mode, and

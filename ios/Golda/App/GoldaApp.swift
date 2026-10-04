@@ -9,6 +9,7 @@ struct GoldaApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @State private var options: LaunchOptions
     @State private var launch: AppLaunch
+    @Environment(\.scenePhase) private var scenePhase
 
     init() {
         let options = LaunchOptions.current
@@ -22,9 +23,11 @@ struct GoldaApp: App {
             case .opened(let model, let voice):
                 RootView(mic: voice)
                     .environment(model)
-                    // The voice widget's link: the tabs start the note (`VoiceEntryDelivery`).
-                    .onOpenURL { url in
-                        if VoiceEntry.isRequest(url) { VoiceEntryRequests.shared.post() }
+                    // The widgets' links: the tabs start the note (`VoiceEntryDelivery`), open
+                    // the form or Home (`MainTabs`).
+                    .onOpenURL { url in AppLinkRequests.shared.open(url) }
+                    .onChange(of: scenePhase) { _, phase in
+                        if phase == .background, !options.isHostingTests { model.publishWidgetsOnLeaving() }
                     }
                     .task {
                         // A unit-test host stays idle: the tests build and drive their own models.

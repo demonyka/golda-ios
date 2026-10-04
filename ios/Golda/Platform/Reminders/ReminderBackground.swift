@@ -6,8 +6,9 @@ import UserNotifications
 private let log = Logger(subsystem: "com.f4studio.golda", category: "Reminders")
 
 /// The background refresh that plans the reminders again while the app is closed, so a debt's next
-/// reminder takes the place of the one that went off (only the nearest of each is pending). The
-/// identifier is in `BGTaskSchedulerPermittedIdentifiers`, with the `fetch` background mode.
+/// reminder takes the place of the one that went off (only the nearest of each is pending), and
+/// writes the widgets' figures for the days ahead. The identifier is in
+/// `BGTaskSchedulerPermittedIdentifiers`, with the `fetch` background mode.
 @MainActor
 enum ReminderBackground {
     static let identifier = "com.f4studio.golda.reminders"
@@ -15,6 +16,8 @@ enum ReminderBackground {
     /// The scheduler of the app's model: a background launch builds the model as any launch does,
     /// but may never show a window, so the task plans through it directly.
     static weak var scheduler: ReminderScheduler?
+    /// The model's widget snapshot, which the task writes from the books for the same reason.
+    static weak var widgets: TodayWidgetPublisher?
     private static var isRegistered = false
 
     /// Once per process, before the launch finishes, as the system requires; the "Try again" of a
@@ -40,8 +43,21 @@ enum ReminderBackground {
         }
     }
 
+    /// Asks to be woken at [millis] or later unless a refresh is pending already. Each refresh
+    /// writes the widgets and the reminders plan the next within a day, so any pending one does;
+    /// this one is for a phone whose reminders ask for none (no permission).
+    static func submitUnlessPending(at millis: Int64) {
+        guard isRegistered else { return }
+        Task {
+            let pending = await BGTaskScheduler.shared.pendingTaskRequests()
+            guard !pending.contains(where: { $0.identifier == identifier }) else { return }
+            submit(at: millis)
+        }
+    }
+
     private static func run(_ box: TaskBox) {
         let work = Task {
+            await widgets?.publishFromBooks()
             await scheduler?.replan()
             box.task.setTaskCompleted(success: !Task.isCancelled)
         }
@@ -74,6 +90,7 @@ final class ReminderTaps: NSObject, @preconcurrency UNUserNotificationCenterDele
         shared.model = model
         UNUserNotificationCenter.current().delegate = shared
         ReminderBackground.scheduler = model.reminders
+        ReminderBackground.widgets = model.widgets
         ReminderBackground.register()
     }
 

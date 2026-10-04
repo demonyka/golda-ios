@@ -22,6 +22,8 @@ struct AppEnvironment: Sendable {
     let voice: VoiceService
     /// The system's local notifications; in memory unless the environment is the real one.
     let notifications: any NotificationCenterClient
+    /// What the widgets read (`TodayWidgetPublisher`); in memory unless the environment is the real one.
+    let widgets: WidgetChannel
 
     /// [voiceProvider] defaults to Gemini with the key in [secrets]; [voiceSecrets] lets the debug
     /// stub give the service a key of its own without writing one where the real key lives.
@@ -35,10 +37,12 @@ struct AppEnvironment: Sendable {
         voiceQueue: VoiceQueue = .live,
         voiceProvider: (any VoiceProvider)? = nil,
         voiceSecrets: (any SecretStore)? = nil,
-        notifications: (any NotificationCenterClient)? = nil
+        notifications: (any NotificationCenterClient)? = nil,
+        widgets: WidgetChannel? = nil
     ) {
         self.database = database
         self.notifications = notifications ?? InMemoryNotificationCenter()
+        self.widgets = widgets ?? .inMemory()
         self.deviceSettings = deviceSettings
         self.secrets = secrets
         self.ratesSource = ratesSource
@@ -79,14 +83,17 @@ struct AppEnvironment: Sendable {
             voiceQueue: .live,
             voiceProvider: voiceProvider,
             voiceSecrets: voiceSecrets,
-            notifications: UserNotificationCenterClient()
+            notifications: UserNotificationCenterClient(),
+            widgets: .appGroup()
         )
     }
 
     /// Nothing on disk survives it: a private database, a defaults suite wiped as it opens, keys in
     /// memory, voice notes in a temporary folder of their own. By default the rates source is
     /// offline, so tests, previews and UI scenarios never touch the network and run on the fallback
-    /// rates; with no key, voice notes wait. Give each concurrent user its own [defaultsSuite].
+    /// rates; with no key, voice notes wait. The widgets' snapshot goes to [defaultsSuite] too, with
+    /// [reloadWidgets] hearing the reloads, unless [widgets] is given. Give each concurrent user its
+    /// own [defaultsSuite].
     static func inMemory(
         defaultsSuite: String = "golda.inMemory",
         ratesSource: any RatesSource = CbrRatesSource(transport: StubHTTPTransport(error: URLError(.notConnectedToInternet))),
@@ -94,7 +101,9 @@ struct AppEnvironment: Sendable {
         zone: @escaping @Sendable () -> TimeZone = { TimeZone.current },
         voiceProvider: (any VoiceProvider)? = nil,
         voiceSecrets: (any SecretStore)? = nil,
-        notifications: (any NotificationCenterClient)? = nil
+        notifications: (any NotificationCenterClient)? = nil,
+        widgets: WidgetChannel? = nil,
+        reloadWidgets: @escaping @MainActor @Sendable () -> Void = {}
     ) throws -> AppEnvironment {
         // Nil only for the app's own bundle id or the global domain, never for our suite names.
         guard let defaults = UserDefaults(suiteName: defaultsSuite) else {
@@ -114,7 +123,8 @@ struct AppEnvironment: Sendable {
             )),
             voiceProvider: voiceProvider,
             voiceSecrets: voiceSecrets,
-            notifications: notifications
+            notifications: notifications,
+            widgets: widgets ?? WidgetChannel(store: TodaySnapshotStore(defaults: defaults), reload: reloadWidgets)
         )
     }
 
@@ -135,7 +145,8 @@ struct AppEnvironment: Sendable {
     /// real one otherwise. A debug build launched with `-golda.voiceStub=<script>` answers voice
     /// notes with the stub's script instead of Gemini, and one launched with `-golda.failDatabase`
     /// fails to open its data. In memory, notifications stay in memory too, unless
-    /// `-golda.liveNotifications` (or `-golda.remindSoon`) asks for the system's.
+    /// `-golda.liveNotifications` (or `-golda.remindSoon`) asks for the system's, and so does what
+    /// the widgets read, unless `-golda.liveWidgets` asks for the App Group.
     static func make(for options: LaunchOptions) throws -> AppEnvironment {
         #if DEBUG
         if options.failsDatabase { throw DebugDatabaseFailure() }
@@ -144,12 +155,16 @@ struct AppEnvironment: Sendable {
         // `-golda.liveNotifications`: a UI run over in-memory books that needs a real delivery.
         let delivers = ReminderDebugOptions.current.usesLiveNotifications && !options.isHostingTests
         let notifications: (any NotificationCenterClient)? = delivers ? UserNotificationCenterClient() : nil
+        // `-golda.liveWidgets`: a UI run over in-memory books that shows them on the widgets.
+        let showsWidgets = ProcessInfo.processInfo.arguments.contains("-golda.liveWidgets") && !options.isHostingTests
+        let widgets: WidgetChannel? = showsWidgets ? .appGroup() : nil
         #else
         let provider: (any VoiceProvider)? = nil, secrets: (any SecretStore)? = nil
         let notifications: (any NotificationCenterClient)? = nil
+        let widgets: WidgetChannel? = nil
         #endif
         return options.inMemory || options.isHostingTests
-            ? try inMemory(voiceProvider: provider, voiceSecrets: secrets, notifications: notifications)
+            ? try inMemory(voiceProvider: provider, voiceSecrets: secrets, notifications: notifications, widgets: widgets)
             : try live(voiceProvider: provider, voiceSecrets: secrets)
     }
 }

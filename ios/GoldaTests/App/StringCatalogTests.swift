@@ -16,7 +16,7 @@ import Testing
     private static let root = URL(fileURLWithPath: #filePath)
         .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
     private static let resources = root.appending(path: "Golda/Resources", directoryHint: .isDirectory)
-    /// The app's and the widgets', which share the `EntryPoints` table.
+    /// The app's and the widgets', whose `EntryPoints` and `Widgets` tables live with the app's.
     private static let sources = ["Golda", "GoldaWidgets"].map { root.appending(path: $0, directoryHint: .isDirectory) }
 
     /// Each table's keys with what the catalog says about them, by table name ("Localizable", "Entry").
@@ -33,7 +33,7 @@ import Testing
 
     @Test func theCatalogsAreThere() throws {
         let tables = Set(try Self.catalogs().keys)
-        #expect(tables.isSuperset(of: ["Localizable", "InfoPlist", "Components", "Entry", "Goals", "Insights", "Profiles", "Settings", "Voice", "AccountForm", "Failure", "Onboarding", "EntryPoints", "AppShortcuts"]), "\(tables)")
+        #expect(tables.isSuperset(of: ["Localizable", "InfoPlist", "Components", "Entry", "Goals", "Insights", "Profiles", "Settings", "Voice", "AccountForm", "Failure", "Onboarding", "EntryPoints", "AppShortcuts", "Widgets"]), "\(tables)")
     }
 
     // MARK: Both languages

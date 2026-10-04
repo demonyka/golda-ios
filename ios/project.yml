@@ -54,6 +54,12 @@ targets:
             UIApplicationShortcutItemIconSymbolName: mic.fill
         BGTaskSchedulerPermittedIdentifiers: [com.f4studio.golda.reminders]
         UIBackgroundModes: [fetch]
+    # The App Group where the app leaves «Можно сегодня» for the widgets (`TodaySnapshot`). The
+    # file is generated, like Info.plist.
+    entitlements:
+      path: Golda/Golda.entitlements
+      properties:
+        com.apple.security.application-groups: [group.com.f4studio.golda]
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.f4studio.golda
@@ -67,16 +73,28 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
 
-  # The voice widget and Control Center's control. They show no data, so no App Group.
+  # «Можно сегодня», the voice widget and Control Center's control. The figures come from the app
+  # through the App Group; formatted with GoldaCore's `Fmt`, as in the app.
   GoldaWidgets:
     type: app-extension
     platform: iOS
     sources:
       - path: GoldaWidgets
-      # Shared with the app: the intent the control runs, the link the widget opens, their labels.
+      # Shared with the app: the intent the mic and the control run, the links the widgets open,
+      # the snapshot the app writes, the bar's geometry, their labels.
       - path: Golda/App/StartVoiceNoteIntent.swift
       - path: Golda/App/VoiceEntry.swift
+      - path: Golda/App/AppLink.swift
+      - path: Golda/App/TodaySnapshot.swift
+      - path: Golda/UI/Components/WavyBarGeometry.swift
       - path: Golda/Resources/EntryPoints.xcstrings
+      - path: Golda/Resources/Widgets.xcstrings
+    dependencies:
+      - package: GoldaCore
+    entitlements:
+      path: GoldaWidgets/GoldaWidgets.entitlements
+      properties:
+        com.apple.security.application-groups: [group.com.f4studio.golda]
     info:
       path: GoldaWidgets/Info.plist
       properties:
