@@ -1,3 +1,5 @@
+import CloudKit
+import GoldaSync
 import OSLog
 import SwiftUI
 import UIKit
@@ -41,12 +43,26 @@ struct GoldaApp: App {
                         await voice.start()
                         model.startReminders()
                         await model.sync.start()
+                        #if DEBUG
+                        if options.seedsCloudKitSchema { await seedCloudKitSchema() }
+                        #endif
                     }
             case .failed(let reason):
                 DataFailureView(reason: reason, retry: reopen)
             }
         }
     }
+
+    #if DEBUG
+    private func seedCloudKitSchema() async {
+        do {
+            try await CloudKitSchemaSeed.run(in: CKContainer(identifier: SyncBackend.containerIdentifier))
+            log.notice("CloudKit schema seeded")
+        } catch {
+            log.error("Seeding the CloudKit schema failed: \(String(describing: error))")
+        }
+    }
+    #endif
 
     private func reopen() {
         #if DEBUG

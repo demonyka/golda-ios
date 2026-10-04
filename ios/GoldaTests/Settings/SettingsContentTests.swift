@@ -187,8 +187,8 @@ import Testing
         #expect(AppVersion.text(["CFBundleShortVersionString": "0.1.0", "CFBundleVersion": "1"]) == "0.1.0 (1)")
         #expect(AppVersion.text(["CFBundleShortVersionString": "1.0.0"]) == "1.0.0")
         #expect(AppVersion.text(nil) == "?")
-        // The app's own: the project sets 0.1.0, build 1.
-        #expect(AppVersion.text(Bundle.main.infoDictionary) == "0.1.0 (1)")
+        // The app's own: the project sets 1.0.0, build 1.
+        #expect(AppVersion.text(Bundle.main.infoDictionary) == "1.0.0 (1)")
     }
 
     @Test func theLanguageIsNamedInItself() {

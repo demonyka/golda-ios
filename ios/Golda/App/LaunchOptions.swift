@@ -22,6 +22,9 @@ struct LaunchOptions: Equatable, Sendable {
     var isHostingTests = false
     /// Opening the data fails, so a UI test can see the failure screen; "Try again" clears it.
     var failsDatabase = false
+    /// Saves one record of every type with every field to iCloud and deletes it, so the Development
+    /// schema is complete before it is deployed to Production (`CloudKitSchemaSeed`).
+    var seedsCloudKitSchema = false
 
     static var current: LaunchOptions {
         LaunchOptions(arguments: ProcessInfo.processInfo.arguments, environment: ProcessInfo.processInfo.environment)
@@ -43,6 +46,7 @@ struct LaunchOptions: Equatable, Sendable {
         command = [LaunchCommand.samples, .demo, .reset].first { flags.contains("-golda.\($0.rawValue)") }
         inMemory = flags.contains("-golda.inMemory")
         failsDatabase = flags.contains("-golda.failDatabase")
+        seedsCloudKitSchema = flags.contains("-golda.seedCloudKitSchema")
         #endif
     }
 }
