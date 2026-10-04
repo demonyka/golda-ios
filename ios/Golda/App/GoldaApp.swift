@@ -32,6 +32,7 @@ struct GoldaApp: App {
                         await model.start(command: options.command)
                         // After the launch command, which wipes this phone's settings with the books.
                         await voice.start()
+                        model.startReminders()
                     }
             case .failed(let reason):
                 DataFailureView(reason: reason, retry: reopen)
@@ -68,6 +69,8 @@ enum AppLaunch {
         let voice = VoiceMicModel.live(model: model)
         // A key saved in Settings lets the notes that waited for one go through.
         model.onGeminiKeyChanged = { [weak model] in model?.processVoiceQueue() }
+        // Before the launch finishes: a tapped notification may be what launched the app.
+        ReminderTaps.attach(model, options: options)
         return .opened(model, voice)
     }
 }

@@ -45,6 +45,9 @@ extension AppModel {
 
     /// "Подумаю": the purchase waits on the wishlist; the wish says until when.
     func thinkAbout(_ consider: Consider) async throws -> Wish {
-        try await environment.repository.think(consider, profileId: try profileOnScreen())
+        let wish = try await environment.repository.think(consider, profileId: try profileOnScreen())
+        // Its reminder is the first need for notifications (D36).
+        askForNotifications()
+        return wish
     }
 }

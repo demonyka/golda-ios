@@ -24,6 +24,7 @@ extension AppModel {
 
     func setReconcileReminder(_ on: Bool) {
         changeDevice { $0.reconcileReminder = on }
+        if on { askForNotifications() }
     }
 
     // MARK: Voice

@@ -34,8 +34,9 @@ enum AppTab: Hashable, CaseIterable {
 struct MainTabs: View {
     let data: AppData
     let mic: any MicModel
+    @Environment(AppModel.self) private var model
     @State private var selection: AppTab
-    /// Accounts in reconcile mode: the Sunday reminder (stage 4) opens the tab this way.
+    /// Accounts in reconcile mode: the Sunday reminder opens the tab this way.
     @State private var isReconciling: Bool
     @State private var router = AppRouter()
     /// One toast for all tabs: the screens over the tabs report through it too, after they close.
@@ -83,6 +84,29 @@ struct MainTabs: View {
                 .environment(\.showUndoToast, ShowUndoToastAction { toast = $0 })
         }
         .environment(router)
+        // A tapped reminder, once its profile's books are the ones on screen.
+        .onChange(of: model.reminders.pendingTap, initial: true) { showTappedReminder() }
+        .onChange(of: data.profile.id) { showTappedReminder() }
+    }
+
+    /// Payments and grace periods open Accounts, the Sunday reminder Accounts in reconcile mode, and
+    /// a wish Goals with the purchase in «Сомневаюсь» again while it still waits (SPEC 6.4, 9).
+    private func showTappedReminder() {
+        guard let destination = model.takeReminderDestination(showing: data.profile.id) else { return }
+        switch destination {
+        case .accounts, .reconcile:
+            router.dismiss()
+            selection = .accounts
+            isReconciling = destination == .reconcile
+        case .wish(let id):
+            selection = .goals
+            if let wish = data.wishes.first(where: { $0.id == id && $0.status == .waiting }) {
+                let consider = Consider(title: wish.title, amountMinor: wish.amountMinor, currency: wish.currency)
+                router.present(.entry(EntryRequest(consider: consider, wishId: wish.id)))
+            } else {
+                router.dismiss()
+            }
+        }
     }
 }
 

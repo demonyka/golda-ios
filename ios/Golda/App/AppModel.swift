@@ -37,6 +37,8 @@ final class AppModel {
     }
 
     @ObservationIgnored let environment: AppEnvironment
+    /// The local notifications of every profile (`AppModel+Reminders`).
+    let reminders: ReminderScheduler
 
     /// By `sort`, then id.
     private(set) var profiles: [Profile] = []
@@ -63,6 +65,7 @@ final class AppModel {
 
     init(environment: AppEnvironment) {
         self.environment = environment
+        reminders = ReminderScheduler(environment: environment)
         device = environment.deviceSettings.current
     }
 
@@ -242,6 +245,7 @@ final class AppModel {
     func saveAccount(_ account: Account, openingMinor: Int64?) async throws {
         let profileId = try profileOnScreen()
         try await environment.repository.saveAccount(account, profileId: profileId, openingMinor: openingMinor)
+        askForNotifications(after: account)
     }
 
     /// Deletes the account with every operation that touches it, both sides of its transfers included.

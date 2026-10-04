@@ -20,6 +20,8 @@ struct AppEnvironment: Sendable {
     /// Understands the notes, one at a time, for the whole app: the mic and the queue share it, so
     /// two notes never book at once and every outcome reaches the one place that announces it.
     let voice: VoiceService
+    /// The system's local notifications; in memory unless the environment is the real one.
+    let notifications: any NotificationCenterClient
 
     /// [voiceProvider] defaults to Gemini with the key in [secrets]; [voiceSecrets] lets the debug
     /// stub give the service a key of its own without writing one where the real key lives.
@@ -32,9 +34,11 @@ struct AppEnvironment: Sendable {
         zone: @escaping @Sendable () -> TimeZone = { TimeZone.current },
         voiceQueue: VoiceQueue = .live,
         voiceProvider: (any VoiceProvider)? = nil,
-        voiceSecrets: (any SecretStore)? = nil
+        voiceSecrets: (any SecretStore)? = nil,
+        notifications: (any NotificationCenterClient)? = nil
     ) {
         self.database = database
+        self.notifications = notifications ?? InMemoryNotificationCenter()
         self.deviceSettings = deviceSettings
         self.secrets = secrets
         self.ratesSource = ratesSource
@@ -74,7 +78,8 @@ struct AppEnvironment: Sendable {
             ratesSource: CbrRatesSource(transport: URLSessionTransport()),
             voiceQueue: .live,
             voiceProvider: voiceProvider,
-            voiceSecrets: voiceSecrets
+            voiceSecrets: voiceSecrets,
+            notifications: UserNotificationCenterClient()
         )
     }
 
@@ -88,7 +93,8 @@ struct AppEnvironment: Sendable {
         clock: (@Sendable () -> Int64)? = nil,
         zone: @escaping @Sendable () -> TimeZone = { TimeZone.current },
         voiceProvider: (any VoiceProvider)? = nil,
-        voiceSecrets: (any SecretStore)? = nil
+        voiceSecrets: (any SecretStore)? = nil,
+        notifications: (any NotificationCenterClient)? = nil
     ) throws -> AppEnvironment {
         // Nil only for the app's own bundle id or the global domain, never for our suite names.
         guard let defaults = UserDefaults(suiteName: defaultsSuite) else {
@@ -107,7 +113,8 @@ struct AppEnvironment: Sendable {
                 path: "golda-voice-\(UUID().uuidString)", directoryHint: .isDirectory
             )),
             voiceProvider: voiceProvider,
-            voiceSecrets: voiceSecrets
+            voiceSecrets: voiceSecrets,
+            notifications: notifications
         )
     }
 
@@ -127,17 +134,22 @@ struct AppEnvironment: Sendable {
     /// The environment [options] ask for: in memory for UI tests and for the unit-test host, the
     /// real one otherwise. A debug build launched with `-golda.voiceStub=<script>` answers voice
     /// notes with the stub's script instead of Gemini, and one launched with `-golda.failDatabase`
-    /// fails to open its data.
+    /// fails to open its data. In memory, notifications stay in memory too, unless
+    /// `-golda.liveNotifications` (or `-golda.remindSoon`) asks for the system's.
     static func make(for options: LaunchOptions) throws -> AppEnvironment {
         #if DEBUG
         if options.failsDatabase { throw DebugDatabaseFailure() }
         let stub = VoiceStubOptions.current
         let provider = stub?.provider, secrets = stub?.secrets
+        // `-golda.liveNotifications`: a UI run over in-memory books that needs a real delivery.
+        let delivers = ReminderDebugOptions.current.usesLiveNotifications && !options.isHostingTests
+        let notifications: (any NotificationCenterClient)? = delivers ? UserNotificationCenterClient() : nil
         #else
         let provider: (any VoiceProvider)? = nil, secrets: (any SecretStore)? = nil
+        let notifications: (any NotificationCenterClient)? = nil
         #endif
         return options.inMemory || options.isHostingTests
-            ? try inMemory(voiceProvider: provider, voiceSecrets: secrets)
+            ? try inMemory(voiceProvider: provider, voiceSecrets: secrets, notifications: notifications)
             : try live(voiceProvider: provider, voiceSecrets: secrets)
     }
 }

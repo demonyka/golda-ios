@@ -36,9 +36,10 @@ targets:
       - package: GoldaData
       - package: GoldaSync
       - target: GoldaWidgets
-    # The voice's ways in from outside (`VoiceEntry`): the widget's link opens the `golda` scheme,
-    # and the quick action on the icon is there from the install on. The file is generated; its
-    # versions stay the build settings', which XcodeGen would otherwise write as 1.0 (1).
+    # The keys the build settings cannot express. The voice's ways in from outside (`VoiceEntry`):
+    # the widget's link opens the `golda` scheme, and the quick action on the icon is there from the
+    # install on. The reminders' background refresh (`ReminderBackground`). The file is generated;
+    # its versions stay the build settings', which XcodeGen would otherwise write as 1.0 (1).
     info:
       path: Golda/Info.plist
       properties:
@@ -51,6 +52,8 @@ targets:
           - UIApplicationShortcutItemType: com.f4studio.golda.voice
             UIApplicationShortcutItemTitle: Say a purchase
             UIApplicationShortcutItemIconSymbolName: mic.fill
+        BGTaskSchedulerPermittedIdentifiers: [com.f4studio.golda.reminders]
+        UIBackgroundModes: [fetch]
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.f4studio.golda

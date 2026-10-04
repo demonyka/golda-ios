@@ -69,6 +69,18 @@ public final class GoldaDatabase: Sendable {
         return stream(observation.values(in: writer, bufferingPolicy: .bufferingNewest(1)))
     }
 
+    /// Every profile's books, in the profiles' order, again after each change to any of them. What
+    /// spans the profiles (the reminders) follows this; the screens follow the profile on screen.
+    public func allSnapshots() -> AsyncThrowingStream<[ProfileSnapshot], any Error> {
+        let observation = ValueObservation
+            .tracking { db -> [ProfileSnapshot]? in
+                let store = Store(db: db)
+                return try store.profiles().compactMap { try store.snapshot(profileId: $0.id) }
+            }
+            .removeDuplicates()
+        return stream(observation.values(in: writer, bufferingPolicy: .bufferingNewest(1)))
+    }
+
     /// The rate table by code, again after each change to it (a refresh, a reset), so the app
     /// revalues what it shows without rereading after its own refresh. Rates are shared by every
     /// profile; each applies its own markup.

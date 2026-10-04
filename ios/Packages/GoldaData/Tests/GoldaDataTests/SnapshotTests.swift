@@ -101,6 +101,23 @@ import Testing
         #expect(familyBooks.operations.map(\.op.id) == [StoreFixture.id(22)])
     }
 
+    /// The reminders span every profile, so their stream follows a write to any of them.
+    @Test func everyProfilesBooksFollowWritesToAnyOfThem() async throws {
+        let database = try await StoreFixture.database(profiles: 1, 2)
+        var books = database.allSnapshots().makeAsyncIterator()
+        let initial = try #require(try await books.next())
+        #expect(initial.map(\.profile.id) == [personal, family])
+        #expect(initial.allSatisfy { $0.accounts.isEmpty })
+
+        try await database.write { try $0.save(StoreFixture.account(12), profileId: family) }
+        let next = try #require(try await books.next())
+        #expect(next.map(\.profile.id) == [personal, family])
+        #expect(next.map { $0.accounts.map(\.id) } == [[], [StoreFixture.id(12)]])
+
+        try await database.write { try $0.deleteProfile(family) }
+        #expect(try await books.next()?.map(\.profile.id) == [personal])
+    }
+
     @Test func snapshotsEndWhenTheProfileIsDeleted() async throws {
         let database = try await StoreFixture.database(profiles: 1)
         var snapshots = database.snapshots(profileId: personal).makeAsyncIterator()
