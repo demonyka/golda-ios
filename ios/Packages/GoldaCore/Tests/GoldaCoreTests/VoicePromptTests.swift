@@ -20,7 +20,8 @@ import Testing
         #expect(prompt.contains("- 1: Карта, RUB, card"))
         #expect(prompt.contains("- 2: Кредит, RUB, loan"))
         #expect(prompt.contains("Сегодня 2026-10-02 (пятница)."))
-        #expect(prompt.contains("Валюты пользователя: RUB, USD."))
+        #expect(prompt.contains("- RUB — российский рубль"))
+        #expect(prompt.contains("- USD — доллар США"))
         #expect(!prompt.contains(uid(9).uuidString))
         // The same positions come back as ids.
         let item = VoiceItem(intent: "expense", amount: "10", currency: "RUB", note: "кофе", accountId: "2")

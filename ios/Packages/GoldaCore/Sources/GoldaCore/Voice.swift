@@ -88,9 +88,13 @@ public enum VoicePrompt {
         func cats(_ kind: CategoryKind) -> String {
             categories.filter { $0.kind == kind }.map { "\($0.key) (\($0.name))" }.joined(separator: ", ")
         }
+        let currencyLines = SpokenCurrency.held(accounts, settings).map(SpokenCurrency.line).joined(separator: "\n")
         return """
         Ты разбираешь голосовые записи о личных деньгах в JSON. Ничего не считай и не конвертируй, только извлекай сказанное.
-        Сегодня \(today) (\(today.dayOfWeek.russianName)). Местная валюта: \(settings.localCurrency). Валюты пользователя: \(settings.displayCurrencies.joined(separator: ", ")).
+        Сегодня \(today) (\(today.dayOfWeek.russianName)). Местная валюта: \(settings.localCurrency).
+
+        Валюты пользователя (код — название, как говорят; разменная монета):
+        \(currencyLines)
 
         Счета (номер: название, валюта, тип):
         \(accountLines)
@@ -104,6 +108,8 @@ public enum VoicePrompt {
         - «Хочу купить», «стоит ли брать», «думаю купить» — intent consider.
         - Перевод между своими счетами или снятие наличных — transfer: account_id откуда, to_account_id куда, to_amount — сколько пришло, если сказано.
         - amount и to_amount — число строкой с точкой: "15", "1500.5". Валюта — код ISO: лари GEL, бат THB, доллар/бакс USD, рубль RUB, евро EUR. Не названа — null.
+        - Название, которое носят несколько валют (\(SpokenCurrency.sharedNames.joined(separator: ", "))), — валюта пользователя с этим названием, если среди его валют такая одна: «хлеб 200 песо» при ARS в списке — ARS. Иначе обычная: доллар — USD, фунт — GBP.
+        - Разменная монета — доля основной валюты: сумму пиши в основной единице, валюту — кодом основной. «50 тетри» — amount "0.50", currency GEL; «2 лари 50 тетри» — "2.50", GEL; «50 копеек» — "0.50", RUB. Это запись числа, как «полтора» — "1.5", а не пересчёт.
         - account_id только из списка выше (номер счёта строкой) и только если счёт явно назван или однозначно следует из сказанного («наличкой», «с кредитки»), иначе null.
         - category — ключ из списка или null. note — коротко, что купил, с маленькой буквы.
         - date в формате YYYY-MM-DD, только если назван день («вчера», «в понедельник»), иначе null.
@@ -147,6 +153,7 @@ public enum VoiceMapper {
             return accounts[n - 1]
         }
         let said = item.currency.map { $0.uppercased() }.flatMap { $0.count == 3 ? $0 : nil }
+            .map { SpokenCurrency.own($0, among: SpokenCurrency.held(accounts, settings)) }
         let currency = said ?? unsaidCurrency(item, named, settings.localCurrency)
         let amount = item.amount.flatMap { Fmt.parseMinor($0, currency) }.flatMap { $0 > 0 ? $0 : nil }
         let trimmed = item.note.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -258,5 +265,139 @@ public enum VoiceMapper {
         guard let day = date.flatMap({ LocalDate(iso: $0) }) else { return recordedAt }
         let recordedDay = Ledger.localDate(recordedAt, zone)
         return day >= recordedDay ? recordedAt : day.atTimeMillis(hour: 12, in: zone)
+    }
+}
+
+/// How a currency is said aloud in Russian past its official name: the words for the main unit and
+/// the coin. A word several currencies go by («песо», «доллар») means the person's own one when
+/// they hold exactly one of them: someone keeping Argentine pesos who says «хлеб 200 песо» does not
+/// mean Mexican ones.
+enum SpokenCurrency {
+    private struct Entry {
+        let code: String
+        /// The main unit as people say it; the first is the usual word.
+        let names: [String]
+        /// One hundredth (or thousandth, by the currency's minor digits) of the main unit. Nil where
+        /// no coin is in use, or where its name is another currency's («дирхам» in Qatar).
+        let coin: String?
+    }
+
+    private static let table: [Entry] = [
+        // The ones people here travel with, first.
+        Entry(code: "RUB", names: ["рубль", "руб"], coin: "копейка"),
+        Entry(code: "USD", names: ["доллар", "бакс"], coin: "цент"),
+        Entry(code: "EUR", names: ["евро"], coin: "евроцент"),
+        Entry(code: "GEL", names: ["лари"], coin: "тетри"),
+        Entry(code: "THB", names: ["бат"], coin: "сатанг"),
+        Entry(code: "TRY", names: ["лира"], coin: "куруш"),
+        Entry(code: "KZT", names: ["тенге"], coin: "тиын"),
+        Entry(code: "AMD", names: ["драм"], coin: "лума"),
+        Entry(code: "CNY", names: ["юань"], coin: "фэнь"),
+        Entry(code: "AED", names: ["дирхам"], coin: "филс"),
+        Entry(code: "VND", names: ["донг"], coin: nil),
+        Entry(code: "IDR", names: ["рупия"], coin: nil),
+        // The rest, by the name they share.
+        Entry(code: "BYN", names: ["рубль"], coin: "копейка"),
+        Entry(code: "AUD", names: ["доллар"], coin: "цент"),
+        Entry(code: "CAD", names: ["доллар"], coin: "цент"),
+        Entry(code: "NZD", names: ["доллар"], coin: "цент"),
+        Entry(code: "SGD", names: ["доллар"], coin: "цент"),
+        Entry(code: "HKD", names: ["доллар"], coin: "цент"),
+        Entry(code: "TWD", names: ["доллар"], coin: nil),
+        Entry(code: "MAD", names: ["дирхам"], coin: "сантим"),
+        Entry(code: "INR", names: ["рупия"], coin: "пайса"),
+        Entry(code: "LKR", names: ["рупия"], coin: "цент"),
+        Entry(code: "NPR", names: ["рупия"], coin: "пайса"),
+        Entry(code: "PKR", names: ["рупия"], coin: "пайса"),
+        Entry(code: "ARS", names: ["песо"], coin: "сентаво"),
+        Entry(code: "MXN", names: ["песо"], coin: "сентаво"),
+        Entry(code: "COP", names: ["песо"], coin: "сентаво"),
+        Entry(code: "CLP", names: ["песо"], coin: nil),
+        Entry(code: "UYU", names: ["песо"], coin: "сентесимо"),
+        Entry(code: "DOP", names: ["песо"], coin: "сентаво"),
+        Entry(code: "CUP", names: ["песо"], coin: "сентаво"),
+        Entry(code: "PHP", names: ["песо"], coin: "сентимо"),
+        Entry(code: "GBP", names: ["фунт"], coin: "пенс"),
+        Entry(code: "EGP", names: ["фунт"], coin: "пиастр"),
+        Entry(code: "SEK", names: ["крона"], coin: "эре"),
+        Entry(code: "NOK", names: ["крона"], coin: "эре"),
+        Entry(code: "DKK", names: ["крона"], coin: "эре"),
+        Entry(code: "CZK", names: ["крона"], coin: nil),
+        Entry(code: "ISK", names: ["крона"], coin: nil),
+        Entry(code: "CHF", names: ["франк"], coin: "сантим"),
+        Entry(code: "XOF", names: ["франк"], coin: nil),
+        Entry(code: "XAF", names: ["франк"], coin: nil),
+        Entry(code: "XPF", names: ["франк"], coin: nil),
+        Entry(code: "RSD", names: ["динар"], coin: "пара"),
+        Entry(code: "KWD", names: ["динар"], coin: "филс"),
+        Entry(code: "BHD", names: ["динар"], coin: "филс"),
+        Entry(code: "JOD", names: ["динар"], coin: "филс"),
+        Entry(code: "TND", names: ["динар"], coin: "миллим"),
+        Entry(code: "DZD", names: ["динар"], coin: "сантим"),
+        Entry(code: "IRR", names: ["риал", "риял"], coin: nil),
+        Entry(code: "SAR", names: ["риял", "риал"], coin: "халал"),
+        Entry(code: "QAR", names: ["риал", "риял"], coin: nil),
+        Entry(code: "OMR", names: ["риал", "риял"], coin: "байса"),
+        Entry(code: "KES", names: ["шиллинг"], coin: "цент"),
+        Entry(code: "TZS", names: ["шиллинг"], coin: nil),
+        Entry(code: "UGX", names: ["шиллинг"], coin: nil),
+        Entry(code: "KRW", names: ["вона"], coin: nil),
+        Entry(code: "KPW", names: ["вона"], coin: nil),
+        Entry(code: "MDL", names: ["лей"], coin: "бань"),
+        Entry(code: "RON", names: ["лей"], coin: "бань"),
+        Entry(code: "AZN", names: ["манат"], coin: "гяпик"),
+        Entry(code: "TMT", names: ["манат"], coin: nil),
+        // Names no other currency goes by.
+        Entry(code: "JPY", names: ["иена", "йена"], coin: nil),
+        Entry(code: "UAH", names: ["гривна"], coin: "копейка"),
+        Entry(code: "KGS", names: ["сом"], coin: "тыйын"),
+        Entry(code: "UZS", names: ["сум"], coin: "тийин"),
+        Entry(code: "TJS", names: ["сомони"], coin: "дирам"),
+        Entry(code: "PLN", names: ["злотый"], coin: "грош"),
+        Entry(code: "HUF", names: ["форинт"], coin: nil),
+        Entry(code: "BGN", names: ["лев"], coin: "стотинка"),
+        Entry(code: "ILS", names: ["шекель"], coin: "агора"),
+        Entry(code: "BRL", names: ["реал"], coin: "сентаво"),
+        Entry(code: "MYR", names: ["ринггит"], coin: "сен"),
+        Entry(code: "ZAR", names: ["рэнд"], coin: "цент"),
+        Entry(code: "MNT", names: ["тугрик"], coin: nil),
+        Entry(code: "LAK", names: ["кип"], coin: nil),
+        Entry(code: "KHR", names: ["риель"], coin: nil),
+        Entry(code: "MMK", names: ["кьят"], coin: nil),
+    ]
+
+    private static let byCode = Dictionary(table.map { ($0.code, $0) }, uniquingKeysWith: { first, _ in first })
+
+    /// Words for a main unit more than one currency goes by, in the table's order.
+    static let sharedNames: [String] = {
+        let names = table.flatMap(\.names)
+        return names.filter { name in names.count { $0 == name } > 1 }.distinct()
+    }()
+
+    /// Every currency the person keeps or watches, the local one first.
+    static func held(_ accounts: [Account], _ settings: Settings) -> [String] {
+        ([settings.localCurrency] + settings.displayCurrencies + [settings.baseCurrency] + accounts.map(\.currency)).distinct()
+    }
+
+    /// "- GEL — грузинский лари, «лари»; тетри = 1/100". The official name comes from Foundation, so
+    /// a currency the table lacks is still named.
+    static func line(_ code: String) -> String {
+        let entry = byCode[code]
+        let official = Locale(identifier: "ru").localizedString(forCurrencyCode: code)
+        let spoken = (entry?.names ?? []).filter { $0 != official }.map { "«\($0)»" }
+        let title = ([official].compactMap { $0 } + spoken).joined(separator: ", ")
+        var line = title.isEmpty ? "- \(code)" : "- \(code) — \(title)"
+        if let coin = entry?.coin, Currencies.digits(code) > 0 {
+            line += "; \(coin) = 1/\(Currencies.integerFactor(code))"
+        }
+        return line
+    }
+
+    /// [said] unless the person does not hold it and holds exactly one currency that shares a name
+    /// with it: the model knows only that «песо» is some peso, and the person meant theirs.
+    static func own(_ said: String, among held: [String]) -> String {
+        guard !held.contains(said), let names = byCode[said]?.names else { return said }
+        let kin = held.filter { code in byCode[code]?.names.contains(where: names.contains) == true }
+        return kin.count == 1 ? kin[0] : said
     }
 }
