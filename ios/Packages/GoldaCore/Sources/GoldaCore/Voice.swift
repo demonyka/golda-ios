@@ -146,8 +146,8 @@ public enum VoiceMapper {
             guard let position, let n = Int(position), accounts.indices.contains(n - 1) else { return nil }
             return accounts[n - 1]
         }
-        let upper = item.currency?.uppercased()
-        let currency = upper.flatMap { $0.count == 3 ? $0 : nil } ?? settings.localCurrency
+        let said = item.currency.map { $0.uppercased() }.flatMap { $0.count == 3 ? $0 : nil }
+        let currency = said ?? unsaidCurrency(item, named, settings.localCurrency)
         let amount = item.amount.flatMap { Fmt.parseMinor($0, currency) }.flatMap { $0 > 0 ? $0 : nil }
         let trimmed = item.note.trimmingCharacters(in: .whitespacesAndNewlines)
         let note = trimmed.prefix(1).uppercased() + trimmed.dropFirst()
@@ -225,6 +225,23 @@ public enum VoiceMapper {
         let spendable = accounts.filter { $0.includeInFree || $0.type == .credit }
         if let last, last.currency == currency { return last }
         return spendable.first { $0.currency == currency } ?? last ?? spendable.first ?? accounts.first
+    }
+
+    /// The currency of an amount said without one (D44). A purchase is priced in the local money,
+    /// whatever card pays for it. Money moved between the person's own accounts, or coming into a
+    /// named one, is counted in those accounts' money: «перевёл с карты на накопительный восемьдесят
+    /// тысяч» between two ruble accounts is rubles, not lari. Accounts in different currencies keep
+    /// the local money when it is one of them (a cash machine gives local money), else the source's.
+    private static func unsaidCurrency(_ item: VoiceItem, _ named: (String?) -> Account?, _ local: String) -> String {
+        let accounts: [Account] = switch item.intent {
+        case "transfer": [named(item.accountId), named(item.toAccountId)].compactMap { $0 }
+        case "income": [named(item.accountId)].compactMap { $0 }
+        default: []
+        }
+        let currencies = accounts.map(\.currency)
+        guard let first = currencies.first else { return local }
+        if currencies.allSatisfy({ $0 == first }) { return first }
+        return currencies.contains(local) ? local : first
     }
 
     private static func timestamp(_ date: String?, _ recordedAt: Int64, _ zone: TimeZone) -> Int64 {
