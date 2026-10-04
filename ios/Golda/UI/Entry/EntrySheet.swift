@@ -233,9 +233,11 @@ private struct EntryForm: View {
         .padding(.horizontal, Theme.Gap.m)
         .frame(minHeight: 52)
         .background(Theme.Color.card, in: RoundedRectangle(cornerRadius: Theme.Radius.field, style: .continuous))
-        // The whole card is the field: a tap on its padding still gives it the keyboard.
+        // The whole card is the field: a tap on its padding still gives it the keyboard, and the
+        // window's tap leaves the keyboard up for it.
         .contentShape(.rect)
         .onTapGesture { focus = .note }
+        .keepsKeyboardOnTap()
     }
 
     // MARK: Actions

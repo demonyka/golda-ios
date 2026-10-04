@@ -130,6 +130,55 @@ final class EntryUITests: XCTestCase {
         XCTAssertTrue(amount.waitForNonExistence(timeout: 5))
     }
 
+    // MARK: The keyboard
+
+    /// A tap on the empty page puts the keyboard away. A tap on another field moves the keyboard
+    /// there, and the charge's button hands it from the amount straight to the charge; a control
+    /// does its job and ends the typing.
+    @MainActor
+    func testATapOnTheEmptyPagePutsTheKeyboardAway() {
+        let app = launch()
+        let keyboard = app.keyboards.firstMatch
+        let amount = openNewEntry(app)
+        // Typed into first, so the software keyboard is really on screen (`Walk.dismissKeyboard`).
+        amount.typeText("10")
+        let transfer = app.segmentedControls["entry.type"].buttons["Transfer"]
+        transfer.tap()
+        XCTAssertTrue(transfer.isSelected)
+        XCTAssertTrue(eventually { !keyboard.exists }, "the switch ends the typing")
+
+        // At the end of the digits, so the caret goes after them.
+        amount.coordinate(withNormalizedOffset: CGVector(dx: 0.97, dy: 0.5)).tap()
+        XCTAssertTrue(eventually { self.hasKeyboardFocus(amount) })
+        amount.typeText("0")
+        let second = app.buttons["entry.second"]
+        XCTAssertTrue(second.waitForExistence(timeout: 5))
+        second.tap()
+        let charge = app.textFields["entry.second.field"]
+        XCTAssertTrue(charge.waitForExistence(timeout: 5))
+        XCTAssertTrue(eventually { self.hasKeyboardFocus(charge) }, "the charge takes the keyboard from the amount")
+        XCTAssertTrue(keyboard.exists)
+        charge.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: ((charge.value as? String) ?? "").count) + "270")
+
+        let note = app.textFields["entry.note"]
+        note.tap()
+        if !eventually(timeout: 2, { self.hasKeyboardFocus(note) }) { note.tap() }
+        XCTAssertTrue(eventually { self.hasKeyboardFocus(note) }, "the note takes the keyboard")
+        XCTAssertTrue(keyboard.exists)
+        XCTAssertTrue(eventually { second.exists }, "the charge folds back once the keyboard leaves it")
+        XCTAssertTrue(second.label.hasPrefix("Receives 270 "), second.label)
+        note.typeText("Rent")
+
+        // The empty page beside the big number.
+        app.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: 24, dy: amount.frame.midY)).tap()
+        XCTAssertTrue(eventually { !keyboard.exists }, "a tap on the empty page puts the keyboard away")
+        XCTAssertFalse(hasKeyboardFocus(note))
+        XCTAssertEqual(note.value as? String, "Rent")
+        XCTAssertEqual(amount.value as? String, "100")
+        app.buttons["entry.cancel"].tap()
+        XCTAssertTrue(amount.waitForNonExistence(timeout: 5))
+    }
+
     // MARK: Existing operations
 
     @MainActor

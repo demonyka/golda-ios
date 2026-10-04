@@ -74,6 +74,8 @@ struct EntryUnderLine: View {
             .padding(.vertical, Theme.Gap.s)
             .frame(maxWidth: 240)
             .background(Theme.Color.card, in: RoundedRectangle(cornerRadius: Theme.Radius.field, style: .continuous))
+            // The card is the field: a tap on its padding does not fold it back.
+            .keepsKeyboardOnTap()
             .frame(maxWidth: .infinity)
             .onAppear { focus.wrappedValue = .second }
         } else {
@@ -92,6 +94,8 @@ struct EntryUnderLine: View {
                 .foregroundStyle(Theme.Color.text)
             }
             .buttonStyle(.glass)
+            // The button opens a field: the keyboard goes from the amount straight to it.
+            .keepsKeyboardOnTap()
             .frame(maxWidth: .infinity)
             .accessibilityLabel(Text(verbatim: spoken))
             .accessibilityHint(Text(verbatim: EntryText.correct.text(in: locale)))

@@ -10,6 +10,8 @@ struct RootView: View {
         content
             // The consent screen answers the mic wherever it opens from: a tap on the mic or settings.
             .environment(\.voiceConsent, VoiceConsentAction { [mic] agreed in mic.answerConsent(agreed) })
+            // A tap beside the text puts the keyboard away, here and in every sheet over it.
+            .background(KeyboardDismissingTapInstaller().allowsHitTesting(false).accessibilityHidden(true))
     }
 
     @ViewBuilder private var content: some View {

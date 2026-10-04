@@ -268,6 +268,39 @@ final class AccountFormUITests: XCTestCase {
         XCTAssertFalse(app.buttons["debt.prepay"].exists)
     }
 
+    // MARK: The keyboard
+
+    /// A tap on the page beside the cards puts the keyboard away; a tap on another field moves the
+    /// keyboard there, and one on a field's row beside its text leaves it with the field.
+    @MainActor
+    func testATapBesideTheCardsPutsTheKeyboardAway() {
+        let app = launch()
+        openAccounts(app)
+        let keyboard = app.keyboards.firstMatch
+        let name = openNewAccountForm(app)
+        // Typed into first, so the software keyboard is really on screen (`Walk.dismissKeyboard`).
+        name.tap()
+        name.typeText("Wallet")
+        let opening = app.textFields["accountForm.opening"]
+        opening.tap()
+        XCTAssertTrue(eventually { self.hasKeyboardFocus(opening) }, "the amount takes the keyboard from the name")
+        XCTAssertFalse(hasKeyboardFocus(name))
+        XCTAssertTrue(keyboard.exists)
+        opening.typeText("500")
+
+        // The amount's row, far to the side of its digits.
+        app.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: 40, dy: opening.frame.midY)).tap()
+        XCTAssertFalse(eventually(timeout: 1) { !keyboard.exists }, "a tap on the field's row keeps the keyboard")
+        XCTAssertTrue(hasKeyboardFocus(opening))
+
+        // The page's margin beside the amount's card.
+        app.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: 6, dy: opening.frame.midY)).tap()
+        XCTAssertTrue(eventually { !keyboard.exists }, "a tap beside the cards puts the keyboard away")
+        XCTAssertFalse(hasKeyboardFocus(opening))
+        XCTAssertEqual(opening.value as? String, "500")
+        XCTAssertEqual(name.value as? String, "Wallet")
+    }
+
     // MARK: Screenshots
 
     /// Not a check: pictures of the whole flow for a human. Runs only when `GOLDA_SHOTS_DIR` is set
@@ -363,6 +396,11 @@ final class AccountFormUITests: XCTestCase {
         field.coordinate(withNormalizedOffset: CGVector(dx: 0.97, dy: 0.5)).tap()
         let current = (field.value as? String) ?? ""
         field.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: current.count) + text)
+    }
+
+    @MainActor
+    private func hasKeyboardFocus(_ element: XCUIElement) -> Bool {
+        (element.value(forKey: "hasKeyboardFocus") as? Bool) ?? false
     }
 
     /// A toggle in a form flips at its switch, not at its label.

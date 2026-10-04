@@ -227,6 +227,54 @@ final class SettingsUITests: XCTestCase {
         XCTAssertEqual(app.switches["settings.reminder"].value as? String, "0")
     }
 
+    /// In a sheet over the settings, a tap on the page beside the field puts the keyboard away; one
+    /// on the field's row, or on the menu over the text, leaves it with the field.
+    @MainActor
+    func testATapBesideTheModelsFieldPutsTheKeyboardAway() {
+        let app = launch()
+        openSettings(app)
+        let model = app.buttons["settings.model"]
+        reveal(model, in: app)
+        model.tap()
+        let field = app.textFields["settings.model.field"]
+        XCTAssertTrue(field.waitForExistence(timeout: 5))
+        let keyboard = app.keyboards.firstMatch
+        // Typed into first, so the software keyboard is really on screen (`Walk.dismissKeyboard`).
+        field.tap()
+        field.typeText("-next")
+        XCTAssertTrue(keyboard.exists)
+
+        // The text's own menu works on the text: "Select All", then "Cut".
+        field.press(forDuration: 1)
+        let selectAll = app.menuItems["Select All"]
+        XCTAssertTrue(selectAll.waitForExistence(timeout: 5))
+        selectAll.tap()
+        let cut = app.menuItems["Cut"]
+        XCTAssertTrue(cut.waitForExistence(timeout: 5))
+        cut.tap()
+        XCTAssertTrue(waitFor { (field.value as? String) != "gemini-3.5-flash-lite-next" }, "the menu cut the text")
+        XCTAssertTrue(keyboard.exists)
+        XCTAssertTrue(hasKeyboardFocus(field))
+        field.typeText("gemini-next")
+
+        // The field's row, above its text.
+        field.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.05)).tap()
+        XCTAssertFalse(waitFor({ !keyboard.exists }, timeout: 1), "a tap on the field's row keeps the keyboard")
+
+        // The page's margin beside the field's card.
+        app.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: 6, dy: field.frame.midY)).tap()
+        XCTAssertTrue(waitFor { !keyboard.exists }, "a tap beside the card puts the keyboard away")
+        XCTAssertFalse(hasKeyboardFocus(field))
+        XCTAssertEqual(field.value as? String, "gemini-next")
+        app.buttons["settings.model.cancel"].tap()
+        XCTAssertTrue(field.waitForNonExistence(timeout: 5))
+    }
+
+    @MainActor
+    private func hasKeyboardFocus(_ element: XCUIElement) -> Bool {
+        (element.value(forKey: "hasKeyboardFocus") as? Bool) ?? false
+    }
+
     @MainActor
     func testRatesShowTheDisplayRateAndARefreshWithoutNetworkSaysSo() {
         let app = launch()
