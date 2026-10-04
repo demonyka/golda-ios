@@ -29,8 +29,16 @@ import Testing
         #expect(usd.minor(left) == 2_019)
 
         let lari = Base(rates, "GEL")
-        #expect(lari.whole(left) == "52 ₾") // 52,59 ₾
+        #expect(lari.whole(left) == "53 ₾") // 52,59 ₾, rounded like `approx` (D61; Kotlin cuts to 52)
         #expect(lari.approx(left) == Fmt.approx(1_849.0 / (31.96 * 1.10), "GEL"))
+    }
+
+    /// The hero and the toast under it say the same number (D61): 1 941,52 ₽ is «1 942 ₽» in both.
+    @Test func wholeUnitsRoundAsTheApproximateAmountsDo() {
+        let base = Base(rates, "RUB")
+        #expect(base.whole(194_152) == "1\u{202F}942 ₽")
+        #expect(base.whole(194_152) == base.approx(194_152))
+        #expect(base.whole(-12_060) == base.approx(-12_060))
     }
 
     @Test func aCurrencyWithoutARateFallsBackToRubles() {

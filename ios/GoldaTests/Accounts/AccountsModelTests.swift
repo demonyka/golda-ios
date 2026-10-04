@@ -67,7 +67,8 @@ import Testing
         // 1 600 + 250 000 + 9 200 + 8 856,72 + 5 160 − 15 000 − 200 000 ₽.
         #expect(hero.totalMinor == 5_981_672)
         #expect(hero.currency == "RUB")
-        #expect(hero.total == "59\u{202F}816 ₽")
+        // Rounded like the others line (D61), which says 59 817 ₽ in dollars' place.
+        #expect(hero.total == "59\u{202F}817 ₽")
         // The local lari first, then dollars, at the rates with the 10 % markup.
         #expect(hero.others == "1\u{202F}813 ₾ · 680 $")
         #expect(AccountsHero.caption.text(in: F.ru) == "Всего")
@@ -81,7 +82,7 @@ import Testing
         #expect(hero.currency == "USD")
         // 59 816,72 ₽ at 88 ₽ a dollar.
         #expect(hero.totalMinor == 67_974)
-        #expect(hero.total == "679 $")
+        #expect(hero.total == "680 $") // 679,74 $, as the others line elsewhere rounds it (D61)
         #expect(hero.others == "1\u{202F}813 ₾ · 59\u{202F}817 ₽")
         // The bank's label follows the main currency too.
         #expect(AccountsContent(data: books.data, today: F.today).sections[1].label == "Мультивалютная · 205 $")
@@ -243,7 +244,7 @@ import Testing
 
     @Test func voiceOverReadsTheHeroAsSentences() {
         let label = books.content.hero.accessibilityLabel(in: F.en)
-        #expect(label.hasPrefix("Total. 59816 Russian rubles. "))
+        #expect(label.hasPrefix("Total. 59817 Russian rubles. "))
         #expect(label.localizedCaseInsensitiveContains("lari"))
         #expect(label.hasSuffix("Spare money does more paying it off."))
     }

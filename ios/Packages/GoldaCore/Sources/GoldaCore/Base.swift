@@ -35,8 +35,8 @@ public struct Base: Sendable {
     /// An approximate amount, "510 ₽" or "5,5 $", as `Fmt.approx` writes converted values.
     public func approx(_ rubMinor: Int64) -> String { Fmt.approx(major(rubMinor), code) }
 
-    /// Whole units for a big number: "1 849 ₽", "20 $".
-    public func whole(_ rubMinor: Int64) -> String { Fmt.split(minor(rubMinor), code).whole + " " + symbol }
+    /// Whole units for a big number: "1 849 ₽", "20 $", rounded as `approx` rounds (D61).
+    public func whole(_ rubMinor: Int64) -> String { Fmt.wholeRounded(minor(rubMinor), code) + " " + symbol }
 }
 
 /// The currency lists and the "others" line. They sit in the domain because what they return

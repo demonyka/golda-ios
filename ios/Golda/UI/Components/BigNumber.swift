@@ -48,7 +48,7 @@ struct AmountParts: Equatable, Sendable {
 
     /// How much of the fraction a big number shows.
     enum FractionStyle: Sendable {
-        /// Whole units only: "1 849 ₽".
+        /// Whole units only, rounded: "1 850 ₽" for 1 849,50 ₽ (D61).
         case hidden
         /// The fraction only when there is one, the way `Fmt.amount` writes it: "4 210 ₽", "4 210,50 ₽".
         case automatic
@@ -61,13 +61,11 @@ struct AmountParts: Equatable, Sendable {
         switch style {
         case .automatic:
             self.init(parsing: Fmt.amount(minor, currency))
-        case .hidden, .always:
+        case .hidden:
+            self.init(whole: Fmt.wholeRounded(minor, currency), symbol: Currencies.symbol(currency))
+        case .always:
             let split = Fmt.split(minor, currency)
-            self.init(
-                whole: split.whole,
-                fraction: style == .always ? split.fraction : "",
-                symbol: Currencies.symbol(currency)
-            )
+            self.init(whole: split.whole, fraction: split.fraction, symbol: Currencies.symbol(currency))
         }
     }
 }

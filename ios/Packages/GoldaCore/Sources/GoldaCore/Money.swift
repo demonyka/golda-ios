@@ -127,6 +127,13 @@ public enum Fmt {
         return ((minor < 0 ? minus : "") + whole, fraction)
     }
 
+    /// Whole units of a big number without its fraction, rounded the way `approx` rounds, so the
+    /// hero and the toast under it agree: "1 942" for 1 941,52 (D61; Kotlin cuts to "1 941").
+    public static func wholeRounded(_ minor: Int64, _ code: String) -> String {
+        let text = fixed(Currencies.toMajor(minor, code), decimals: 0, grouping: true)
+        return text == minus + "0" ? "0" : text
+    }
+
     /// Converted, approximate values: "510 ₽", "5,5 $".
     public static func approx(_ major: Double, _ code: String) -> String {
         let decimals = (abs(major) >= 100 || Currencies.digits(code) == 0) ? 0 : 1

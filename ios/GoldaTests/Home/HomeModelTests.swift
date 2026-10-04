@@ -121,8 +121,8 @@ import Testing
         books.device.baseCurrency = "USD"
         let hero = HomeHero(data: books.data, today: F.today)
 
-        // 2 000 ₽ at 88 ₽ a dollar.
-        #expect(hero.left == "22 $")
+        // 2 000 ₽ at 88 ₽ a dollar: 22,73 $, rounded as the toast rounds it (D61).
+        #expect(hero.left == "23 $")
         #expect(hero.leftMinor == 2_273)
         #expect(hero.currency == "USD")
         #expect(hero.others == "60,6 ₾ · 2\u{202F}000 ₽")

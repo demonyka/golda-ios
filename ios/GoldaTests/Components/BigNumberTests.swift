@@ -44,11 +44,16 @@ import UIKit
         }
     }
 
+    /// Rounded, not cut (D61): the hero said «1 941 ₽» for 1 941,52 ₽ while the toast under it said
+    /// «осталось 1 942 ₽».
     @Test func fromMinorUnitsHiddenShowsWholeUnitsOnly() {
         let parts = AmountParts(minor: 184_950, currency: "RUB", fraction: .hidden)
-        #expect(parts.whole == "1\(thin)849")
+        #expect(parts.whole == "1\(thin)850")
         #expect(parts.fraction == "")
         #expect(parts.symbol == "₽")
+        #expect(AmountParts(minor: 194_152, currency: "RUB", fraction: .hidden).whole == "1\(thin)942")
+        #expect(AmountParts(minor: 194_149, currency: "RUB", fraction: .hidden).whole == "1\(thin)941")
+        #expect(AmountParts(minor: -40, currency: "RUB", fraction: .hidden).whole == "0")
     }
 
     @Test func fromMinorUnitsAutomaticDropsAZeroFractionOnly() {

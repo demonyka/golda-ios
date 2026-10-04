@@ -50,7 +50,7 @@ struct TodaySnapshot: Codable, Equatable, Sendable {
         var day: LocalDate? { LocalDate(iso: date) }
 
         /// "1 849 ₽", the big number as Home writes it (`Base.whole`).
-        var left: String { Fmt.split(leftMinor, currency).whole + " " + Currencies.symbol(currency) }
+        var left: String { Fmt.wholeRounded(leftMinor, currency) + " " + Currencies.symbol(currency) }
     }
 }
 
