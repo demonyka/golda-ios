@@ -20,6 +20,9 @@ struct AppEnvironment: Sendable {
     /// Understands the notes, one at a time, for the whole app: the mic and the queue share it, so
     /// two notes never book at once and every outcome reaches the one place that announces it.
     let voice: VoiceService
+    /// Where `voice` reads the Gemini key: the Keychain's store, or the debug stub's own. Whether a
+    /// note can be understood at once is asked of this one.
+    let voiceKeys: any SecretStore
     /// The system's local notifications; in memory unless the environment is the real one.
     let notifications: any NotificationCenterClient
     /// What the widgets read (`TodayWidgetPublisher`); in memory unless the environment is the real one.
@@ -52,6 +55,7 @@ struct AppEnvironment: Sendable {
         let repository = Repository(database: database, deviceSettings: deviceSettings, secrets: secrets, clock: clock, zone: zone)
         self.repository = repository
         self.voiceQueue = voiceQueue
+        voiceKeys = voiceSecrets ?? secrets
         voice = VoiceService(
             repository: repository,
             provider: voiceProvider ?? GeminiProvider(secrets: secrets),

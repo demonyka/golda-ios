@@ -1,3 +1,4 @@
+import AppIntents
 import GoldaCore
 import SwiftUI
 import WidgetKit
@@ -175,15 +176,15 @@ private struct TodayNotice: View {
 /// The mic: a voice note, started as a tap on the app's mic starts one. The one place the widgets
 /// start a note, so the way it starts changes here alone.
 ///
-/// The voice widget's link, `golda://voice`. `Button(intent: StartVoiceNoteIntent())` did not
-/// bring the app up from a widget on the iOS 26.2 simulator, though the same intent does from
-/// Control Center; an intent that records in the background would go here.
+/// `StartVoiceNoteIntent`, which records without opening the app when it can (an
+/// `AudioRecordingIntent`, run in the app's process) and brings the app up when the note needs it.
 struct MicButton: View {
     var body: some View {
-        Link(destination: AppLink.voice.url) {
+        Button(intent: StartVoiceNoteIntent()) {
             // The app's mic glyph (`Symbols.mic`): beside "+" its meaning is plain.
             WidgetButtonFace(symbol: "mic.fill")
         }
+        .buttonStyle(.plain)
         .accessibilityLabel(Text("Say a purchase", tableName: "EntryPoints"))
     }
 }

@@ -4,22 +4,52 @@
     "One tap and say what you spent" : {
       "comment" : "The voice widget and control in the system's galleries.",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "One tap and say what you spent" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Одно касание — и говоришь, что потратил" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One tap and say what you spent"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Одно касание — и говоришь, что потратил"
+          }
+        }
       }
     },
-    "Opens Golda and starts recording, as a tap on the mic does." : {
+    "Records a purchase by voice and opens Golda only when it has to." : {
       "comment" : "What the voice entry point does, in Shortcuts.",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Opens Golda and starts recording, as a tap on the mic does." } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Открывает Golda и сразу начинает запись, как касание микрофона." } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Records a purchase by voice and opens Golda only when it has to."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Записывает покупку голосом и открывает Golda, только когда без этого никак."
+          }
+        }
       }
     },
     "Say a purchase" : {
       "comment" : "The voice entry point: Shortcuts, Siri, Spotlight, the widget and the Control Center control.",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Say a purchase" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Записать голосом" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Say a purchase"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Записать голосом"
+          }
+        }
       }
     }
   },

@@ -18,6 +18,8 @@ final class FakeRecorder: VoiceRecording {
     /// False plays a note the recorder judged a stray tap or silence.
     var keepsNote = true
     var isRecording = false
+    /// Where the order of starts and stops is written, beside the chimes' (`FakeCues`).
+    var events: EventLog?
 
     private(set) var started: [URL] = []
     private(set) var stops = 0
@@ -33,6 +35,7 @@ final class FakeRecorder: VoiceRecording {
         if let startError { throw startError }
         started.append(file)
         isRecording = true
+        events?.add("record")
     }
 
     func level() -> Double {
@@ -42,6 +45,7 @@ final class FakeRecorder: VoiceRecording {
     func stop() -> URL? {
         stops += 1
         isRecording = false
+        events?.add("stop")
         return keepsNote ? started.last : nil
     }
 }
@@ -73,13 +77,14 @@ final class FakeVoiceNotes: VoiceNotes {
         folder.appending(path: "\(recordedAt).\(profileId.uuidString).wav")
     }
 
-    func understand(note: URL) async {
+    func understand(note: URL) async -> VoiceOutcome {
         let (outcome, gate) = state.withLock { state in
             state.understood.append(note)
             return (state.answer, state.gate)
         }
         await gate?.wait()
         send(outcome)
+        return outcome
     }
 
     func processWaiting() async {
@@ -167,5 +172,96 @@ extension Account {
     static func named(_ name: String, in profileId: UUID, _ app: AppHarness) async throws -> Account {
         let accounts = try await app.environment.database.read { try $0.accounts(profileId: profileId) }
         return try #require(accounts.first { $0.name == name })
+    }
+}
+
+/// The order things happened in, as the fakes write it.
+@MainActor
+final class EventLog {
+    private(set) var events: [String] = []
+
+    func add(_ event: String) {
+        events.append(event)
+    }
+}
+
+/// Chimes that sound nowhere: they write when they play into [events], and the rising one holds
+/// the start until [gate] opens, when one is set, so a test can tap in the middle of it.
+@MainActor
+final class FakeCues: VoiceCues {
+    let events: EventLog
+    var gate: Gate?
+
+    init(events: EventLog) {
+        self.events = events
+    }
+
+    func listen(then start: () throws -> Void) async rethrows {
+        events.add("rising chime")
+        await gate?.wait()
+        await Task.yield()
+        events.add("rising chime over")
+        try start()
+    }
+
+    func stop(_ stop: () -> URL?) -> URL? {
+        let file = stop()
+        events.add("falling chime")
+        return file
+    }
+}
+
+/// Live Activities kept as the states they were given.
+@MainActor
+final class FakeActivities: VoiceActivities {
+    typealias State = VoiceActivityAttributes.ContentState
+
+    final class Handle: VoiceActivityHandle {
+        private(set) var states: [State]
+        /// The last state and how long it stays, once ended; `.some(nil)` ended at once.
+        private(set) var ending: (state: State?, lingering: Duration)?
+        let events: EventLog?
+
+        init(_ state: State, events: EventLog?) {
+            states = [state]
+            self.events = events
+        }
+
+        func update(_ state: State) async {
+            states.append(state)
+        }
+
+        func end(_ state: State?, lingering: Duration) async {
+            ending = (state, lingering)
+            events?.add("activity ended")
+        }
+    }
+
+    var areAllowed = true
+    var refuses = false
+    var events: EventLog?
+    private(set) var started: [Handle] = []
+    private(set) var undone: [VoiceUndoTicket] = []
+
+    func begin(_ state: State) throws -> any VoiceActivityHandle {
+        if refuses { throw VoiceRecorderError.unavailable }
+        events?.add("activity")
+        let handle = Handle(state, events: events)
+        started.append(handle)
+        return handle
+    }
+
+    func showUndone(_ ticket: VoiceUndoTicket) async {
+        undone.append(ticket)
+    }
+}
+
+/// Notifications kept as their words.
+@MainActor
+final class FakeAlerts: VoiceAlerts {
+    private(set) var posted: [String] = []
+
+    func post(_ message: String) async {
+        posted.append(message)
     }
 }

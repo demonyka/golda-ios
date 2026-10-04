@@ -1,0 +1,227 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Listening…" : {
+      "comment" : "Live Activity: the microphone is on for a voice note.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listening…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Слушаю…"
+          }
+        }
+      }
+    },
+    "Not sure: %@. Decide in Golda" : {
+      "comment" : "Live Activity and notification: a voice note asked to weigh a purchase up; the argument is the purchase and its price.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not sure: %@. Decide in Golda"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сомневаюсь: %@. Реши в Golda"
+          }
+        }
+      }
+    },
+    "Open Golda" : {
+      "comment" : "Live Activity: a tap opens the app, where the voice note waits.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Golda"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открой Golda"
+          }
+        }
+      }
+    },
+    "Open Golda to finish the note" : {
+      "comment" : "Live Activity and notification: a note recorded from the Lock Screen needs the app.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Golda to finish the note"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открой Golda, чтобы закончить запись"
+          }
+        }
+      }
+    },
+    "Operations" : {
+      "comment" : "Hidden parameter of the voice note's undo: what it booked.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Operations"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Операции"
+          }
+        }
+      }
+    },
+    "Profile" : {
+      "comment" : "Hidden parameter of the voice note's undo: the profile it booked into.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profile"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Профиль"
+          }
+        }
+      }
+    },
+    "Saved" : {
+      "comment" : "Live Activity: the voice note was booked.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Записано"
+          }
+        }
+      }
+    },
+    "Stop" : {
+      "comment" : "Live Activity button: ends the voice note.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Стоп"
+          }
+        }
+      }
+    },
+    "Stop recording" : {
+      "comment" : "The Live Activity's button that ends a voice note; also its name in Shortcuts.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop recording"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Остановить запись"
+          }
+        }
+      }
+    },
+    "Undo" : {
+      "comment" : "Live Activity button: deletes what the voice note booked.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Undo"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отменить"
+          }
+        }
+      }
+    },
+    "Undo the voice note" : {
+      "comment" : "The Live Activity's button that deletes what a voice note booked; also its name in Shortcuts.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Undo the voice note"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отменить голосовую запись"
+          }
+        }
+      }
+    },
+    "Undone" : {
+      "comment" : "Live Activity: what the voice note booked was deleted.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Undone"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отменено"
+          }
+        }
+      }
+    },
+    "Working it out…" : {
+      "comment" : "Live Activity: the voice note went to the model.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Working it out…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Разбираю…"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

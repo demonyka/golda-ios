@@ -6,8 +6,10 @@ import GoldaData
 protocol VoiceNotes: Sendable {
     /// Where a note recorded now, in [profileId], goes.
     func newNote(profileId: UUID, recordedAt: Int64) throws -> URL
-    /// Understands and books a note just recorded; the outcome arrives through `outcomes()`.
-    func understand(note: URL) async
+    /// Understands and books a note just recorded. The outcome arrives through `outcomes()` too;
+    /// a note recorded outside the app also shows it on its Live Activity.
+    @discardableResult
+    func understand(note: URL) async -> VoiceOutcome
     /// The notes that wait (no network, no key, no consent), oldest first.
     func processWaiting() async
     /// Every outcome from now on, those of the queue included.
@@ -19,7 +21,7 @@ extension VoiceService: VoiceNotes {
         try queue.newFile(profileId: profileId, recordedAt: recordedAt, fileExtension: "wav")
     }
 
-    func understand(note: URL) async {
+    func understand(note: URL) async -> VoiceOutcome {
         await understand(file: note, late: false)
     }
 

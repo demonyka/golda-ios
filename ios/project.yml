@@ -38,8 +38,11 @@ targets:
       - target: GoldaWidgets
     # The keys the build settings cannot express. The voice's ways in from outside (`VoiceEntry`):
     # the widget's link opens the `golda` scheme, and the quick action on the icon is there from the
-    # install on. The reminders' background refresh (`ReminderBackground`). The file is generated;
-    # its versions stay the build settings', which XcodeGen would otherwise write as 1.0 (1).
+    # install on. The reminders' background refresh (`ReminderBackground`). A voice note recorded
+    # without the app (`BackgroundVoiceNote`) shows a Live Activity, and keeps the microphone with the
+    # app out of sight: the `audio` background mode, without which iOS suspends the app a few seconds
+    # after the intent returns and the note is cut off. The file is generated; its versions stay the
+    # build settings', which XcodeGen would otherwise write as 1.0 (1).
     info:
       path: Golda/Info.plist
       properties:
@@ -53,7 +56,8 @@ targets:
             UIApplicationShortcutItemTitle: Say a purchase
             UIApplicationShortcutItemIconSymbolName: mic.fill
         BGTaskSchedulerPermittedIdentifiers: [com.f4studio.golda.reminders]
-        UIBackgroundModes: [fetch]
+        UIBackgroundModes: [fetch, audio]
+        NSSupportsLiveActivities: true
     # The App Group where the app leaves «Можно сегодня» for the widgets (`TodaySnapshot`). The
     # file is generated, like Info.plist.
     entitlements:
@@ -80,15 +84,18 @@ targets:
     platform: iOS
     sources:
       - path: GoldaWidgets
-      # Shared with the app: the intent the mic and the control run, the links the widgets open,
-      # the snapshot the app writes, the bar's geometry, their labels.
+      # Shared with the app: the intents the mic, the control and the Live Activity run, the links
+      # the widgets open, the snapshot the app writes, the Live Activity's state, the bar's geometry,
+      # their labels.
       - path: Golda/App/StartVoiceNoteIntent.swift
+      - path: Golda/App/VoiceActivity.swift
       - path: Golda/App/VoiceEntry.swift
       - path: Golda/App/AppLink.swift
       - path: Golda/App/TodaySnapshot.swift
       - path: Golda/UI/Components/WavyBarGeometry.swift
       - path: Golda/Resources/EntryPoints.xcstrings
       - path: Golda/Resources/Widgets.xcstrings
+      - path: Golda/Resources/VoiceActivity.xcstrings
     dependencies:
       - package: GoldaCore
     entitlements:
@@ -107,6 +114,8 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.f4studio.golda.widgets
         PRODUCT_NAME: GoldaWidgets
+        # The shared intents compile here only to be named by buttons; their work is the app's.
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: $(inherited) GOLDA_WIDGETS
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: Golda
 

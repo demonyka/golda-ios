@@ -25,9 +25,15 @@ extension AppModel {
     /// "Отменить" on a voice toast: what the note booked goes, from the profile it was booked into,
     /// whichever profile is open now (Android deleted each operation of the note).
     func undoVoiceNote(_ done: VoiceOutcome.Done) async {
-        for recorded in done.recorded.reversed() {
+        await undoVoiceNote(profileId: done.profileId, operationIds: done.recorded.map(\.operationId))
+    }
+
+    /// The same for «Отменить» on the Live Activity of a note recorded outside the app, which
+    /// carries only the ids. An operation already gone (undone in the app too) is skipped.
+    func undoVoiceNote(profileId: UUID, operationIds: [UUID]) async {
+        for id in operationIds.reversed() {
             do {
-                _ = try await environment.repository.deleteOperation(recorded.operationId, profileId: done.profileId)
+                _ = try await environment.repository.deleteOperation(id, profileId: profileId)
             } catch {
                 log.error("Undoing a voice note failed: \(String(describing: error))")
             }

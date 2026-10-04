@@ -1,5 +1,6 @@
 import OSLog
 import SwiftUI
+import UIKit
 
 private let log = Logger(subsystem: "com.f4studio.golda", category: "Launch")
 
@@ -74,6 +75,12 @@ enum AppLaunch {
         model.onGeminiKeyChanged = { [weak model] in model?.processVoiceQueue() }
         // Before the launch finishes: a tapped notification may be what launched the app.
         ReminderTaps.attach(model, options: options)
+        // Before the launch finishes too: a voice intent may be what launched the app, in the
+        // background, with no window. The unit-test host keeps requests in the app.
+        if !options.isHostingTests {
+            VoiceNoteLauncher.shared.background = BackgroundVoiceNote.live(model: model, mic: voice)
+            VoiceNoteLauncher.shared.appIsActive = { UIApplication.shared.applicationState == .active }
+        }
         return .opened(model, voice)
     }
 }

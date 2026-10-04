@@ -1,12 +1,13 @@
+import AppIntents
 import SwiftUI
 import WidgetKit
 
-/// Android's one-cell `VoiceWidget`: a mic that opens the app recording. The smallest Home Screen
-/// widget, and the round one on the Lock Screen, the true one-cell size of iOS.
+/// Android's one-cell `VoiceWidget`: a mic that starts a note. The smallest Home Screen widget, and
+/// the round one on the Lock Screen, the true one-cell size of iOS.
 ///
-/// The whole widget is the link (`widgetURL`), as the whole Android cell was the button. A link
-/// rather than `Button(intent:)`: a small widget's button covers only its glyph, and a tap beside
-/// it would open the app without a note.
+/// The whole widget is the button, as the whole Android cell was: `StartVoiceNoteIntent` stretched
+/// over the widget's face, which records without opening the app when it can. The link
+/// `golda://voice` stays under it, so a tap the button misses still opens the app recording.
 struct VoiceWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: "com.f4studio.golda.voice", provider: VoiceWidgetTimeline()) { _ in
@@ -49,9 +50,6 @@ struct VoiceWidgetView: View {
     var body: some View {
         content
             .widgetURL(VoiceEntry.url)
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel(Text("Say a purchase", tableName: "EntryPoints"))
-            .accessibilityAddTraits(.isButton)
     }
 
     @ViewBuilder private var content: some View {
@@ -59,19 +57,33 @@ struct VoiceWidgetView: View {
         case .accessoryCircular:
             ZStack {
                 AccessoryWidgetBackground()
-                Image(Self.coinSymbol)
-                    .font(.system(size: 30))
-                    .widgetAccentable()
+                button {
+                    Image(Self.coinSymbol)
+                        .font(.system(size: 30))
+                        .widgetAccentable()
+                }
             }
             .containerBackground(.clear, for: .widget)
         default:
-            Image(systemName: "mic.fill")
-                .font(.system(size: 56, weight: .regular))
-                .foregroundStyle(.primary)
-                .widgetAccentable()
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .containerBackground(.background, for: .widget)
+            button {
+                Image(systemName: "mic.fill")
+                    .font(.system(size: 56, weight: .regular))
+                    .foregroundStyle(.primary)
+                    .widgetAccentable()
+            }
+            .containerBackground(.background, for: .widget)
         }
+    }
+
+    /// [glyph] on a button as large as the widget, so a tap anywhere on it starts the note.
+    private func button(@ViewBuilder _ glyph: () -> some View) -> some View {
+        Button(intent: StartVoiceNoteIntent()) {
+            glyph()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text("Say a purchase", tableName: "EntryPoints"))
     }
 }
 

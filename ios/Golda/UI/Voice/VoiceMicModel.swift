@@ -29,12 +29,23 @@ final class VoiceMicModel: MicModel {
     @ObservationIgnored private let foregrounds: AsyncStream<Void>?
     @ObservationIgnored private let openSystemSettings: @MainActor () -> Void
     @ObservationIgnored private let confirm: @MainActor () -> Void
+    /// The chimes around a note; nil plays none and starts the recorder at once, as the tests that
+    /// drive the mic step by step need.
+    @ObservationIgnored private let cues: (any VoiceCues)?
+    /// Ends a note recorded outside the app (`BackgroundVoiceNote`), if one is being recorded: a tap
+    /// on the mic then stops that one instead of starting a second recorder beside it.
+    @ObservationIgnored private let stopsOutsideNote: @MainActor () -> Bool
     /// Debug stub only: agree at launch, and leave a note in the queue before it first runs.
     @ObservationIgnored private let grantsConsentAtStart: Bool
     @ObservationIgnored private let beforeFirstQueueRun: (@MainActor () -> Void)?
 
     /// A tap that met the consent screen: recording starts once the person agrees.
     @ObservationIgnored private var startAfterConsent = false
+    /// The rising chime sounds; the recorder starts when it is over.
+    @ObservationIgnored private var isStarting = false
+    /// Outcomes of notes recorded outside the app before this mic followed the service: they are
+    /// said once the app is on screen.
+    @ObservationIgnored private var keptOutcomes: [VoiceOutcome] = []
     /// "Не сейчас" this run: a waiting note does not ask again until the next launch.
     @ObservationIgnored private var consentDeclined = false
     @ObservationIgnored private var meter: Task<Void, Never>?
@@ -43,7 +54,8 @@ final class VoiceMicModel: MicModel {
 
     /// [locale] is the language of the toasts; [levelInterval] how often the level is read while
     /// recording; [foregrounds] ticks each time the app comes back. [openSystemSettings] and
-    /// [confirm] (the success haptic) are UIKit's unless a test passes its own.
+    /// [confirm] (the success haptic) are UIKit's unless a test passes its own; [cues] play the
+    /// chimes, [stopsOutsideNote] ends a note recorded from the Lock Screen.
     init(
         model: AppModel,
         recorder: any VoiceRecording,
@@ -53,6 +65,8 @@ final class VoiceMicModel: MicModel {
         foregrounds: AsyncStream<Void>? = nil,
         openSystemSettings: @escaping @MainActor () -> Void = VoiceMicModel.openAppSettings,
         confirm: @escaping @MainActor () -> Void = { UINotificationFeedbackGenerator().notificationOccurred(.success) },
+        cues: (any VoiceCues)? = nil,
+        stopsOutsideNote: @escaping @MainActor () -> Bool = { false },
         grantsConsentAtStart: Bool = false,
         beforeFirstQueueRun: (@MainActor () -> Void)? = nil
     ) {
@@ -64,6 +78,8 @@ final class VoiceMicModel: MicModel {
         self.foregrounds = foregrounds
         self.openSystemSettings = openSystemSettings
         self.confirm = confirm
+        self.cues = cues
+        self.stopsOutsideNote = stopsOutsideNote
         self.grantsConsentAtStart = grantsConsentAtStart
         self.beforeFirstQueueRun = beforeFirstQueueRun
     }
@@ -89,11 +105,15 @@ final class VoiceMicModel: MicModel {
             }
             return VoiceMicModel(
                 model: model, recorder: StubVoiceRecorder(), notes: environment.voice, foregrounds: foregroundSignals(),
+                cues: LiveVoiceCues.shared, stopsOutsideNote: { VoiceNoteLauncher.shared.stopOutsideNote() },
                 grantsConsentAtStart: stub.grantsConsent, beforeFirstQueueRun: leaveNote
             )
         }
         #endif
-        return VoiceMicModel(model: model, recorder: LiveVoiceRecorder(), notes: environment.voice, foregrounds: foregroundSignals())
+        return VoiceMicModel(
+            model: model, recorder: LiveVoiceRecorder(), notes: environment.voice, foregrounds: foregroundSignals(),
+            cues: LiveVoiceCues.shared, stopsOutsideNote: { VoiceNoteLauncher.shared.stopOutsideNote() }
+        )
     }
 
     // MARK: Launch
@@ -118,15 +138,29 @@ final class VoiceMicModel: MicModel {
                 }
             })
         }
+        let kept = keptOutcomes
+        keptOutcomes.removeAll()
+        for outcome in kept { await react(to: outcome) }
         beforeFirstQueueRun?()
         await notes.processWaiting()
+    }
+
+    /// A note recorded outside the app came to [outcome] before the app was ever on screen, so
+    /// nothing followed the service yet: it is said once the mic starts, as a toast or the form,
+    /// like any other. Once the mic follows the service, the outcome reaches it by itself.
+    func keepUntilShown(_ outcome: VoiceOutcome) {
+        guard !started else { return }
+        keptOutcomes.append(outcome)
     }
 
     // MARK: The tap
 
     func tap() {
         switch state {
-        case .idle: begin()
+        case .idle:
+            // A note from the Lock Screen still listening: this tap ends it, as a second tap would.
+            if stopsOutsideNote() { return }
+            begin()
         case .recording: finish()
         case .thinking: break
         }
@@ -170,7 +204,21 @@ final class VoiceMicModel: MicModel {
     }
 
     private func startRecording() {
-        guard state == .idle, let profileId = model.activeProfileId else { return }
+        guard state == .idle, !isStarting, let profileId = model.activeProfileId else { return }
+        guard let cues else {
+            record(into: profileId)
+            return
+        }
+        // The rising chime first, so the note does not carry it; taps meanwhile change nothing.
+        isStarting = true
+        Task { [weak self] in
+            await cues.listen { self?.record(into: profileId) }
+            self?.isStarting = false
+        }
+    }
+
+    private func record(into profileId: UUID) {
+        guard state == .idle else { return }
         do {
             let file = try notes.newNote(profileId: profileId, recordedAt: model.environment.clock())
             try recorder.start(into: file)
@@ -204,7 +252,9 @@ final class VoiceMicModel: MicModel {
         meter?.cancel()
         meter = nil
         level = 0
-        guard let file = recorder.stop() else {
+        // The falling chime after the recorder stops, so the note does not carry it either.
+        let stopped: URL? = if let cues { cues.stop { recorder.stop() } } else { recorder.stop() }
+        guard let file = stopped else {
             // A stray tap or silence: nothing to send.
             state = .idle
             return

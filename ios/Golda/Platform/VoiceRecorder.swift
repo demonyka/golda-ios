@@ -76,6 +76,7 @@ final class LiveVoiceRecorder: VoiceRecording {
     private var file: URL?
     private var startedAt = Date.distantPast
     private var judge = RecordingJudge()
+    private let session = VoiceAudioSession.shared
 
     /// What AVAudioRecorder is asked for; the `.wav` extension of the file picks the container.
     nonisolated static let settings: [String: Int] = [
@@ -104,17 +105,16 @@ final class LiveVoiceRecorder: VoiceRecording {
 
     func start(into file: URL) throws {
         if recorder != nil { _ = stop() }
-        let session = AVAudioSession.sharedInstance()
+        // Shared with the chimes (`VoiceCues`): other audio pauses while the note is taken and
+        // comes back afterwards.
+        try session.hold()
         do {
-            // Record only: other audio pauses while the note is taken and comes back afterwards.
-            try session.setCategory(.record, mode: .default)
-            try session.setActive(true)
             let recorder = try AVAudioRecorder(url: file, settings: Self.settings)
             recorder.isMeteringEnabled = true
             guard recorder.record(forDuration: RecordingJudge.longest) else { throw VoiceRecorderError.unavailable }
             self.recorder = recorder
         } catch {
-            release(session)
+            session.release()
             try? FileManager.default.removeItem(at: file)
             throw error
         }
@@ -140,17 +140,12 @@ final class LiveVoiceRecorder: VoiceRecording {
         recorder.stop()
         self.recorder = nil
         self.file = nil
-        release(AVAudioSession.sharedInstance())
+        session.release()
         let size = (try? FileManager.default.attributesOfItem(atPath: file.path(percentEncoded: false))[.size] as? Int) ?? 0
         guard !judge.isAccidental(duration: duration), size > Self.headerBytes else {
             try? FileManager.default.removeItem(at: file)
             return nil
         }
         return file
-    }
-
-    /// Gives the audio back, so music paused for the note plays on.
-    private func release(_ session: AVAudioSession) {
-        try? session.setActive(false, options: .notifyOthersOnDeactivation)
     }
 }

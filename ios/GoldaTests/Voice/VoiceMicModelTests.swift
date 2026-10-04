@@ -188,3 +188,73 @@ import Testing
         #expect(stub.route == nil)
     }
 }
+
+/// The chimes around a note in the app, as a voice assistant makes them: the rising one is over
+/// before the microphone starts, the falling one follows the stop, so neither is in the note.
+@MainActor @Suite struct VoiceMicChimeTests {
+    @Test func theRisingChimeEndsBeforeTheMicrophoneAndTheFallingOneFollowsTheStop() async throws {
+        let h = try MicHarness()
+        try await h.open()
+        let events = EventLog()
+        let cues = FakeCues(events: events)
+        let gate = Gate()
+        cues.gate = gate
+        h.recorder.events = events
+        let mic = VoiceMicModel(
+            model: h.app.model, recorder: h.recorder, notes: h.notes, locale: Locale(identifier: "ru"),
+            levelInterval: .seconds(3_600), cues: cues
+        )
+
+        mic.tap()
+        await eventually { events.events == ["rising chime"] }
+        #expect(mic.state == .idle)
+        #expect(h.recorder.started.isEmpty)
+        // A tap while it sounds changes nothing: the note is on its way.
+        mic.tap()
+
+        await gate.open()
+        await eventually { mic.state == .recording }
+        #expect(events.events == ["rising chime", "rising chime over", "record"])
+        #expect(h.recorder.started.count == 1)
+
+        mic.tap()
+        #expect(events.events.suffix(2) == ["stop", "falling chime"])
+        #expect(mic.state == .thinking)
+        await eventually { h.notes.understood.count == 1 }
+    }
+
+    /// A stray tap still ends with the falling chime, as the start had its rising one.
+    @Test func aStrayTapEndsWithTheFallingChimeToo() async throws {
+        let h = try MicHarness()
+        try await h.open()
+        let events = EventLog()
+        h.recorder.events = events
+        h.recorder.keepsNote = false
+        let mic = VoiceMicModel(
+            model: h.app.model, recorder: h.recorder, notes: h.notes, locale: Locale(identifier: "ru"),
+            levelInterval: .seconds(3_600), cues: FakeCues(events: events)
+        )
+        mic.tap()
+        await eventually { mic.state == .recording }
+        mic.tap()
+        #expect(events.events == ["rising chime", "rising chime over", "record", "stop", "falling chime"])
+        #expect(mic.state == .idle)
+    }
+
+    /// A note recorded outside the app before the app was ever on screen: its toast is said once the
+    /// mic starts. Once the mic follows the service, outcomes reach it by themselves.
+    @Test func aNoteFromOutsideIsSaidOnceTheMicStarts() async throws {
+        let h = try MicHarness()
+        try await h.open()
+        h.mic.keepUntilShown(.waiting(.offline))
+        #expect(h.mic.toast == nil)
+
+        await h.mic.start()
+        #expect(h.mic.toast?.message == "Нет связи — запись разберётся позже")
+
+        h.mic.toast = nil
+        h.mic.keepUntilShown(.waiting(.noKey))
+        try await Task.sleep(for: .milliseconds(50))
+        #expect(h.mic.toast == nil)
+    }
+}
