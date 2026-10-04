@@ -185,15 +185,25 @@ public enum VoiceMapper {
             ))
 
         case "transfer":
-            guard let amount, let from = named(item.accountId) ?? pick(accounts, currency, settings),
+            guard let from = named(item.accountId) ?? pick(accounts, currency, settings),
                   let to = named(item.toAccountId), to.id != from.id
             else { return lost }
-            let sent = from.currency == currency ? amount : rates.convert(amount, from: currency, to: from.currency)
-            guard let sent else { return lost }
             let said = item.toAmount.flatMap { Fmt.parseMinor($0, to.currency) }.flatMap { $0 > 0 ? $0 : nil }
+            let sent: Int64?
+            if let amount {
+                sent = from.currency == currency ? amount : rates.convert(amount, from: currency, to: from.currency)
+            } else if let said {
+                // Only what arrived was given (D46): what left the source follows from it.
+                sent = to.currency == from.currency ? said : rates.convert(said, from: to.currency, to: from.currency)
+            } else {
+                sent = nil
+            }
+            guard let sent else { return lost }
             let received = said ?? (to.currency == from.currency ? sent : rates.convert(sent, from: from.currency, to: to.currency))
             guard let received else { return lost }
-            let guessed = item.toAmount == nil && to.currency != from.currency
+            // One side of a transfer between currencies is the bank's to say: the received one when
+            // only the sent amount was given, the sent one when only the received amount was.
+            let guessed = to.currency != from.currency && (item.toAmount == nil || amount == nil)
             return .record(Draft(
                 type: .transfer, timestamp: timestamp, accountId: from.id, amountMinor: sent, toAccountId: to.id,
                 toAmountMinor: received, note: note, isEstimate: guessed, voiceText: transcript
