@@ -3,6 +3,7 @@
   "strings" : {
     "%@ a month" : {
       "comment" : "Early repayment: the lower monthly payment, “8 333 ₽ a month”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -20,6 +21,7 @@
     },
     "%@ a year" : {
       "comment" : "Debt details: a yearly interest rate, “24,9 % a year”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -37,6 +39,7 @@
     },
     "%lld months" : {
       "comment" : "A number of months, “48 months”; used inside longer lines.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "variations" : {
@@ -90,6 +93,7 @@
     },
     "%lld months sooner" : {
       "comment" : "Early repayment: how much sooner the loan is paid off, “12 months sooner”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "variations" : {
@@ -158,8 +162,27 @@
         }
       }
     },
+    "about %@" : {
+      "comment" : "VoiceOver: an estimate, “about 48 months”.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "about %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "примерно %@"
+          }
+        }
+      }
+    },
     "Account" : {
       "comment" : "Title of the account form when editing one.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -177,6 +200,7 @@
     },
     "Add" : {
       "comment" : "Account form: the main action that creates the account.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -194,6 +218,7 @@
     },
     "All operations with this account go too, transfers included." : {
       "comment" : "Account form: what deleting an account takes with it.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -228,6 +253,7 @@
     },
     "Annuity estimate; the bank's schedule has the exact figures." : {
       "comment" : "Early repayment: the figures are an estimate.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -262,6 +288,7 @@
     },
     "Card" : {
       "comment" : "Account type tile: a bank card.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -279,6 +306,7 @@
     },
     "Cash" : {
       "comment" : "Account type tile: cash.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -313,6 +341,7 @@
     },
     "Credit" : {
       "comment" : "Account type tile: a credit card.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -362,6 +391,24 @@
         }
       }
     },
+    "Delete “%@”?" : {
+      "comment" : "Title of the confirmation before an account is deleted, with its name.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete “%@”?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить «%@»?"
+          }
+        }
+      }
+    },
     "Delete account" : {
       "comment" : "Account form: the trash button.",
       "localizations" : {
@@ -379,25 +426,9 @@
         }
       }
     },
-    "Delete “%@”?" : {
-      "comment" : "Title of the confirmation before an account is deleted, with its name.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Delete “%@”?"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Удалить «%@»?"
-          }
-        }
-      }
-    },
     "Done" : {
       "comment" : "Closes a sheet over the account: the early repayment calculator, the grace period's calendar.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -415,6 +446,7 @@
     },
     "Early repayment" : {
       "comment" : "Title of the early repayment calculator.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -466,6 +498,7 @@
     },
     "How much is there now" : {
       "comment" : "Account form: caption over the opening balance.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -483,6 +516,7 @@
     },
     "How much to pay" : {
       "comment" : "Early repayment: caption over the amount paid early.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -500,6 +534,7 @@
     },
     "How much you owe now" : {
       "comment" : "Account form: caption over the opening balance of a debt.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -517,6 +552,7 @@
     },
     "Interest left" : {
       "comment" : "Debt details: the interest still to be paid on a loan.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -534,6 +570,7 @@
     },
     "Interest saved" : {
       "comment" : "Early repayment: the interest an option saves.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -568,6 +605,7 @@
     },
     "Interest-free until" : {
       "comment" : "The last day of a credit card's grace period.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -585,6 +623,7 @@
     },
     "Keeping it saved is better by %@." : {
       "comment" : "Early repayment: keeping the money on savings beats paying off, by this much.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -602,6 +641,7 @@
     },
     "Last payment" : {
       "comment" : "Debt details: the month the loan's last payment falls in.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -619,6 +659,7 @@
     },
     "Left to pay" : {
       "comment" : "Debt details: how many months of payments are left.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -636,6 +677,7 @@
     },
     "Loan" : {
       "comment" : "Account type tile: a loan.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -653,6 +695,7 @@
     },
     "Lower the payment" : {
       "comment" : "Early repayment: the option that keeps the term and lowers the payment.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -670,6 +713,7 @@
     },
     "Minimum payment" : {
       "comment" : "A credit card's monthly minimum payment.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -704,6 +748,7 @@
     },
     "New account" : {
       "comment" : "Title of the account form when creating one.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -738,6 +783,7 @@
     },
     "New payment" : {
       "comment" : "Early repayment: the monthly payment after paying early.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -755,6 +801,7 @@
     },
     "Next payment" : {
       "comment" : "Debt details: when the next monthly payment is due.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -823,6 +870,7 @@
     },
     "On “%@” the same money would earn %@ over that time." : {
       "comment" : "Early repayment: what the savings account would pay on the same money. The account's name, then the amount.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -840,6 +888,7 @@
     },
     "Or keep it saved" : {
       "comment" : "Early repayment: the header over the comparison with a savings account.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -857,6 +906,7 @@
     },
     "Owed %@ at %@, %@ a month." : {
       "comment" : "Early repayment: the loan as it stands. What is owed, the yearly rate, the payment.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -872,8 +922,27 @@
         }
       }
     },
+    "p.a." : {
+      "comment" : "Account form: “per year” after a yearly interest rate, “24,9 % p.a.”.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p.a."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "год."
+          }
+        }
+      }
+    },
     "Paid off" : {
       "comment" : "Early repayment: when the loan ends, “12 months sooner”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -891,6 +960,7 @@
     },
     "Pay off early…" : {
       "comment" : "Debt details: opens the early repayment calculator.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -908,6 +978,7 @@
     },
     "Paying off is better by %@." : {
       "comment" : "Early repayment: paying the loan off early beats saving, by this much.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -925,6 +996,7 @@
     },
     "Payment" : {
       "comment" : "A loan's monthly payment.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -959,6 +1031,7 @@
     },
     "Rate" : {
       "comment" : "A debt's yearly interest rate.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -976,6 +1049,7 @@
     },
     "Rate on balance" : {
       "comment" : "Account form: the yearly rate a savings account pays.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -993,6 +1067,7 @@
     },
     "Save" : {
       "comment" : "Account form: the main action that saves the changes.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1010,6 +1085,7 @@
     },
     "Savings" : {
       "comment" : "Account type tile: a savings account.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1044,6 +1120,7 @@
     },
     "Shorten the term" : {
       "comment" : "Early repayment: the option that keeps the payment and ends the loan sooner.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1061,6 +1138,7 @@
     },
     "Terms" : {
       "comment" : "Debt details: the header over a debt's rate, payment and term.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1078,6 +1156,7 @@
     },
     "The account was not deleted. Try again." : {
       "comment" : "Account form: deleting failed.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1095,6 +1174,7 @@
     },
     "The account was not saved. Try again." : {
       "comment" : "Account form: saving failed.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1112,6 +1192,7 @@
     },
     "The payment does not even cover the interest; the debt grows" : {
       "comment" : "Debt details: the payment is smaller than the monthly interest.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1146,6 +1227,7 @@
     },
     "Type an amount to see both options." : {
       "comment" : "Early repayment: shown until an amount is typed.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1157,40 +1239,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Введи сумму, чтобы увидеть оба варианта."
-          }
-        }
-      }
-    },
-    "about %@" : {
-      "comment" : "VoiceOver: an estimate, “about 48 months”.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "about %@"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "примерно %@"
-          }
-        }
-      }
-    },
-    "p.a." : {
-      "comment" : "Account form: “per year” after a yearly interest rate, “24,9 % p.a.”.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "p.a."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "год."
           }
         }
       }

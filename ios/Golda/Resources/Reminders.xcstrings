@@ -3,22 +3,53 @@
   "strings" : {
     "%lld days" : {
       "comment" : "How many days are left in a notification, “in 3 days”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "variations" : {
             "plural" : {
-              "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld day" } },
-              "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld days" } }
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld day"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld days"
+                }
+              }
             }
           }
         },
         "ru" : {
           "variations" : {
             "plural" : {
-              "few" : { "stringUnit" : { "state" : "translated", "value" : "%lld дня" } },
-              "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld дней" } },
-              "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld день" } },
-              "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld дня" } }
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld дня"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld дней"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld день"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld дня"
+                }
+              }
             }
           }
         }
@@ -26,51 +57,128 @@
     },
     "A week has passed. Open your bank and compare the accounts in Golda; forgotten purchases will show up." : {
       "comment" : "The Sunday notification that asks to compare the balances with the bank; a tap opens Accounts in reconcile mode.",
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "A week has passed. Open your bank and compare the accounts in Golda; forgotten purchases will show up." } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Неделя прошла. Открой банк и сравни счета в Golda — забытые траты найдутся сами." } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A week has passed. Open your bank and compare the accounts in Golda; forgotten purchases will show up."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Неделя прошла. Открой банк и сравни счета в Golda — забытые траты найдутся сами."
+          }
+        }
       }
     },
     "Check your balances" : {
       "comment" : "Title of the Sunday notification that asks to compare the balances with the bank.",
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Check your balances" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Сверь балансы" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check your balances"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сверь балансы"
+          }
+        }
       }
     },
     "It’s been %@. Still want “%@” for %@?" : {
       "comment" : "Notification when the time to think about a purchase is up: “It’s been 3 days. Still want “Headphones” for 120 $?”",
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "It’s been %@. Still want “%@” for %@?" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Прошло %@. Ещё хочешь «%@» за %@?" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It’s been %@. Still want “%@” for %@?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Прошло %@. Ещё хочешь «%@» за %@?"
+          }
+        }
       }
     },
     "Payment due in %@: %@" : {
       "comment" : "Notification three days before a debt's monthly payment, under the debt's name: “Payment due in 3 days: 10 000 ₽”.",
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Payment due in %@: %@" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Через %@ платёж: %@" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payment due in %@: %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Через %@ платёж: %@"
+          }
+        }
       }
     },
     "Payment due today: %@" : {
       "comment" : "Notification on the day a debt's monthly payment is due, under the debt's name.",
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Payment due today: %@" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Сегодня платёж: %@" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payment due today: %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сегодня платёж: %@"
+          }
+        }
       }
     },
     "The interest-free period ends in %@. Pay %@." : {
       "comment" : "Notification a week or a day before a credit card's interest-free period ends: “The interest-free period ends in 7 days. Pay 42 100,50 ₽.”",
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "The interest-free period ends in %@. Pay %@." } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Льготный период кончается через %@. Погаси %@." } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The interest-free period ends in %@. Pay %@."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Льготный период кончается через %@. Погаси %@."
+          }
+        }
       }
     },
     "The interest-free period ends today. Pay %@." : {
       "comment" : "Notification on the last day of a credit card's interest-free period, with what is owed on it.",
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "The interest-free period ends today. Pay %@." } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Льготный период кончается сегодня. Погаси %@." } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The interest-free period ends today. Pay %@."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Льготный период кончается сегодня. Погаси %@."
+          }
+        }
       }
     }
   },

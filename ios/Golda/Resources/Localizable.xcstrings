@@ -1,8 +1,81 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "“%@” costs %@, more than “%@” earns (%@). Spare money does more paying it off." : {
+      "comment" : "Accounts hero: the dearest debt costs more than the best savings account earns. Debt name, its rate, savings name, its rate.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” costs %@, more than “%@” earns (%@). Spare money does more paying it off."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«%1$@» стоит %2$@ — дороже, чем приносит «%3$@» (%4$@). Лишние деньги выгоднее пустить на него."
+          }
+        }
+      }
+    },
+    "“%@” earns %@, more than your debts cost. Paying early does not pay." : {
+      "comment" : "Accounts hero: the best savings account earns more than the debts cost. Savings name, its rate.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” earns %@, more than your debts cost. Paying early does not pay."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«%1$@» приносит %2$@, больше ставки по долгам. Досрочно гасить невыгодно."
+          }
+        }
+      }
+    },
+    "“%@”: the interest-free period ends in %@; pay %@" : {
+      "comment" : "Home hero: a credit card's grace period ends soon. The card's name, “3 days”, then what is owed.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%1$@”: the interest-free period ends in %2$@; pay %3$@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«%1$@»: льготный период кончается через %2$@ — погаси %3$@"
+          }
+        }
+      }
+    },
+    "“%@”: the interest-free period ends today; pay %@" : {
+      "comment" : "Home hero: a credit card's grace period ends today. The card's name, then what is owed.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%1$@”: the interest-free period ends today; pay %2$@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«%1$@»: льготный период кончается сегодня — погаси %2$@"
+          }
+        }
+      }
+    },
     "%@ a day" : {
       "comment" : "Home hero: today's budget share, “2 648 ₽ a day”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -20,6 +93,7 @@
     },
     "%lld days" : {
       "comment" : "A number of days, “3 days”; used inside longer sentences.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "variations" : {
@@ -73,6 +147,7 @@
     },
     "%lld days to payday" : {
       "comment" : "Home hero: days until the next salary, “8 days to payday”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "variations" : {
@@ -126,6 +201,7 @@
     },
     "+%@ for %@" : {
       "comment" : "A savings account's interest forecast this month, “+1 605 ₽ for October”. The amount, then the month's name.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -141,8 +217,27 @@
         }
       }
     },
+    "about %@" : {
+      "comment" : "VoiceOver: an approximate amount, “about 1849 Russian rubles”.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "about %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "около %@"
+          }
+        }
+      }
+    },
     "Account" : {
       "comment" : "Accounts: the last row, “+ Account”, opens the form for a new account.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -160,6 +255,7 @@
     },
     "Accounts" : {
       "comment" : "Tab and screen title: the list of accounts.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -177,6 +273,7 @@
     },
     "Add account" : {
       "comment" : "VoiceOver: the “+ Account” row.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -194,6 +291,7 @@
     },
     "Add by hand" : {
       "comment" : "Toolbar button (+): record an operation by hand instead of by voice.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -211,6 +309,7 @@
     },
     "Ahead of plan by %@" : {
       "comment" : "VoiceOver, Home hero: today's share is bigger than the pay period started with (▲).",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -228,6 +327,7 @@
     },
     "All accounts reconciled" : {
       "comment" : "Toast after the last account of a reconcile round was checked.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -245,6 +345,7 @@
     },
     "Behind plan by %@" : {
       "comment" : "VoiceOver, Home hero: today's share is smaller than the pay period started with (▼).",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -260,8 +361,27 @@
         }
       }
     },
+    "bought at %@" : {
+      "comment" : "Account page: the average rate a foreign currency was bought at, “bought at 92,5 ₽/$”.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bought at %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "курс покупки %@"
+          }
+        }
+      }
+    },
     "Cancel" : {
       "comment" : "Button that closes a dialog without changes.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -279,6 +399,7 @@
     },
     "Card" : {
       "comment" : "Account type: a bank card or a current account.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -296,6 +417,7 @@
     },
     "Cash" : {
       "comment" : "Account type: cash in hand.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -313,6 +435,7 @@
     },
     "Change the sign" : {
       "comment" : "VoiceOver: the +/− key above the keyboard of the reconcile sheet.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -330,6 +453,7 @@
     },
     "Checked" : {
       "comment" : "VoiceOver, reconcile mode: this account has been checked against the bank.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -347,6 +471,7 @@
     },
     "Clothes" : {
       "comment" : "Category.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -364,6 +489,7 @@
     },
     "Counts in “Safe to spend today”" : {
       "comment" : "VoiceOver: the dot after an account's name; the account's money counts towards today's budget.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -381,6 +507,7 @@
     },
     "Credit card" : {
       "comment" : "Account type: a credit card; a negative balance is a debt.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -398,6 +525,7 @@
     },
     "Difference %@ goes in as an adjustment" : {
       "comment" : "Reconcile sheet: the typed balance differs from the account's; the difference is recorded as an adjustment.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -415,6 +543,7 @@
     },
     "Eating out" : {
       "comment" : "Category: cafés and restaurants.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -432,6 +561,7 @@
     },
     "Edit" : {
       "comment" : "Account page toolbar: opens the account's form.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -449,6 +579,7 @@
     },
     "Fees" : {
       "comment" : "Category: bank and ATM fees.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -466,6 +597,7 @@
     },
     "Fun" : {
       "comment" : "Category: entertainment.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -483,6 +615,7 @@
     },
     "Gift" : {
       "comment" : "Income category.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -500,6 +633,7 @@
     },
     "Goals" : {
       "comment" : "Tab and screen title: savings goals and the wishlist.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -517,6 +651,7 @@
     },
     "Groceries" : {
       "comment" : "Category.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -534,6 +669,7 @@
     },
     "Health" : {
       "comment" : "Category.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -551,6 +687,7 @@
     },
     "Home" : {
       "comment" : "Tab and screen title: today's budget and the operations.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -568,6 +705,7 @@
     },
     "Housing" : {
       "comment" : "Category: rent and utilities.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -585,6 +723,7 @@
     },
     "How much is really there?" : {
       "comment" : "Reconcile sheet: asks for the balance the bank shows.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -602,6 +741,7 @@
     },
     "Insights" : {
       "comment" : "Tab and screen title: spending analytics.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -619,6 +759,7 @@
     },
     "Interest" : {
       "comment" : "Income category: interest earned.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -636,6 +777,7 @@
     },
     "It matches" : {
       "comment" : "Reconcile sheet's button while the typed balance is the same as the account's.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -653,6 +795,7 @@
     },
     "Loan" : {
       "comment" : "Account type: a loan paid off monthly.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -670,6 +813,7 @@
     },
     "Manage profiles" : {
       "comment" : "Profile menu: opens the list of profiles.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -687,6 +831,7 @@
     },
     "Matches" : {
       "comment" : "Reconcile mode, a button on each account: the bank shows the same balance.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -704,6 +849,7 @@
     },
     "Matches the bank: “Matches”. Doesn’t: tap the account." : {
       "comment" : "Accounts in reconcile mode: how to check each account against the bank.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -721,6 +867,7 @@
     },
     "New profile" : {
       "comment" : "Profile menu item and the title of the dialog it opens.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -738,6 +885,7 @@
     },
     "No category" : {
       "comment" : "Row title of an operation with neither a note nor a category.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -755,6 +903,7 @@
     },
     "Nothing yet. Tap the mic and name a purchase, like “shawarma 15 lari”. Or “+” to type it." : {
       "comment" : "Home with no operations yet: how to record the first one.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -772,6 +921,7 @@
     },
     "OK" : {
       "comment" : "The toast's button that only closes it.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -789,6 +939,7 @@
     },
     "Other" : {
       "comment" : "Category: anything else, spent or earned.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -806,6 +957,7 @@
     },
     "Pay off “%@” first: it has the highest rate, %@." : {
       "comment" : "Accounts hero: several debts and no savings; the dearest goes first. Debt name, its rate.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -823,6 +975,7 @@
     },
     "Personal" : {
       "comment" : "Name of the first profile, created on the first launch.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -840,6 +993,7 @@
     },
     "Phone" : {
       "comment" : "Category: phone and internet.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -857,6 +1011,7 @@
     },
     "Profile" : {
       "comment" : "Profile menu: the list of profiles to switch between.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -891,6 +1046,7 @@
     },
     "Reconcile" : {
       "comment" : "Account page: opens the sheet to check the balance against the bank.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -908,6 +1064,7 @@
     },
     "Reconciliation" : {
       "comment" : "Row title of an operation that brought an account to the bank's balance.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -925,6 +1082,7 @@
     },
     "Reconciling" : {
       "comment" : "Accounts in reconcile mode: the heading over the hint.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -942,6 +1100,7 @@
     },
     "Record %@" : {
       "comment" : "Reconcile sheet's button: record the difference, “Record −50 ₽”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -959,6 +1118,7 @@
     },
     "Safe to spend today" : {
       "comment" : "Home hero caption over the big number: what can be spent today.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -976,6 +1136,7 @@
     },
     "Salary" : {
       "comment" : "Income category.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -993,6 +1154,7 @@
     },
     "Savings" : {
       "comment" : "Account type: a savings account that earns interest.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1010,6 +1172,7 @@
     },
     "Set aside for payments: %@" : {
       "comment" : "Home hero: money kept back for payments due before payday.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1027,6 +1190,7 @@
     },
     "Settings" : {
       "comment" : "Toolbar button (gear) and screen title.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1044,6 +1208,7 @@
     },
     "Subscriptions" : {
       "comment" : "Category.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1078,6 +1243,7 @@
     },
     "Today" : {
       "comment" : "Heading of today's operations.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1095,6 +1261,7 @@
     },
     "Total" : {
       "comment" : "Accounts hero caption over the big number: everything on all accounts.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1112,6 +1279,7 @@
     },
     "Transfer" : {
       "comment" : "Row title of a transfer between accounts that has no note.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1129,6 +1297,7 @@
     },
     "Transport" : {
       "comment" : "Category.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1146,6 +1315,7 @@
     },
     "Travel" : {
       "comment" : "Category.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1163,6 +1333,7 @@
     },
     "Type what the bank shows" : {
       "comment" : "VoiceOver hint, reconcile mode: tapping an account opens the sheet to enter its real balance.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1180,6 +1351,7 @@
     },
     "Yesterday" : {
       "comment" : "Heading of yesterday's operations.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1191,108 +1363,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Вчера"
-          }
-        }
-      }
-    },
-    "about %@" : {
-      "comment" : "VoiceOver: an approximate amount, “about 1849 Russian rubles”.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "about %@"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "около %@"
-          }
-        }
-      }
-    },
-    "bought at %@" : {
-      "comment" : "Account page: the average rate a foreign currency was bought at, “bought at 92,5 ₽/$”.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "bought at %@"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "курс покупки %@"
-          }
-        }
-      }
-    },
-    "“%@” costs %@, more than “%@” earns (%@). Spare money does more paying it off." : {
-      "comment" : "Accounts hero: the dearest debt costs more than the best savings account earns. Debt name, its rate, savings name, its rate.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "“%@” costs %@, more than “%@” earns (%@). Spare money does more paying it off."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "«%1$@» стоит %2$@ — дороже, чем приносит «%3$@» (%4$@). Лишние деньги выгоднее пустить на него."
-          }
-        }
-      }
-    },
-    "“%@” earns %@, more than your debts cost. Paying early does not pay." : {
-      "comment" : "Accounts hero: the best savings account earns more than the debts cost. Savings name, its rate.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "“%@” earns %@, more than your debts cost. Paying early does not pay."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "«%1$@» приносит %2$@, больше ставки по долгам. Досрочно гасить невыгодно."
-          }
-        }
-      }
-    },
-    "“%@”: the interest-free period ends in %@; pay %@" : {
-      "comment" : "Home hero: a credit card's grace period ends soon. The card's name, “3 days”, then what is owed.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "“%1$@”: the interest-free period ends in %2$@; pay %3$@"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "«%1$@»: льготный период кончается через %2$@ — погаси %3$@"
-          }
-        }
-      }
-    },
-    "“%@”: the interest-free period ends today; pay %@" : {
-      "comment" : "Home hero: a credit card's grace period ends today. The card's name, then what is owed.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "“%1$@”: the interest-free period ends today; pay %2$@"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "«%1$@»: льготный период кончается сегодня — погаси %2$@"
           }
         }
       }

@@ -3,6 +3,7 @@
   "strings" : {
     "Name or code" : {
       "comment" : "Currency lists: the prompt of the search field, which finds a currency by its name or its code.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -20,6 +21,7 @@
     },
     "Other currencies" : {
       "comment" : "Currency lists: the header over every other currency, by name.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -37,6 +39,7 @@
     },
     "Popular" : {
       "comment" : "Currency lists: the header over the popular currencies (ruble, dollar, euro, lari…).",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -54,6 +57,7 @@
     },
     "Your currencies" : {
       "comment" : "Currency list of a form: the header over the person's own currencies, the local and the shown ones.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

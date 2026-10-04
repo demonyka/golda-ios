@@ -3,6 +3,7 @@
   "strings" : {
     "Add" : {
       "comment" : "Voice toast button: opens the form to add an operation by hand.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -20,6 +21,7 @@
     },
     "Add a Gemini key in settings; the note is kept" : {
       "comment" : "Voice toast: a note waits because no Gemini API key is set.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -37,6 +39,7 @@
     },
     "Agree" : {
       "comment" : "Voice consent: the button that gives consent.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -54,6 +57,7 @@
     },
     "Couldn’t make out “%@”. Add it with “+”" : {
       "comment" : "Voice toast: nothing was understood; the argument is what was heard.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -71,6 +75,7 @@
     },
     "Couldn’t save the note; it is kept for another try" : {
       "comment" : "Voice toast: the books could not be written.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -88,6 +93,7 @@
     },
     "From a saved note: %@" : {
       "comment" : "Voice toast: a note recorded earlier was booked now; the argument lists what it booked.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -105,6 +111,7 @@
     },
     "Gemini isn’t available in your country; the note is kept for when it is" : {
       "comment" : "Voice toast: Gemini refuses to work where the phone is; the note waits.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -122,6 +129,7 @@
     },
     "Gemini: %@" : {
       "comment" : "Voice toast: Gemini refused the note; the argument is its own explanation.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -139,6 +147,7 @@
     },
     "Gemini’s answer made no sense; the note is kept" : {
       "comment" : "Voice toast: the provider answered with something unreadable.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -156,6 +165,7 @@
     },
     "Golda does not recognise speech itself. To turn what you say into an operation, it sends the recording to Gemini, Google’s AI model." : {
       "comment" : "Voice consent: why the recording leaves the phone.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -173,6 +183,7 @@
     },
     "Google handles the recording under the Gemini API terms. On the phone it is deleted as soon as the operation is saved." : {
       "comment" : "Voice consent: who processes the recording and when it leaves the phone's storage.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -190,6 +201,7 @@
     },
     "Google’s terms" : {
       "comment" : "Voice consent: title of the point about how Google handles the recording.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -207,6 +219,7 @@
     },
     "No connection; the note will be worked out later" : {
       "comment" : "Voice toast: a note waits for the network.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -224,6 +237,7 @@
     },
     "Not now" : {
       "comment" : "Voice consent: the button that closes the screen without consent.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -241,6 +255,7 @@
     },
     "OK" : {
       "comment" : "Voice toast button: only closes the toast.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -258,6 +273,7 @@
     },
     "Only the recording you make after tapping the mic, with the names and currencies of your accounts so Gemini can tell what you paid with. Balances and other records stay on the phone." : {
       "comment" : "Voice consent: exactly what is sent to Gemini.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -275,6 +291,7 @@
     },
     "Profile: %@" : {
       "comment" : "Voice toast: the profile a note was booked into, when there are several.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -292,6 +309,7 @@
     },
     "Purchase" : {
       "comment" : "Title of a purchase to weigh up when the voice note named none.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -309,6 +327,7 @@
     },
     "Requests go straight to Google with your Gemini API key. Golda has no servers of its own." : {
       "comment" : "Voice consent: whose key is used and where requests go.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -326,6 +345,7 @@
     },
     "Saved" : {
       "comment" : "Voice toast: title of a booked operation with neither a note nor a category.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -343,6 +363,7 @@
     },
     "Settings" : {
       "comment" : "Voice toast button: opens the settings.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -360,6 +381,7 @@
     },
     "The microphone is busy or unavailable" : {
       "comment" : "Voice toast: recording could not start.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -377,6 +399,7 @@
     },
     "The note got lost" : {
       "comment" : "Voice toast: the recording file is missing.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -394,6 +417,7 @@
     },
     "The note’s profile was deleted, and the note with it" : {
       "comment" : "Voice toast: the profile a note was recorded in is gone.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -411,6 +435,7 @@
     },
     "Voice" : {
       "comment" : "Title of the screen that asks before a recording is sent to the voice provider.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -428,6 +453,7 @@
     },
     "Voice needs microphone access" : {
       "comment" : "Voice toast: the microphone is not allowed.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -445,6 +471,7 @@
     },
     "What is sent" : {
       "comment" : "Voice consent: title of the point that says what leaves the phone.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -462,6 +489,7 @@
     },
     "You can withdraw consent in Settings. Without it voice stays off, and “+” always works." : {
       "comment" : "Voice consent: how to take the consent back, and that manual entry works without it.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -479,6 +507,7 @@
     },
     "Your choice" : {
       "comment" : "Voice consent: title of the point about withdrawing consent.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -496,6 +525,7 @@
     },
     "Your own key" : {
       "comment" : "Voice consent: title of the point about the API key.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -513,6 +543,7 @@
     },
     "Your voice goes to Google Gemini" : {
       "comment" : "Voice consent: the headline naming the provider.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

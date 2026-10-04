@@ -3,6 +3,7 @@
   "strings" : {
     "%@ against the CBR" : {
       "comment" : "Insights: the exchange loss as a share of what was exchanged, “3 % against the CBR”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -14,6 +15,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ против ЦБ"
+          }
+        }
+      }
+    },
+    "≈ %@/day" : {
+      "comment" : "Insights, the ring’s center: the average spending per day of the period, “≈ 2 421 ₽/day”.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈ %@/day"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈ %@/день"
           }
         }
       }
@@ -37,6 +56,7 @@
     },
     "Changes the dates" : {
       "comment" : "VoiceOver hint of the line with the custom period’s dates.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -54,6 +74,7 @@
     },
     "Custom range" : {
       "comment" : "Insights: pick the dates of the period yourself; the picker’s calendar button.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -71,6 +92,7 @@
     },
     "Daily budget" : {
       "comment" : "VoiceOver: the dashed line over the day bars, the share of the budget that falls on one day.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -88,6 +110,7 @@
     },
     "Done" : {
       "comment" : "Button that takes the picked period.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -105,6 +128,7 @@
     },
     "Everything else" : {
       "comment" : "Insights: the ring slice that gathers the small categories.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -122,6 +146,7 @@
     },
     "From" : {
       "comment" : "Insights, custom period: the first day.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -139,6 +164,7 @@
     },
     "Income" : {
       "comment" : "Insights: the tile with what came in during the period.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -156,6 +182,7 @@
     },
     "Lost on exchange" : {
       "comment" : "Insights: the tile with what currency exchanges cost against the CBR rate.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -173,6 +200,7 @@
     },
     "Month" : {
       "comment" : "Insights: the last thirty days.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -190,6 +218,7 @@
     },
     "no exchanges" : {
       "comment" : "Insights: no currency exchange in the period.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -207,6 +236,7 @@
     },
     "No spending in these days." : {
       "comment" : "Insights: the period has no expenses.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -241,6 +271,7 @@
     },
     "Shows this category in the ring" : {
       "comment" : "VoiceOver hint of a category row: it picks the slice in the ring.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -258,6 +289,7 @@
     },
     "Since %@" : {
       "comment" : "Insights: from the last payday on, “Since Sep 10”. The date.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -275,6 +307,7 @@
     },
     "Spending by day" : {
       "comment" : "VoiceOver: the bars of the period’s spending day by day.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -292,6 +325,7 @@
     },
     "Spent %@, about %@ a day" : {
       "comment" : "VoiceOver, Insights: the period’s spending and its daily average.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -309,6 +343,7 @@
     },
     "To" : {
       "comment" : "Insights, custom period: the last day.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -326,6 +361,7 @@
     },
     "Week" : {
       "comment" : "Insights: the last seven days.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -337,23 +373,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Неделя"
-          }
-        }
-      }
-    },
-    "≈ %@/day" : {
-      "comment" : "Insights, the ring’s center: the average spending per day of the period, “≈ 2 421 ₽/day”.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "≈ %@/day"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "≈ %@/день"
           }
         }
       }

@@ -20,6 +20,7 @@
     },
     "Not sure: %@. Decide in Golda" : {
       "comment" : "Live Activity and notification: a voice note asked to weigh a purchase up; the argument is the purchase and its price.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -54,6 +55,7 @@
     },
     "Open Golda to finish the note" : {
       "comment" : "Live Activity and notification: a note recorded from the Lock Screen needs the app.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -71,6 +73,7 @@
     },
     "Operations" : {
       "comment" : "Hidden parameter of the voice note's undo: what it booked.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -88,6 +91,7 @@
     },
     "Profile" : {
       "comment" : "Hidden parameter of the voice note's undo: the profile it booked into.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -139,6 +143,7 @@
     },
     "Stop recording" : {
       "comment" : "The Live Activity's button that ends a voice note; also its name in Shortcuts.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -173,6 +178,7 @@
     },
     "Undo the voice note" : {
       "comment" : "The Live Activity's button that deletes what a voice note booked; also its name in Shortcuts.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

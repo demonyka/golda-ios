@@ -20,6 +20,7 @@
     },
     "Records a purchase by voice and opens Golda only when it has to." : {
       "comment" : "What the voice entry point does, in Shortcuts.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

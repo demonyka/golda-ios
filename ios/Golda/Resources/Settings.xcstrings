@@ -3,6 +3,7 @@
   "strings" : {
     "%@ · default" : {
       "comment" : "Settings: the Gemini model's name when it is the default one.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -20,6 +21,7 @@
     },
     "%lld accounts" : {
       "comment" : "A number of accounts, inside the restore message.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "variations" : {
@@ -73,6 +75,7 @@
     },
     "%lld operations" : {
       "comment" : "A number of operations, inside the restore message.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "variations" : {
@@ -126,6 +129,7 @@
     },
     "%lld profiles" : {
       "comment" : "A number of profiles, inside the restore message.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "variations" : {
@@ -179,6 +183,7 @@
     },
     "About" : {
       "comment" : "Settings: header of the version and licences group.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -196,6 +201,7 @@
     },
     "Amounts said without a currency are in it, and new purchases start in it." : {
       "comment" : "Local currency sheet: what picking it changes.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -213,6 +219,7 @@
     },
     "App language" : {
       "comment" : "Settings: the row that opens Golda's page in the iOS Settings.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -230,6 +237,7 @@
     },
     "At the CBR rate plus the profile's markup, %@." : {
       "comment" : "Settings: under the rates, how the shown rates are made, with the markup “10 %”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -247,6 +255,7 @@
     },
     "Back to %@" : {
       "comment" : "Gemini model sheet: puts the default model's name back.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -264,6 +273,7 @@
     },
     "Backup saved" : {
       "comment" : "Message after the backup file was written.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -281,6 +291,7 @@
     },
     "Big numbers and totals" : {
       "comment" : "Settings: what the main currency is for, under its row.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -298,6 +309,7 @@
     },
     "Big numbers and totals are shown in it, at today's rate. The books stay in rubles." : {
       "comment" : "Main currency sheet: what picking it changes.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -313,8 +325,27 @@
         }
       }
     },
+    "Cancel" : {
+      "comment" : "Closes a sheet without changes.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отмена"
+          }
+        }
+      }
+    },
     "CBR %@" : {
       "comment" : "Settings: the official rate at the end of a rate row, “CBR 83.25”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -332,6 +363,7 @@
     },
     "CBR of %@" : {
       "comment" : "Settings: the day of the official rates, “CBR of October 2”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -347,25 +379,9 @@
         }
       }
     },
-    "Cancel" : {
-      "comment" : "Closes a sheet without changes.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cancel"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Отмена"
-          }
-        }
-      }
-    },
     "Changed in the iOS Settings → Golda → Language." : {
       "comment" : "Settings: where the app language is changed.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -383,6 +399,7 @@
     },
     "Could not save the file" : {
       "comment" : "Message when the backup file could not be written.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -400,6 +417,7 @@
     },
     "Data" : {
       "comment" : "Settings: header of the backup group.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -417,6 +435,7 @@
     },
     "Didn't work. No network?" : {
       "comment" : "Message when fresh rates could not be fetched.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -434,6 +453,7 @@
     },
     "Done" : {
       "comment" : "Closes the settings or a sheet whose changes are already kept.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -451,6 +471,7 @@
     },
     "Each profile keeps its own accounts, goals, income and markup." : {
       "comment" : "Settings: what lives in a profile, under the profiles row.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -468,6 +489,7 @@
     },
     "Erase" : {
       "comment" : "Confirms erasing everything.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -485,6 +507,7 @@
     },
     "Erase everything" : {
       "comment" : "Settings: the last row, which deletes all data on this phone.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -502,6 +525,7 @@
     },
     "Erase everything?" : {
       "comment" : "Title of the confirmation before all data is erased.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -519,6 +543,7 @@
     },
     "Every amount also in these" : {
       "comment" : "Settings: what the shown currencies are for, under their row.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -536,6 +561,7 @@
     },
     "Every profile with its accounts, operations and goals, this iPhone's settings and the Gemini key will be gone for good." : {
       "comment" : "Confirmation before erasing: what goes.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -553,6 +579,7 @@
     },
     "Everything but the key, in one file" : {
       "comment" : "Settings: what a backup holds, under its row.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -570,6 +597,7 @@
     },
     "Everything in Golda now will be replaced by the file. The Gemini key stays." : {
       "comment" : "Confirmation before restoring: what happens to the current data and the key.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -587,6 +615,7 @@
     },
     "For new purchases and voice" : {
       "comment" : "Settings: what the local currency is for, under its row.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -604,6 +633,7 @@
     },
     "From a backup file" : {
       "comment" : "Settings: where restoring reads from, under its row.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -621,6 +651,7 @@
     },
     "Gemini key" : {
       "comment" : "Settings: the API key voice notes are sent with.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -638,6 +669,7 @@
     },
     "Gemini model" : {
       "comment" : "Title of the sheet that changes the Gemini model.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -655,6 +687,7 @@
     },
     "Golda for iOS is a port of Golda for Android by Shamil Aminov, under the MIT licence." : {
       "comment" : "Licences page: the original app and its author.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -672,6 +705,7 @@
     },
     "Golda keeps its data with GRDB by Gwendal Roué, under the MIT licence." : {
       "comment" : "Licences page: the database library and its author.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -689,6 +723,7 @@
     },
     "Key removed" : {
       "comment" : "Message after the Gemini key was deleted.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -706,6 +741,7 @@
     },
     "Key saved" : {
       "comment" : "Message after the Gemini key was stored.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -723,6 +759,7 @@
     },
     "Language" : {
       "comment" : "Settings: header of the language group.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -740,6 +777,7 @@
     },
     "Licences" : {
       "comment" : "Settings: the row and the page with the licences.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -757,6 +795,7 @@
     },
     "Local currency" : {
       "comment" : "Settings: the currency of the country you are in.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -774,6 +813,7 @@
     },
     "Made in Google AI Studio. Kept in this iPhone's Keychain and never put in a backup." : {
       "comment" : "Gemini key sheet: where the key comes from and where it is kept.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -791,6 +831,7 @@
     },
     "Main currency" : {
       "comment" : "Settings: the currency big numbers and totals are shown in.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -808,6 +849,7 @@
     },
     "Model" : {
       "comment" : "Settings: the Gemini model voice notes are parsed by.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -825,6 +867,7 @@
     },
     "None" : {
       "comment" : "Settings: there is no Gemini key on this phone.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -842,6 +885,7 @@
     },
     "Not everything was erased. Try again." : {
       "comment" : "Message when erasing stopped half way.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -859,6 +903,7 @@
     },
     "OK" : {
       "comment" : "Closes a message that something failed.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -876,6 +921,7 @@
     },
     "Paste the key" : {
       "comment" : "Gemini key sheet: the placeholder of the secure field.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -893,6 +939,7 @@
     },
     "Profiles" : {
       "comment" : "Settings: the row that opens the profiles screen.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -910,6 +957,7 @@
     },
     "Rates" : {
       "comment" : "Settings: header of the exchange rates group.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -927,6 +975,7 @@
     },
     "Rates updated" : {
       "comment" : "Message after fresh rates arrived.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -944,6 +993,7 @@
     },
     "Reconcile reminder" : {
       "comment" : "Settings: the weekly nudge to compare balances with the bank.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -961,6 +1011,7 @@
     },
     "Recordings go to Google Gemini with your key only while this is on." : {
       "comment" : "Settings: what the voice consent switch allows.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -978,6 +1029,7 @@
     },
     "Remove key" : {
       "comment" : "Gemini key sheet: deletes the stored key.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -995,6 +1047,7 @@
     },
     "Restore" : {
       "comment" : "Settings: replaces everything with a backup file; also the button that confirms it.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1012,6 +1065,7 @@
     },
     "Restore from the file?" : {
       "comment" : "Title of the confirmation before a backup replaces everything.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1029,6 +1083,7 @@
     },
     "Restored: %@" : {
       "comment" : "Message after a backup was restored, with what came back, “2 accounts, 14 operations”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1046,6 +1101,7 @@
     },
     "Save" : {
       "comment" : "Keeps what was typed in a settings sheet.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1063,6 +1119,7 @@
     },
     "Save a backup" : {
       "comment" : "Settings: writes everything to one file.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1080,6 +1137,7 @@
     },
     "Saved" : {
       "comment" : "Settings: there is a Gemini key on this phone.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1097,6 +1155,7 @@
     },
     "Send voice to Gemini" : {
       "comment" : "Settings: the switch that allows sending recordings to Google Gemini.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1114,6 +1173,7 @@
     },
     "Settings" : {
       "comment" : "Title of this phone's settings.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1131,6 +1191,7 @@
     },
     "Show amounts in" : {
       "comment" : "Settings: the currencies every amount is also shown in.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1148,6 +1209,7 @@
     },
     "Sundays at 19:00" : {
       "comment" : "Settings: when the reconcile reminder comes.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1165,6 +1227,7 @@
     },
     "That file did not fit; nothing changed" : {
       "comment" : "Message when a file could not be restored.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1182,6 +1245,7 @@
     },
     "The colours come from the Tailwind CSS palette by Tailwind Labs, under the MIT licence." : {
       "comment" : "Licences page: where the colour values come from.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1197,25 +1261,9 @@
         }
       }
     },
-    "The markup was not saved. Try again." : {
-      "comment" : "Message when the profile's markup could not be saved.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The markup was not saved. Try again."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Наценка не сохранилась. Попробуй ещё раз."
-          }
-        }
-      }
-    },
     "The key was not saved. Try again." : {
       "comment" : "Message when the Keychain refused the key.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1231,8 +1279,27 @@
         }
       }
     },
+    "The markup was not saved. Try again." : {
+      "comment" : "Message when the profile's markup could not be saved.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The markup was not saved. Try again."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Наценка не сохранилась. Попробуй ещё раз."
+          }
+        }
+      }
+    },
     "The ruble always stays. Hiding the local or the main currency turns it into the ruble." : {
       "comment" : "Shown currencies sheet: the rules of the switches.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1250,6 +1317,7 @@
     },
     "Update rates" : {
       "comment" : "Settings: fetches fresh rates from the Bank of Russia.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1267,6 +1335,7 @@
     },
     "Version" : {
       "comment" : "Settings: the app's version and build.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1284,6 +1353,7 @@
     },
     "Voice" : {
       "comment" : "Settings: header of the voice notes group.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1301,6 +1371,7 @@
     },
     "Voice notes are parsed by this model. Change it to move to a newer one." : {
       "comment" : "Gemini model sheet: what the model is and why change it.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1318,6 +1389,7 @@
     },
     "Where I am" : {
       "comment" : "Settings: header of the currency group.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

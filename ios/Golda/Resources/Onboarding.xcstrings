@@ -3,6 +3,7 @@
   "strings" : {
     "Account" : {
       "comment" : "Onboarding, accounts step: the last row, “+ Account”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -20,6 +21,7 @@
     },
     "Accounts" : {
       "comment" : "Onboarding, step 3: its title.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -37,6 +39,7 @@
     },
     "Add account" : {
       "comment" : "Onboarding, VoiceOver: the “+ Account” row.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -54,6 +57,7 @@
     },
     "All currencies" : {
       "comment" : "Onboarding, currencies step: the row under the popular currencies that opens every currency, with search.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -71,6 +75,7 @@
     },
     "Back" : {
       "comment" : "Onboarding: the button to the previous step.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -88,6 +93,7 @@
     },
     "Cards, cash, savings and debts with their balances now. Rough numbers are easy to fix later by reconciling." : {
       "comment" : "Onboarding, accounts step: what to add and that mistakes can be fixed.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -105,6 +111,7 @@
     },
     "Currencies" : {
       "comment" : "Onboarding, step 2: its title.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -122,6 +129,7 @@
     },
     "Currency" : {
       "comment" : "Onboarding, currencies step: the label of the local and the main currency menus.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -139,6 +147,7 @@
     },
     "Done" : {
       "comment" : "Onboarding, last step: the button that finishes it and opens the app.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -156,6 +165,7 @@
     },
     "Every amount shows in all the chosen currencies at once. Big numbers and totals are in the main one." : {
       "comment" : "Onboarding, currencies step: what the shown currencies and the main one do.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -173,6 +183,7 @@
     },
     "Income" : {
       "comment" : "Onboarding, step 1: its title.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -190,6 +201,7 @@
     },
     "Local currency, for amounts said without one" : {
       "comment" : "Onboarding, currencies step: the header over the choice of the local currency.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -207,6 +219,7 @@
     },
     "Main currency, for big numbers and totals" : {
       "comment" : "Onboarding, currencies step: the header over the choice of the main currency.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -224,6 +237,7 @@
     },
     "Next" : {
       "comment" : "Onboarding: the button to the next step.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -241,6 +255,7 @@
     },
     "Show amounts in" : {
       "comment" : "Onboarding, currencies step: the header over the switches of the shown currencies.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -258,6 +273,7 @@
     },
     "Step %lld of %lld" : {
       "comment" : "Onboarding, VoiceOver: where the progress bar stands, “Step 2 of 3”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -275,6 +291,7 @@
     },
     "Used to work out what is safe to spend until the next payday and to turn prices into hours of work." : {
       "comment" : "Onboarding, income step: what the income is for.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

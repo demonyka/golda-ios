@@ -1,8 +1,45 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "“%@” removed" : {
+      "comment" : "Toast after a wish was taken off the list, with its name.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” removed"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«%@» убрано"
+          }
+        }
+      }
+    },
+    "“%@” will no longer be the main goal." : {
+      "comment" : "Goal form, under the main-goal switch turned on: the goal that is main now stops being it. Its name.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” will no longer be the main goal."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«%@» перестанет быть главной."
+          }
+        }
+      }
+    },
     "%@ from what you skipped" : {
       "comment" : "Goals hero: what refusals (“I’ll pass”) have put towards the goals, “+13 700 ₽ from what you skipped”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -20,6 +57,7 @@
     },
     "%@ of %@" : {
       "comment" : "Goals hero: how far along the main goal is, “38 % of 80 000 ₽”. The percent, then the goal’s amount.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -37,6 +75,7 @@
     },
     "%@ of the goal" : {
       "comment" : "A waiting wish: its price as a share of the main goal, “14 % of the goal”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -54,6 +93,7 @@
     },
     "%@ spent from “%@”. The goal closes." : {
       "comment" : "The question before a goal is bought: the expense and the account it comes from. The amount, then the account’s name.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -71,6 +111,7 @@
     },
     "A bike, a trip, a cushion. Every purchase is held up against it, and what you skip goes into it." : {
       "comment" : "Goals hero with no goals yet: what a goal is for.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -88,6 +129,7 @@
     },
     "Add" : {
       "comment" : "Goal form: the main action that creates the goal.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -105,6 +147,7 @@
     },
     "Add goal" : {
       "comment" : "VoiceOver: the “+ Goal” row.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -122,6 +165,7 @@
     },
     "Already put aside" : {
       "comment" : "Goal form: what has been saved for the goal without an account.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -137,8 +181,27 @@
         }
       }
     },
+    "bought" : {
+      "comment" : "A decided wish that was bought.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bought"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "купил"
+          }
+        }
+      }
+    },
     "Buy" : {
       "comment" : "Confirms buying a reached goal.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -154,25 +217,9 @@
         }
       }
     },
-    "Buy %@ · %@" : {
-      "comment" : "Goals hero: the button that buys a reached goal, “Buy Bike · 80 000 ₽”. The goal’s name, then its amount.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buy %@ · %@"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Купить %@ · %@"
-          }
-        }
-      }
-    },
     "Buy “%@”?" : {
       "comment" : "Title of the question before a reached goal is bought, with its name.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -188,8 +235,27 @@
         }
       }
     },
+    "Buy %@ · %@" : {
+      "comment" : "Goals hero: the button that buys a reached goal, “Buy Bike · 80 000 ₽”. The goal’s name, then its amount.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buy %@ · %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Купить %@ · %@"
+          }
+        }
+      }
+    },
     "Cancel" : {
       "comment" : "Closes a form or a question without changes.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -207,6 +273,7 @@
     },
     "Currency" : {
       "comment" : "Goal form: the goal’s currency.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -224,6 +291,7 @@
     },
     "Decided · %lld" : {
       "comment" : "Goals: the folded list of wishes bought or skipped, with how many.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -241,6 +309,7 @@
     },
     "Delete goal" : {
       "comment" : "Goal form: the trash button.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -258,6 +327,7 @@
     },
     "Every purchase is held up against the main goal, and what you skip goes into it." : {
       "comment" : "Goal form, under the main-goal switch turned off: what the main goal is for.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -275,6 +345,7 @@
     },
     "Goal" : {
       "comment" : "Goals: the row “+ Goal” that opens the form for a new goal; also the title of the form for an existing goal.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -292,6 +363,7 @@
     },
     "Goal “%@” deleted" : {
       "comment" : "Toast after a goal was deleted, with its name.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -309,6 +381,7 @@
     },
     "Goals" : {
       "comment" : "Goals: the header over the goals when none of them is the main one.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -326,6 +399,7 @@
     },
     "How much it takes" : {
       "comment" : "Goal form: the header over the goal’s amount.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -341,433 +415,9 @@
         }
       }
     },
-    "Main goal" : {
-      "comment" : "Goal form: the switch that makes the goal the main one.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Main goal"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Главная цель"
-          }
-        }
-      }
-    },
-    "New goal" : {
-      "comment" : "Title of the goal form when creating one.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "New goal"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Новая цель"
-          }
-        }
-      }
-    },
-    "No account" : {
-      "comment" : "Goal form: the goal is not tied to an account.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No account"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Без счёта"
-          }
-        }
-      }
-    },
-    "No suitable account." : {
-      "comment" : "A goal cannot be bought: no account to pay from.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No suitable account."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Нет подходящего счёта."
-          }
-        }
-      }
-    },
-    "OK" : {
-      "comment" : "Closes a message.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "OK"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ОК"
-          }
-        }
-      }
-    },
-    "Opens a new goal" : {
-      "comment" : "VoiceOver hint of the empty Goals hero: tapping it opens the form for a new goal.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Opens a new goal"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Открывает новую цель"
-          }
-        }
-      }
-    },
-    "Opens the goal" : {
-      "comment" : "VoiceOver hint of the Goals hero: tapping it opens the goal’s form.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Opens the goal"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Открывает цель"
-          }
-        }
-      }
-    },
-    "Opens the purchase to decide on it" : {
-      "comment" : "VoiceOver hint of a waiting wish: tapping it opens “Not sure” for it.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Opens the purchase to decide on it"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Открывает покупку, чтобы решить"
-          }
-        }
-      }
-    },
-    "Other goals" : {
-      "comment" : "Goals: the header over the goals other than the main one.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Other goals"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Другие цели"
-          }
-        }
-      }
-    },
-    "Pick the main goal" : {
-      "comment" : "Goals hero when goals exist but none is the main one.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pick the main goal"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Выбери главную цель"
-          }
-        }
-      }
-    },
-    "Progress is the account’s balance plus what you skip." : {
-      "comment" : "Goal form: how progress is counted for a goal saved on an account.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Progress is the account’s balance plus what you skip."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Прогресс — остаток на счёте плюс отказы."
-          }
-        }
-      }
-    },
-    "Remove" : {
-      "comment" : "Swipe action and menu item that takes a wish off the list.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remove"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Убрать"
-          }
-        }
-      }
-    },
-    "Save" : {
-      "comment" : "Goal form: the main action that saves the changes.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сохранить"
-          }
-        }
-      }
-    },
-    "Saved on" : {
-      "comment" : "Goal form: the account the money for the goal is kept on.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saved on"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Копится на"
-          }
-        }
-      }
-    },
-    "Savings" : {
-      "comment" : "Goals hero caption when there is no main goal: the savings pot.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Savings"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Копилка"
-          }
-        }
-      }
-    },
-    "Set a goal" : {
-      "comment" : "Goals hero with no goals yet: the call to make one.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Set a goal"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Поставь цель"
-          }
-        }
-      }
-    },
-    "Shows or hides what was decided" : {
-      "comment" : "VoiceOver hint of the “Decided · 3” header.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Shows or hides what was decided"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Показывает или прячет решённое"
-          }
-        }
-      }
-    },
-    "That did not work. Try again." : {
-      "comment" : "Goals: deleting, buying or bringing something back failed.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "That did not work. Try again."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Не получилось. Попробуй ещё раз."
-          }
-        }
-      }
-    },
-    "The first goal is the main one." : {
-      "comment" : "Goal form, under the main-goal switch when there is no other goal.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The first goal is the main one."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Первая цель — главная."
-          }
-        }
-      }
-    },
-    "The goal was not saved. Try again." : {
-      "comment" : "Goal form: saving failed.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The goal was not saved. Try again."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Цель не сохранилась. Попробуй ещё раз."
-          }
-        }
-      }
-    },
-    "The star in a goal makes it the main one" : {
-      "comment" : "Goals hero when no goal is main: how to make one main.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The star in a goal makes it the main one"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Звезда в цели делает её главной"
-          }
-        }
-      }
-    },
-    "To change the main goal, star another one." : {
-      "comment" : "Goal form, under the main-goal switch of the main goal: how the main goal changes.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "To change the main goal, star another one."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Чтобы сменить главную, отметь звездой другую цель."
-          }
-        }
-      }
-    },
-    "Waiting for a decision" : {
-      "comment" : "Goals: the header over the wishes put off with “Let me think”.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Waiting for a decision"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ждут решения"
-          }
-        }
-      }
-    },
-    "What it is for" : {
-      "comment" : "Goal form: the placeholder of the goal’s name.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "What it is for"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "На что копишь"
-          }
-        }
-      }
-    },
-    "bought" : {
-      "comment" : "A decided wish that was bought.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "bought"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "купил"
-          }
-        }
-      }
-    },
     "in %lld days" : {
       "comment" : "A waiting wish: the days left to think, “in 2 days”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "variations" : {
@@ -821,6 +471,7 @@
     },
     "in %lld hours" : {
       "comment" : "A waiting wish: the hours left to think, “in 5 hours”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "variations" : {
@@ -872,8 +523,81 @@
         }
       }
     },
+    "Main goal" : {
+      "comment" : "Goal form: the switch that makes the goal the main one.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Main goal"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Главная цель"
+          }
+        }
+      }
+    },
+    "New goal" : {
+      "comment" : "Title of the goal form when creating one.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New goal"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новая цель"
+          }
+        }
+      }
+    },
+    "No account" : {
+      "comment" : "Goal form: the goal is not tied to an account.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No account"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Без счёта"
+          }
+        }
+      }
+    },
+    "No suitable account." : {
+      "comment" : "A goal cannot be bought: no account to pay from.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No suitable account."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет подходящего счёта."
+          }
+        }
+      }
+    },
     "of %@" : {
       "comment" : "A goal’s row: the goal’s amount after its percent, “110 % · of 300 000 ₽”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -889,8 +613,243 @@
         }
       }
     },
+    "OK" : {
+      "comment" : "Closes a message.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ОК"
+          }
+        }
+      }
+    },
+    "Opens a new goal" : {
+      "comment" : "VoiceOver hint of the empty Goals hero: tapping it opens the form for a new goal.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens a new goal"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открывает новую цель"
+          }
+        }
+      }
+    },
+    "Opens the goal" : {
+      "comment" : "VoiceOver hint of the Goals hero: tapping it opens the goal’s form.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens the goal"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открывает цель"
+          }
+        }
+      }
+    },
+    "Opens the purchase to decide on it" : {
+      "comment" : "VoiceOver hint of a waiting wish: tapping it opens “Not sure” for it.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens the purchase to decide on it"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открывает покупку, чтобы решить"
+          }
+        }
+      }
+    },
+    "Other goals" : {
+      "comment" : "Goals: the header over the goals other than the main one.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other goals"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Другие цели"
+          }
+        }
+      }
+    },
+    "Pick the main goal" : {
+      "comment" : "Goals hero when goals exist but none is the main one.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick the main goal"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбери главную цель"
+          }
+        }
+      }
+    },
+    "Progress is the account’s balance plus what you skip." : {
+      "comment" : "Goal form: how progress is counted for a goal saved on an account.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Progress is the account’s balance plus what you skip."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Прогресс — остаток на счёте плюс отказы."
+          }
+        }
+      }
+    },
+    "Remove" : {
+      "comment" : "Swipe action and menu item that takes a wish off the list.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Убрать"
+          }
+        }
+      }
+    },
+    "Save" : {
+      "comment" : "Goal form: the main action that saves the changes.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранить"
+          }
+        }
+      }
+    },
+    "Saved on" : {
+      "comment" : "Goal form: the account the money for the goal is kept on.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved on"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Копится на"
+          }
+        }
+      }
+    },
+    "Savings" : {
+      "comment" : "Goals hero caption when there is no main goal: the savings pot.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Savings"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Копилка"
+          }
+        }
+      }
+    },
+    "Set a goal" : {
+      "comment" : "Goals hero with no goals yet: the call to make one.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set a goal"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поставь цель"
+          }
+        }
+      }
+    },
+    "Shows or hides what was decided" : {
+      "comment" : "VoiceOver hint of the “Decided · 3” header.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows or hides what was decided"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывает или прячет решённое"
+          }
+        }
+      }
+    },
     "skipped" : {
       "comment" : "A decided wish that was not bought (“I’ll pass”).",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -906,8 +865,81 @@
         }
       }
     },
+    "That did not work. Try again." : {
+      "comment" : "Goals: deleting, buying or bringing something back failed.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "That did not work. Try again."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не получилось. Попробуй ещё раз."
+          }
+        }
+      }
+    },
+    "The first goal is the main one." : {
+      "comment" : "Goal form, under the main-goal switch when there is no other goal.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The first goal is the main one."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Первая цель — главная."
+          }
+        }
+      }
+    },
+    "The goal was not saved. Try again." : {
+      "comment" : "Goal form: saving failed.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The goal was not saved. Try again."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Цель не сохранилась. Попробуй ещё раз."
+          }
+        }
+      }
+    },
+    "The star in a goal makes it the main one" : {
+      "comment" : "Goals hero when no goal is main: how to make one main.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The star in a goal makes it the main one"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Звезда в цели делает её главной"
+          }
+        }
+      }
+    },
     "time to decide" : {
       "comment" : "A waiting wish whose thinking time is up.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -923,36 +955,56 @@
         }
       }
     },
-    "“%@” removed" : {
-      "comment" : "Toast after a wish was taken off the list, with its name.",
+    "To change the main goal, star another one." : {
+      "comment" : "Goal form, under the main-goal switch of the main goal: how the main goal changes.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“%@” removed"
+            "value" : "To change the main goal, star another one."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "«%@» убрано"
+            "value" : "Чтобы сменить главную, отметь звездой другую цель."
           }
         }
       }
     },
-    "“%@” will no longer be the main goal." : {
-      "comment" : "Goal form, under the main-goal switch turned on: the goal that is main now stops being it. Its name.",
+    "Waiting for a decision" : {
+      "comment" : "Goals: the header over the wishes put off with “Let me think”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“%@” will no longer be the main goal."
+            "value" : "Waiting for a decision"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "«%@» перестанет быть главной."
+            "value" : "Ждут решения"
+          }
+        }
+      }
+    },
+    "What it is for" : {
+      "comment" : "Goal form: the placeholder of the goal’s name.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What it is for"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На что копишь"
           }
         }
       }

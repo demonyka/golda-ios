@@ -1,8 +1,45 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "“%@” deleted" : {
+      "comment" : "Toast after an operation was deleted, with its note or category.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” deleted"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«%@» удалено"
+          }
+        }
+      }
+    },
+    "“%@”: decide in %@" : {
+      "comment" : "Toast after “Think”: the purchase waits on the wishlist, ““Headphones”: decide in 3 days”.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%1$@”: decide in %2$@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«%1$@» — решить через %2$@"
+          }
+        }
+      }
+    },
     "%@ from the account" : {
       "comment" : "Operation form: what the card is charged for a purchase in another currency, “≈ 5,87 $ from the account”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -20,6 +57,7 @@
     },
     "%lld days" : {
       "comment" : "How long to think before buying, “3 days”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "variations" : {
@@ -73,6 +111,7 @@
     },
     "%lld days of budget" : {
       "comment" : "“Not sure”: a whole number of days of the budget the price is, “5 days of budget”. The number shows above the words, so it is cut off the front.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "variations" : {
@@ -126,6 +165,7 @@
     },
     "%lld hours" : {
       "comment" : "How long to think before buying, “24 hours”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "variations" : {
@@ -179,6 +219,7 @@
     },
     "+%@ to “%@”" : {
       "comment" : "Toast after “Skip”: what went to the main goal, “+50 $ to “Bike””.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -194,8 +235,45 @@
         }
       }
     },
+    "≈ %@ h of work" : {
+      "comment" : "After an expense: the hours of work it cost, “≈ 2,6 h of work”.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈ %@ h of work"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈ %@ ч работы"
+          }
+        }
+      }
+    },
+    "about %@" : {
+      "comment" : "VoiceOver: an approximate amount, “about 1849 Russian rubles”.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "about %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "примерно %@"
+          }
+        }
+      }
+    },
     "Account" : {
       "comment" : "Operation form: the account pill when no account is picked, and its VoiceOver name.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -213,6 +291,7 @@
     },
     "Amount" : {
       "comment" : "VoiceOver: the big amount field of the operation form.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -230,6 +309,7 @@
     },
     "Back" : {
       "comment" : "Operation form, “Not sure”: back to the form.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -247,6 +327,7 @@
     },
     "Buy" : {
       "comment" : "“Not sure”: buy it; the expense is recorded. Russian “Беру”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -264,6 +345,7 @@
     },
     "Cancel" : {
       "comment" : "Closes the operation form without saving.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -281,6 +363,7 @@
     },
     "Category" : {
       "comment" : "VoiceOver: the group of category tiles.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -298,6 +381,7 @@
     },
     "Close" : {
       "comment" : "Closes the read-only sheet of an opening balance or a reconciliation adjustment.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -315,6 +399,7 @@
     },
     "Correct" : {
       "comment" : "VoiceOver hint: tap to type the bank's real figure over the estimate.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -332,6 +417,7 @@
     },
     "Currency" : {
       "comment" : "Operation form: the menu of the currency the price is in.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -349,6 +435,7 @@
     },
     "Date" : {
       "comment" : "VoiceOver: the date pill of the operation form.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -364,8 +451,27 @@
         }
       }
     },
+    "days of budget" : {
+      "comment" : "“Not sure”: under a fractional number of days of the budget the price is, “3,6 days of budget”.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "days of budget"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "дня бюджета"
+          }
+        }
+      }
+    },
     "Delete" : {
       "comment" : "Operation form: deletes the operation, at once, with an undo afterwards.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -383,6 +489,7 @@
     },
     "Done" : {
       "comment" : "Closes the calendar of the operation form, keeping the day it shows.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -400,6 +507,7 @@
     },
     "Entry" : {
       "comment" : "What a deleted operation with neither a note nor a category is called in the toast.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -417,6 +525,7 @@
     },
     "Expense" : {
       "comment" : "Operation form: the type switch, money spent.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -434,6 +543,7 @@
     },
     "From" : {
       "comment" : "Transfer: the tile of the account the money leaves.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -451,6 +561,7 @@
     },
     "From where" : {
       "comment" : "Income: the placeholder of where the money came from.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -466,8 +577,27 @@
         }
       }
     },
+    "h of work" : {
+      "comment" : "“Not sure”: under the hours of work the price is, “2,6 h of work”.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "h of work"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ч работы"
+          }
+        }
+      }
+    },
     "Income" : {
       "comment" : "Operation form: the type switch, money that came in.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -483,8 +613,27 @@
         }
       }
     },
+    "left for today %@" : {
+      "comment" : "After an expense: what is left of today's budget, “left for today 503 ₽”.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "left for today %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "на сегодня осталось %@"
+          }
+        }
+      }
+    },
     "New operation" : {
       "comment" : "Operation form: the title for a new operation.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -502,6 +651,7 @@
     },
     "Not sure" : {
       "comment" : "Operation form: the button that turns a new expense into “Not sure”, and that state's title, where a purchase is weighed up before buying.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -519,6 +669,7 @@
     },
     "Note" : {
       "comment" : "Transfer: the placeholder of its note.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -536,6 +687,7 @@
     },
     "Note.label" : {
       "comment" : "VoiceOver: the note field of the operation form, whatever its placeholder says. Russian “Комментарий”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -551,8 +703,27 @@
         }
       }
     },
+    "of the goal" : {
+      "comment" : "“Not sure”: under the share of the main goal the price is, “12 % of the goal”.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "of the goal"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "от цели"
+          }
+        }
+      }
+    },
     "OK" : {
       "comment" : "Closes a message.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -570,6 +741,7 @@
     },
     "Opening balance" : {
       "comment" : "Read-only sheet of an account's opening balance.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -587,6 +759,7 @@
     },
     "Operation" : {
       "comment" : "Operation form: the title when an operation is open for editing.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -602,8 +775,27 @@
         }
       }
     },
+    "over budget by %@" : {
+      "comment" : "After an expense: by how much today's budget is spent past, “over budget by 120 ₽”.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "over budget by %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "перерасход %@"
+          }
+        }
+      }
+    },
     "Purchase" : {
       "comment" : "An expense with neither a note nor a category; also the placeholder of an expense's note.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -621,6 +813,7 @@
     },
     "Receives %@" : {
       "comment" : "VoiceOver, transfer: what the other account receives, “Receives about 109 US dollars”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -638,6 +831,7 @@
     },
     "Reconciliation adjustment" : {
       "comment" : "Read-only sheet of an operation that brought an account to the bank's balance.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -655,6 +849,7 @@
     },
     "Safe today %@" : {
       "comment" : "Operation form, under the empty amount: what can be spent today, “Safe today 1 849 ₽”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -672,6 +867,7 @@
     },
     "Save" : {
       "comment" : "Operation form: the confirmation that saves the changes to an operation.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -689,6 +885,7 @@
     },
     "Save.new" : {
       "comment" : "Operation form: the confirmation that records a new operation. Russian “Записать”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -706,6 +903,7 @@
     },
     "Saved" : {
       "comment" : "Toast after recording an operation with neither a note nor a category.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -723,6 +921,7 @@
     },
     "Saved %@" : {
       "comment" : "Toast after “Skip” with no main goal: the money not spent, “Saved 50 $”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -740,6 +939,7 @@
     },
     "Skip" : {
       "comment" : "“Not sure”: do not buy it; the money goes to the main goal. Russian “Не беру”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -757,6 +957,7 @@
     },
     "Swap" : {
       "comment" : "Transfer: the round button that swaps “From” and “To”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -774,6 +975,7 @@
     },
     "That did not work. Try again." : {
       "comment" : "“Not sure”: skipping or putting on the wishlist failed.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -791,6 +993,7 @@
     },
     "The operation was not deleted. Try again." : {
       "comment" : "Operation form: deleting failed.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -808,6 +1011,7 @@
     },
     "The operation was not saved. Try again." : {
       "comment" : "Operation form: saving failed.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -825,6 +1029,7 @@
     },
     "Think" : {
       "comment" : "“Not sure”: put it on the wishlist for a while. Russian “Подумаю”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -842,6 +1047,7 @@
     },
     "To" : {
       "comment" : "Transfer: the tile of the account the money goes to.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -859,6 +1065,7 @@
     },
     "Transfer" : {
       "comment" : "Operation form: the type switch, money moved between own accounts.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -876,6 +1083,7 @@
     },
     "Type" : {
       "comment" : "VoiceOver: the switch between expense, income and transfer at the top of the operation form.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -893,6 +1101,7 @@
     },
     "Undo" : {
       "comment" : "Toast action: takes back the operation just recorded. Russian “Отменить”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -910,6 +1119,7 @@
     },
     "Undo.delete" : {
       "comment" : "Toast action: brings a deleted operation back. Russian “Вернуть”.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -927,6 +1137,7 @@
     },
     "What is it" : {
       "comment" : "“Not sure”: the placeholder of what the purchase is.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -938,159 +1149,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Что это"
-          }
-        }
-      }
-    },
-    "about %@" : {
-      "comment" : "VoiceOver: an approximate amount, “about 1849 Russian rubles”.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "about %@"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "примерно %@"
-          }
-        }
-      }
-    },
-    "days of budget" : {
-      "comment" : "“Not sure”: under a fractional number of days of the budget the price is, “3,6 days of budget”.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "days of budget"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "дня бюджета"
-          }
-        }
-      }
-    },
-    "h of work" : {
-      "comment" : "“Not sure”: under the hours of work the price is, “2,6 h of work”.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "h of work"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ч работы"
-          }
-        }
-      }
-    },
-    "left for today %@" : {
-      "comment" : "After an expense: what is left of today's budget, “left for today 503 ₽”.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "left for today %@"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "на сегодня осталось %@"
-          }
-        }
-      }
-    },
-    "of the goal" : {
-      "comment" : "“Not sure”: under the share of the main goal the price is, “12 % of the goal”.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "of the goal"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "от цели"
-          }
-        }
-      }
-    },
-    "over budget by %@" : {
-      "comment" : "After an expense: by how much today's budget is spent past, “over budget by 120 ₽”.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "over budget by %@"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "перерасход %@"
-          }
-        }
-      }
-    },
-    "“%@” deleted" : {
-      "comment" : "Toast after an operation was deleted, with its note or category.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "“%@” deleted"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "«%@» удалено"
-          }
-        }
-      }
-    },
-    "“%@”: decide in %@" : {
-      "comment" : "Toast after “Think”: the purchase waits on the wishlist, ““Headphones”: decide in 3 days”.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "“%1$@”: decide in %2$@"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "«%1$@» — решить через %2$@"
-          }
-        }
-      }
-    },
-    "≈ %@ h of work" : {
-      "comment" : "After an expense: the hours of work it cost, “≈ 2,6 h of work”.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "≈ %@ h of work"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "≈ %@ ч работы"
           }
         }
       }

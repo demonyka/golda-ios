@@ -3,37 +3,92 @@
   "strings" : {
     "Listening. Tap when done" : {
       "comment" : "VoiceOver label of the mic while it records.",
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Listening. Tap when done" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Слушаю. Нажми, когда закончишь" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listening. Tap when done"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Слушаю. Нажми, когда закончишь"
+          }
+        }
       }
     },
     "Say it" : {
       "comment" : "VoiceOver label of the idle mic, the one main action of the app.",
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Say it" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Сказать" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Say it"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сказать"
+          }
+        }
       }
     },
     "Starts recording a note" : {
       "comment" : "VoiceOver hint of the mic while it is idle.",
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Starts recording a note" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Начинает запись заметки" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starts recording a note"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Начинает запись заметки"
+          }
+        }
       }
     },
     "Undo" : {
       "comment" : "The default action of an undo toast.",
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Undo" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Отменить" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Undo"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отменить"
+          }
+        }
       }
     },
     "Working it out…" : {
       "comment" : "VoiceOver label of the mic while the note is being understood.",
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Working it out…" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Разбираю…" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Working it out…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Разбираю…"
+          }
+        }
       }
     }
   },
