@@ -132,6 +132,10 @@ import Testing
         #expect(VoiceNotice.of(.waiting(.offline), books: nil, locale: ru)?.message == "Нет связи — запись разберётся позже")
         #expect(VoiceNotice.of(.waiting(.offline), books: nil, locale: en)?.message == "No connection; the note will be worked out later")
         #expect(VoiceNotice.of(.waiting(.offline), books: nil, locale: ru)?.actionTitle(in: ru) == "ОК")
+        let location = VoiceNotice.of(.waiting(.unsupportedLocation), books: nil, locale: ru)
+        #expect(location?.message == "Gemini недоступен в вашей стране — запись сохранена и разберётся, когда он станет доступен")
+        #expect(location?.action == .dismiss)
+        #expect(VoiceNotice.of(.waiting(.unsupportedLocation), books: nil, locale: en)?.message == "Gemini isn’t available in your country; the note is kept for when it is")
     }
 
     @Test func failuresSayWhatWentWrong() {

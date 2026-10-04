@@ -20,6 +20,9 @@ public enum VoiceOutcome: Equatable, Sendable {
         case noKey
         /// No connection, or the service failed on its side.
         case offline
+        /// The provider does not work in this country (D45): the note waits to be understood from
+        /// somewhere it does.
+        case unsupportedLocation
     }
 
     public enum Failure: Equatable, Sendable {

@@ -50,6 +50,7 @@ public struct GeminiProvider: VoiceProvider {
         }
         guard (200..<300).contains(response.statusCode) else {
             let message = Self.errorMessage(data) ?? "HTTP \(response.statusCode)"
+            if Self.refusesLocation(message) { throw VoiceProviderError.unsupportedLocation }
             // A server error passes; a refusal (bad key, unknown model, quota) needs a person.
             throw response.statusCode >= 500 ? VoiceProviderError.offline(message: message) : .rejected(message: message)
         }
@@ -75,6 +76,13 @@ public struct GeminiProvider: VoiceProvider {
         ]
         // Sorted keys keep the body the same from run to run; unescaped slashes keep the base64 short.
         return try JSONSerialization.data(withJSONObject: body, options: [.sortedKeys, .withoutEscapingSlashes])
+    }
+
+    /// Google's words for "not where you are": the API refused outright, or its free tier refused
+    /// the country.
+    static func refusesLocation(_ message: String) -> Bool {
+        message.localizedCaseInsensitiveContains("location is not supported")
+            || message.localizedCaseInsensitiveContains("not available in your country")
     }
 
     /// `error.message` of Google's error answer, when there is one.

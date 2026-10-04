@@ -103,6 +103,23 @@
         }
       }
     },
+    "Gemini isn’t available in your country; the note is kept for when it is" : {
+      "comment" : "Voice toast: Gemini refuses to work where the phone is; the note waits.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemini isn’t available in your country; the note is kept for when it is"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemini недоступен в вашей стране — запись сохранена и разберётся, когда он станет доступен"
+          }
+        }
+      }
+    },
     "Gemini: %@" : {
       "comment" : "Voice toast: Gemini refused the note; the argument is its own explanation.",
       "localizations" : {

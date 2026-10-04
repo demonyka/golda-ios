@@ -20,4 +20,7 @@ public enum VoiceProviderError: Error, Equatable, Sendable {
     case rejected(message: String)
     /// The answer was not the JSON the schema asks for.
     case malformedAnswer
+    /// The service does not work where the phone is (Gemini in Russia without a VPN); the note can be
+    /// understood later, from somewhere it does.
+    case unsupportedLocation
 }

@@ -194,6 +194,15 @@ import Testing
         #expect(try await voice.operations(personal).isEmpty)
     }
 
+    @Test func anUnsupportedLocationWaitsAndKeepsTheNote() async throws {
+        let file = try voice.note(personal, recordedAt: hourAgo)
+        voice.provider.fail(VoiceProviderError.unsupportedLocation)
+
+        #expect(await service.understand(file: file) == .waiting(.unsupportedLocation))
+        #expect(voice.exists(file))
+        #expect(try await voice.operations(personal).isEmpty)
+    }
+
     @Test func aRefusalFailsAndKeepsTheNote() async throws {
         let file = try voice.note(personal, recordedAt: hourAgo)
         voice.provider.fail(VoiceProviderError.rejected(message: "API key not valid. Please pass a valid API key."))

@@ -189,6 +189,15 @@ private func apiError(_ code: Int, _ message: String, _ status: String) -> Data 
         #expect(await failure(gemini(status: 400, body: body)) == .rejected(message: "API key not valid. Please pass a valid API key."))
     }
 
+    /// Russia without a VPN, or another country Google does not serve: the note can be understood
+    /// later, from somewhere else, so it is not a refusal of the note itself (D45).
+    @Test func aRefusalOfTheCountryIsAnUnsupportedLocation() async {
+        let location = apiError(400, "User location is not supported for the API use.", "FAILED_PRECONDITION")
+        #expect(await failure(gemini(status: 400, body: location)) == .unsupportedLocation)
+        let freeTier = apiError(400, "Gemini API free tier is not available in your country. Please enable billing on your project in Google AI Studio.", "FAILED_PRECONDITION")
+        #expect(await failure(gemini(status: 400, body: freeTier)) == .unsupportedLocation)
+    }
+
     @Test func aRefusalWithoutAMessageNamesTheStatus() async {
         #expect(await failure(gemini(status: 404, body: Data("<html>Not Found</html>".utf8))) == .rejected(message: "HTTP 404"))
         #expect(await failure(gemini(status: 403, body: Data())) == .rejected(message: "HTTP 403"))

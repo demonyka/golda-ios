@@ -143,6 +143,7 @@ public actor VoiceService {
             case .offline: return .waiting(.offline)
             case .rejected(let message): return .failed(.rejected(message: message))
             case .malformedAnswer: return .failed(.malformedAnswer)
+            case .unsupportedLocation: return .waiting(.unsupportedLocation)
             }
         } catch {
             // A provider that lets its transport's error through: the network, as on Android.

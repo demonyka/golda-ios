@@ -57,6 +57,8 @@ struct VoiceNotice: Equatable, Sendable {
             return VoiceNotice(message: Strings.noKey.text(in: locale), action: .openSettings, length: .long)
         case .waiting(.offline):
             return VoiceNotice(message: Strings.offline.text(in: locale), action: .dismiss, length: .long)
+        case .waiting(.unsupportedLocation):
+            return VoiceNotice(message: Strings.unsupportedLocation.text(in: locale), action: .dismiss, length: .long)
         case .needsConsent:
             return nil
         case .failed(let failure):
@@ -127,6 +129,10 @@ struct VoiceNotice: Equatable, Sendable {
         static let saved = LocalizedStringResource("Saved", table: "Voice", comment: "Voice toast: title of a booked operation with neither a note nor a category.")
         static let noKey = LocalizedStringResource("Add a Gemini key in settings; the note is kept", table: "Voice", comment: "Voice toast: a note waits because no Gemini API key is set.")
         static let offline = LocalizedStringResource("No connection; the note will be worked out later", table: "Voice", comment: "Voice toast: a note waits for the network.")
+        static let unsupportedLocation = LocalizedStringResource(
+            "Gemini isn’t available in your country; the note is kept for when it is", table: "Voice",
+            comment: "Voice toast: Gemini refuses to work where the phone is; the note waits."
+        )
         static let lost = LocalizedStringResource("The note got lost", table: "Voice", comment: "Voice toast: the recording file is missing.")
         static let profileGone = LocalizedStringResource("The note’s profile was deleted, and the note with it", table: "Voice", comment: "Voice toast: the profile a note was recorded in is gone.")
         static let malformedAnswer = LocalizedStringResource("Gemini’s answer made no sense; the note is kept", table: "Voice", comment: "Voice toast: the provider answered with something unreadable.")
