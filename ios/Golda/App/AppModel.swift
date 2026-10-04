@@ -14,7 +14,7 @@ struct OperationUndoToken: Equatable, Sendable {
 }
 
 enum AppModelError: Error, Equatable, Sendable {
-    /// A change to the books was asked for while no profile is open (before the welcome screen).
+    /// A change to the books was asked for while no profile is open (before onboarding makes one).
     case noProfileOpen
 }
 
@@ -28,8 +28,8 @@ final class AppModel {
     enum Phase {
         /// Before the first read; nothing to draw yet.
         case loading
-        /// No profile or not onboarded: the welcome screen.
-        case welcome
+        /// No profile or not onboarded: the three steps of the first launch.
+        case onboarding
         case main(AppData)
         /// The data could not be read: the failure screen, with "Try again". [reason] is the
         /// technical message, which only debug builds show.
@@ -59,6 +59,7 @@ final class AppModel {
     /// Remembered profiles missing from the list, being looked up.
     @ObservationIgnored private var checkingProfileIds: Set<UUID> = []
     @ObservationIgnored private var started = false
+    @ObservationIgnored private var isBeginningOnboarding = false
 
     init(environment: AppEnvironment) {
         self.environment = environment
@@ -75,7 +76,7 @@ final class AppModel {
     var phase: Phase {
         if let failureReason { return .failed(reason: failureReason) }
         guard isLoaded else { return .loading }
-        guard device.onboarded, !profiles.isEmpty else { return .welcome }
+        guard device.onboarded, !profiles.isEmpty else { return .onboarding }
         return data.map(Phase.main) ?? .loading
     }
 
@@ -195,15 +196,22 @@ final class AppModel {
         applyDeviceSettings()
     }
 
-    /// The temporary welcome screen's one button (onboarding proper is step 2e): the first profile,
-    /// unless one exists already, opened, and the welcome done.
-    func completeWelcome(profileName: String = AppModel.firstProfileName) async throws {
+    /// The first profile, unless one exists already, opened: the steps of onboarding set it up
+    /// through its books, so it is there from the first of them, while the app stays closed until
+    /// `finishOnboarding`. A profile left by an earlier launch that never finished is the one
+    /// the steps continue with.
+    func beginOnboarding(profileName: String = AppModel.firstProfileName) async throws {
+        // The screen's task can run twice; a second profile would be a duplicate nobody sees.
+        guard !isBeginningOnboarding else { return }
+        isBeginningOnboarding = true
+        defer { isBeginningOnboarding = false }
         await reloadProfiles()
-        if profiles.isEmpty {
-            let profile = try await environment.repository.createProfile(name: profileName)
-            await reloadProfiles()
-            environment.deviceSettings.update { $0.activeProfileId = profile.id }
-        }
+        guard profiles.isEmpty else { return }
+        try await createProfile(name: profileName)
+    }
+
+    /// The last step's "Готово": the app opens on the profile the steps set up.
+    func finishOnboarding() {
         environment.deviceSettings.update { $0.onboarded = true }
         applyDeviceSettings()
     }

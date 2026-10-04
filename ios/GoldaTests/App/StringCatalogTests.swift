@@ -32,7 +32,7 @@ import Testing
 
     @Test func theCatalogsAreThere() throws {
         let tables = Set(try Self.catalogs().keys)
-        #expect(tables.isSuperset(of: ["Localizable", "InfoPlist", "Components", "Entry", "Goals", "Insights", "Profiles", "Settings", "Voice", "AccountForm", "Failure"]), "\(tables)")
+        #expect(tables.isSuperset(of: ["Localizable", "InfoPlist", "Components", "Entry", "Goals", "Insights", "Profiles", "Settings", "Voice", "AccountForm", "Failure", "Onboarding"]), "\(tables)")
     }
 
     // MARK: Both languages

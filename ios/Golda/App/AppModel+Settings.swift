@@ -81,7 +81,7 @@ extension AppModel {
     // MARK: Erase
 
     /// Everything goes: profiles with their books, this phone's settings and the API keys (D28). The
-    /// app is back at the welcome screen once the observers see it.
+    /// app is back at onboarding once the observers see it.
     func eraseEverything() async throws {
         do {
             try await environment.repository.resetAll()

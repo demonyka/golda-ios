@@ -3,7 +3,7 @@ import XCTest
 /// The settings on the made-up person's books (shown ₽ $ ₾, local ₾, main ₽), offline: the main
 /// currency reaches Home's big number, the shown currencies flip with their fallbacks, the key is
 /// saved and removed, a refresh without network says so, the rows lead where they say, and
-/// "Стереть всё" goes back to the welcome screen.
+/// "Стереть всё" goes back to onboarding.
 final class SettingsUITests: XCTestCase {
     override func setUp() {
         continueAfterFailure = false
@@ -265,7 +265,7 @@ final class SettingsUITests: XCTestCase {
     }
 
     @MainActor
-    func testEraseEverythingAsksAndGoesBackToWelcome() {
+    func testEraseEverythingAsksAndGoesBackToOnboarding() {
         let app = launch()
         openSettings(app)
         let erase = app.buttons["settings.erase"]
@@ -282,11 +282,11 @@ final class SettingsUITests: XCTestCase {
         erase.tap()
         XCTAssertTrue(alert.waitForExistence(timeout: 5))
         alert.buttons["Erase"].tap()
-        XCTAssertTrue(app.buttons["welcome.start"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["onboarding.next"].waitForExistence(timeout: 10))
         XCTAssertFalse(app.buttons["settings.done"].exists)
 
         // A new start is a fresh install: the defaults, no samples left.
-        app.buttons["welcome.start"].tap()
+        app.finishOnboarding()
         let hero = app.descendants(matching: .any)["home.hero"]
         XCTAssertTrue(hero.waitForExistence(timeout: 10))
         openSettings(app)

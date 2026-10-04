@@ -141,23 +141,6 @@
         }
       }
     },
-    "A voice-first money tracker for people who earn in one currency and live in another." : {
-      "comment" : "Welcome screen: what the app is, under its name.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A voice-first money tracker for people who earn in one currency and live in another."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Трекер денег с голосовым вводом для тех, кто зарабатывает в одной валюте, а живёт в другой."
-          }
-        }
-      }
-    },
     "Account" : {
       "comment" : "Accounts: the last row, “+ Account”, opens the form for a new account.",
       "localizations" : {
@@ -1055,23 +1038,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Настройки"
-          }
-        }
-      }
-    },
-    "Start" : {
-      "comment" : "Welcome screen: creates the first profile and opens the app.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Start"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Начать"
           }
         }
       }

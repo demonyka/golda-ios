@@ -1,0 +1,261 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Account" : {
+      "comment" : "Onboarding, accounts step: the last row, “+ Account”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Счёт"
+          }
+        }
+      }
+    },
+    "Accounts" : {
+      "comment" : "Onboarding, step 3: its title.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accounts"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Счета"
+          }
+        }
+      }
+    },
+    "Add account" : {
+      "comment" : "Onboarding, VoiceOver: the “+ Account” row.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add account"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить счёт"
+          }
+        }
+      }
+    },
+    "Back" : {
+      "comment" : "Onboarding: the button to the previous step.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Назад"
+          }
+        }
+      }
+    },
+    "Cards, cash, savings and debts with their balances now. Rough numbers are easy to fix later by reconciling." : {
+      "comment" : "Onboarding, accounts step: what to add and that mistakes can be fixed.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cards, cash, savings and debts with their balances now. Rough numbers are easy to fix later by reconciling."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Карты, наличные, накопительные счета и долги с текущими балансами. Неточные цифры потом легко поправить сверкой."
+          }
+        }
+      }
+    },
+    "Currencies" : {
+      "comment" : "Onboarding, step 2: its title.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Currencies"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Валюты"
+          }
+        }
+      }
+    },
+    "Currency" : {
+      "comment" : "Onboarding, currencies step: the label of the local currency's menu.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Currency"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Валюта"
+          }
+        }
+      }
+    },
+    "Done" : {
+      "comment" : "Onboarding, last step: the button that finishes it and opens the app.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Готово"
+          }
+        }
+      }
+    },
+    "Every amount shows in all the chosen currencies at once. The ruble is the main one." : {
+      "comment" : "Onboarding, currencies step: what the shown currencies do.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every amount shows in all the chosen currencies at once. The ruble is the main one."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Любая сумма будет видна сразу во всех выбранных валютах. Рубль — основная."
+          }
+        }
+      }
+    },
+    "Income" : {
+      "comment" : "Onboarding, step 1: its title.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Income"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Доход"
+          }
+        }
+      }
+    },
+    "Local currency, for amounts said without one" : {
+      "comment" : "Onboarding, currencies step: the header over the choice of the local currency.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local currency, for amounts said without one"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Местная валюта — в ней суммы без валюты"
+          }
+        }
+      }
+    },
+    "Next" : {
+      "comment" : "Onboarding: the button to the next step.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дальше"
+          }
+        }
+      }
+    },
+    "Show amounts in" : {
+      "comment" : "Onboarding, currencies step: the header over the switches of the shown currencies.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show amounts in"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать суммы в"
+          }
+        }
+      }
+    },
+    "Step %lld of %lld" : {
+      "comment" : "Onboarding, VoiceOver: where the progress bar stands, “Step 2 of 3”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Step %lld of %lld"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Шаг %lld из %lld"
+          }
+        }
+      }
+    },
+    "Used to work out what is safe to spend until the next payday and to turn prices into hours of work." : {
+      "comment" : "Onboarding, income step: what the income is for.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Used to work out what is safe to spend until the next payday and to turn prices into hours of work."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нужен, чтобы считать «можно сегодня» до следующей зарплаты и переводить покупки в часы работы."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

@@ -472,7 +472,7 @@ struct SettingsScreen: View {
         }
     }
 
-    /// Everything goes, and the app goes back to the welcome screen, which takes this sheet with it.
+    /// Everything goes, and the app goes back to onboarding, which takes this sheet with it.
     private func erase() {
         guard !isBusy else { return }
         isBusy = true

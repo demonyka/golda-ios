@@ -5,7 +5,7 @@ import Testing
 
 @testable import Golda
 
-/// The active profile, switching, creating and deleting profiles, the welcome flow and the launch work.
+/// The active profile, switching, creating and deleting profiles, onboarding and the launch work.
 @MainActor @Suite(.timeLimit(.minutes(1))) struct AppModelTests {
     let harness: AppHarness
 
@@ -15,39 +15,95 @@ import Testing
 
     var model: AppModel { harness.model }
 
-    // MARK: Welcome
+    // MARK: Onboarding
 
-    @Test func aFreshInstallOpensOnTheWelcomeScreen() async throws {
+    @Test func aFreshInstallOpensOnOnboarding() async throws {
         await model.start()
 
         #expect(model.isLoaded)
-        #expect(model.phase.isWelcome)
+        #expect(model.phase.isOnboarding)
         #expect(model.profiles.isEmpty && model.activeProfileId == nil && model.data == nil)
     }
 
-    @Test func theWelcomeCreatesTheFirstProfileAndFinishesOnboarding() async throws {
+    @Test func beginningOnboardingCreatesTheFirstProfileAndOpensIt() async throws {
         await model.start()
 
-        try await model.completeWelcome(profileName: "Личный")
+        try await model.beginOnboarding(profileName: "Личный")
 
         let profile = try #require(model.profiles.first)
         #expect(model.profiles.map(\.name) == ["Личный"])
-        #expect(harness.device.current.onboarded)
         #expect(harness.device.current.activeProfileId == profile.id)
         #expect(model.activeProfileId == profile.id)
+        // The steps set the profile up through its books, so they must be there; the app is not
+        // open until the last step says so.
+        await eventually { model.data?.profile.id == profile.id }
+        #expect(!harness.device.current.onboarded)
+        #expect(model.phase.isOnboarding)
+    }
+
+    @Test func beginningOnboardingKeepsAProfileThatIsAlreadyThere() async throws {
+        let family = try await harness.profile("Семья")
+        await model.start()
+        #expect(model.phase.isOnboarding)
+
+        try await model.beginOnboarding(profileName: "Личный")
+
+        #expect(model.profiles.map(\.id) == [family])
+        #expect(model.activeProfileId == family)
+        await eventually { model.data?.profile.id == family }
+        #expect(!harness.device.current.onboarded)
+    }
+
+    /// The screen's task can run again (the view comes back); two profiles would be a bug nobody sees.
+    @Test func beginningOnboardingTwiceAtOnceCreatesOneProfile() async throws {
+        await model.start()
+
+        async let first: Void = model.beginOnboarding(profileName: "Личный")
+        async let second: Void = model.beginOnboarding(profileName: "Личный")
+        _ = try await (first, second)
+
+        #expect(model.profiles.map(\.name) == ["Личный"])
+        try await model.beginOnboarding(profileName: "Личный")
+        #expect(model.profiles.count == 1)
+    }
+
+    @Test func finishingOnboardingOpensTheApp() async throws {
+        await model.start()
+        try await model.beginOnboarding(profileName: "Личный")
+        let profile = try #require(model.profiles.first)
+
+        model.finishOnboarding()
+
+        #expect(harness.device.current.onboarded)
         await eventually { model.phase.data?.profile.id == profile.id }
     }
 
-    @Test func theWelcomeKeepsAProfileThatIsAlreadyThere() async throws {
-        let family = try await harness.profile("Семья")
+    /// What the steps did to the books before the end stays: income through the profile, an account
+    /// through the form's save, currencies through this phone's settings.
+    @Test func whatTheStepsSetUpIsThereWhenTheAppOpens() async throws {
         await model.start()
-        #expect(model.phase.isWelcome)
+        try await model.beginOnboarding(profileName: "Личный")
+        let profile = try #require(model.profiles.first)
+        var settings = profile.settings
+        settings.incomeHourly = false
+        settings.monthlySalary = 150_000
+        settings.payday = 5
+        try await model.saveProfileSettings(settings, profileId: profile.id)
+        model.toggleShownCurrency("GEL")
+        model.setLocalCurrency("GEL")
+        _ = try await harness.data()
+        try await model.saveAccount(
+            Account(name: "Card", currency: "RUB", type: .card, includeInFree: true, sort: 0), openingMinor: 1_000_00
+        )
 
-        try await model.completeWelcome(profileName: "Личный")
+        model.finishOnboarding()
 
-        #expect(model.profiles.map(\.id) == [family])
-        #expect(harness.device.current.onboarded)
-        await eventually { model.phase.data?.profile.id == family }
+        await eventually { model.phase.data?.accounts.count == 1 }
+        let data = try #require(model.phase.data)
+        #expect(data.profile.settings.monthlySalary == 150_000 && !data.profile.settings.incomeHourly)
+        #expect(data.profile.settings.payday == 5)
+        #expect(data.settings.localCurrency == "GEL" && data.settings.displayCurrencies.contains("GEL"))
+        #expect(data.accounts.map(\.name) == ["Card"])
     }
 
     // MARK: The active profile
@@ -303,7 +359,7 @@ import Testing
 
         #expect(model.profiles.isEmpty)
         #expect(!harness.device.current.onboarded)
-        #expect(model.phase.isWelcome)
+        #expect(model.phase.isOnboarding)
     }
 
     @Test func launchWorkRunsOnce() async throws {

@@ -180,3 +180,16 @@ final class Shots {
         try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: path))
     }
 }
+
+extension XCUIApplication {
+    /// Walks the three steps of onboarding without changing anything, so the defaults stay: a fresh
+    /// install opens on Home with empty books.
+    @MainActor
+    func finishOnboarding(file: StaticString = #filePath, line: UInt = #line) {
+        for identifier in ["onboarding.next", "onboarding.next", "onboarding.done"] {
+            let button = buttons[identifier]
+            XCTAssertTrue(button.waitForExistence(timeout: 10), identifier, file: file, line: line)
+            button.tap()
+        }
+    }
+}

@@ -7,7 +7,7 @@ enum LaunchCommand: String, CaseIterable, Sendable {
     case demo
     /// `Demo.samples`: the same person with a fortnight of life abroad.
     case samples
-    /// `Repository.resetAll`: a fresh install, back to the welcome screen.
+    /// `Repository.resetAll`: a fresh install, back to onboarding.
     case reset
 }
 

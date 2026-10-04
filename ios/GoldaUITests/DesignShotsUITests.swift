@@ -34,10 +34,16 @@ final class DesignShotsUITests: XCTestCase {
             return app
         }
 
-        // A fresh install: the welcome screen and its one button.
+        // A fresh install: the three steps of onboarding.
         var app = launch(samples: false)
-        XCTAssertTrue(app.buttons["welcome.start"].waitForExistence(timeout: 30))
-        try shoot("welcome")
+        XCTAssertTrue(app.buttons["onboarding.next"].waitForExistence(timeout: 30))
+        try shoot("onboarding-income")
+        app.buttons["onboarding.next"].tap()
+        XCTAssertTrue(app.switches["onboarding.shown.USD"].waitForExistence(timeout: 5))
+        try shoot("onboarding-currencies")
+        app.buttons["onboarding.next"].tap()
+        XCTAssertTrue(app.buttons["onboarding.addAccount"].waitForExistence(timeout: 5))
+        try shoot("onboarding-accounts")
         app.terminate()
 
         // Home with the mic in its three states.

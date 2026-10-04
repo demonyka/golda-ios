@@ -81,8 +81,8 @@ func eventually(
 }
 
 extension AppModel.Phase {
-    var isWelcome: Bool {
-        if case .welcome = self { return true }
+    var isOnboarding: Bool {
+        if case .onboarding = self { return true }
         return false
     }
 

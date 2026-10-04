@@ -163,14 +163,14 @@ import Testing
 
     // MARK: Erase
 
-    @Test func erasingEverythingGoesBackToWelcomeAndTakesTheKey() async throws {
+    @Test func erasingEverythingGoesBackToOnboardingAndTakesTheKey() async throws {
         _ = try await samples()
         try model.saveGeminiKey("AIza-gone")
         model.setVoiceConsent(true)
 
         try await model.eraseEverything()
 
-        #expect(model.phase.isWelcome)
+        #expect(model.phase.isOnboarding)
         #expect(!model.hasGeminiKey)
         #expect(model.device == DeviceSettings())
         await eventually { model.profiles.isEmpty }

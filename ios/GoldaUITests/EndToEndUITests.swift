@@ -170,7 +170,7 @@ final class EndToEndUITests: XCTestCase {
         XCTAssertTrue(firstPhrase(walk.homeHero.label).localizedCaseInsensitiveContains(rubles), walk.homeHero.label)
     }
 
-    /// "Erase everything" goes back to the welcome screen; a new start has empty books, and an
+    /// "Erase everything" goes back to onboarding; a new start has empty books, and an
     /// account with an expense works from there.
     @MainActor
     func testEraseEverythingAndStartAgain() {
@@ -184,10 +184,9 @@ final class EndToEndUITests: XCTestCase {
         let question = app.alerts.firstMatch
         XCTAssertTrue(question.waitForExistence(timeout: 5))
         question.buttons[walk.text("Erase", "Стереть")].tap()
-        let start = app.buttons["welcome.start"]
-        XCTAssertTrue(start.waitForExistence(timeout: 10))
-        walk.shoot("welcome")
-        start.tap()
+        XCTAssertTrue(app.buttons["onboarding.next"].waitForExistence(timeout: 10))
+        walk.shoot("onboarding")
+        app.finishOnboarding()
 
         // Empty books: nothing on Home, nothing on Accounts but "+ Account".
         XCTAssertTrue(walk.any("home.empty").waitForExistence(timeout: 10))

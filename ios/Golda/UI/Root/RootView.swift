@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// The welcome screen until there is a profile and onboarding is done, then the tabs; the failure
-/// screen whenever the data cannot be read.
+/// Onboarding until there is a profile and it is done, then the tabs; the failure screen whenever
+/// the data cannot be read.
 struct RootView: View {
     @Environment(AppModel.self) private var model
     let mic: any MicModel
@@ -17,8 +17,8 @@ struct RootView: View {
         case .loading:
             // A few milliseconds at launch: a blank page carries on, where a spinner would only flash.
             Theme.Color.page.ignoresSafeArea()
-        case .welcome:
-            WelcomeView()
+        case .onboarding:
+            OnboardingView()
         case .main(let data):
             MainTabs(data: data, mic: mic)
         case .failed(let reason):
@@ -47,7 +47,7 @@ extension AppModel {
         .task { await model.start(command: .samples) }
 }
 
-#Preview("Welcome") {
+#Preview("Onboarding") {
     @Previewable @State var model = AppModel.preview()
     RootView(mic: StubMicModel())
         .environment(model)
