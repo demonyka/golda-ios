@@ -103,6 +103,8 @@ struct TaxHoursSheet: View {
             .tabularDigits()
             .foregroundStyle(form.invalidFields.contains(field) ? Theme.Color.danger : Theme.Color.text)
             .focused($focus, equals: field)
+            // The field carries the title for VoiceOver, which otherwise heard a bare "0".
+            .accessibilityLabel(Text(verbatim: title))
             .accessibilityIdentifier(identifier)
             Text(verbatim: unit)
                 .foregroundStyle(Theme.Color.muted)
@@ -112,6 +114,7 @@ struct TaxHoursSheet: View {
             if dynamicTypeSize.isAccessibilitySize {
                 VStack(alignment: .leading, spacing: Theme.Gap.xs) {
                     Text(verbatim: title)
+                        .accessibilityHidden(true)
                     number
                 }
             } else {
@@ -119,6 +122,7 @@ struct TaxHoursSheet: View {
                     Text(verbatim: title)
                         .lineLimit(1)
                         .layoutPriority(1)
+                        .accessibilityHidden(true)
                     number
                 }
             }

@@ -170,6 +170,8 @@ struct GeminiKeySheet: View {
                     .focused($isFocused)
                     .onSubmit(save)
                     .frame(minHeight: Theme.minimumTarget)
+                    // A field with a prompt hides its label from VoiceOver.
+                    .accessibilityLabel(Text(verbatim: SettingsText.geminiKey.text(in: locale)))
                     .accessibilityIdentifier("settings.key.field")
                 } footer: {
                     Text(verbatim: SettingsText.keyFooter.text(in: locale))
@@ -271,6 +273,8 @@ struct GeminiModelSheet: View {
                     .focused($isFocused)
                     .onSubmit(save)
                     .frame(minHeight: Theme.minimumTarget)
+                    // A field with a prompt hides its label from VoiceOver.
+                    .accessibilityLabel(Text(verbatim: SettingsText.model.text(in: locale)))
                     .accessibilityIdentifier("settings.model.field")
                 } footer: {
                     Text(verbatim: SettingsText.modelFooter.text(in: locale))

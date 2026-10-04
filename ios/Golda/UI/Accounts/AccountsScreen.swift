@@ -217,7 +217,7 @@ struct AccountsHeroView: View {
                         .foregroundStyle(.secondary)
                 }
                 if let advice = hero.adviceText(in: locale) {
-                    Text(verbatim: advice)
+                    Text(verbatim: advice.keepingMarksOnTheLine)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -229,14 +229,6 @@ struct AccountsHeroView: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(verbatim: hero.accessibilityLabel(in: locale)))
         .accessibilityIdentifier("accounts.hero")
-    }
-}
-
-extension String {
-    /// "Карта · ≈ 5 298 117 ₽" with no-break spaces before each dot and after each "≈", so a line
-    /// that wraps never starts with a dot nor ends with a lone "≈".
-    var keepingMarksOnTheLine: String {
-        replacingOccurrences(of: " · ", with: "\u{00A0}· ").replacingOccurrences(of: "≈ ", with: "≈\u{00A0}")
     }
 }
 

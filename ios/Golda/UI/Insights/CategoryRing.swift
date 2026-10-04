@@ -79,7 +79,8 @@ struct CategoryRing: View {
                     .font(.subheadline.weight(.medium))
                     .foregroundStyle(Theme.Color.muted)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.6)
+                    // The hole does not grow with the text: at the largest sizes the line shrinks to fit.
+                    .minimumScaleFactor(0.4)
             }
             BigNumber(AmountParts(parsing: center.amount), value: center.value, color: Theme.Color.text, maxSize: 56, alignment: .center)
                 .accessibilityIdentifier("insights.total")
@@ -88,7 +89,7 @@ struct CategoryRing: View {
                 .tabularDigits()
                 .foregroundStyle(Theme.Color.muted)
                 .lineLimit(1)
-                .minimumScaleFactor(0.6)
+                .minimumScaleFactor(0.4)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }

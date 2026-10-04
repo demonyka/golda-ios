@@ -69,6 +69,8 @@ struct ReconcileSheet: View {
                 .foregroundStyle(Theme.Color.muted)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
+                // The field below carries the question for VoiceOver.
+                .accessibilityHidden(true)
             amountField
             // A space while nothing differs keeps the line's height, so nothing jumps.
             Text(verbatim: entry.differenceText(in: locale) ?? " ")
@@ -101,6 +103,8 @@ struct ReconcileSheet: View {
             .keyboardType(.decimalPad)
             .multilineTextAlignment(.center)
             .fixedSize()
+            // A field with a prompt hides its label from VoiceOver, which otherwise heard a bare number.
+            .accessibilityLabel(Text(verbatim: Self.question.text(in: locale)))
             .accessibilityIdentifier("reconcile.amount")
             Text(verbatim: Currencies.symbol(state.currency))
                 .foregroundStyle(Theme.Color.muted)

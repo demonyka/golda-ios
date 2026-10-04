@@ -191,6 +191,9 @@ private struct CategoryRowView: View {
 
     @Environment(\.locale) private var locale
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    /// The symbols' column grows with the text: a fixed 24 pt let the larger sizes' cart and shirt
+    /// spill into the names.
+    @ScaledMetric(relativeTo: .body) private var symbolWidth: CGFloat = 24
 
     var body: some View {
         HStack(spacing: Theme.Gap.m) {
@@ -201,7 +204,7 @@ private struct CategoryRowView: View {
                 .overlay { if row.isRest { Circle().strokeBorder(Theme.Color.line, lineWidth: 1) } }
             Image(systemName: row.symbol)
                 .foregroundStyle(Theme.Color.muted)
-                .frame(width: 24)
+                .frame(width: symbolWidth)
             if dynamicTypeSize.isAccessibilitySize {
                 VStack(alignment: .leading, spacing: Theme.Gap.xs) {
                     name
@@ -225,17 +228,17 @@ private struct CategoryRowView: View {
             .lineLimit(dynamicTypeSize.isAccessibilitySize ? 2 : 1)
     }
 
+    /// One text, so at the accessibility sizes the share wraps under the amount instead of
+    /// cutting it to "661…"; it breaks only after the dot.
     private var figures: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 0) {
-            Text(verbatim: row.amount)
-                .font(.body.weight(.semibold))
-                .foregroundStyle(Theme.Color.text)
-            Text(verbatim: " · " + row.percent)
-                .font(.subheadline)
-                .foregroundStyle(Theme.Color.muted)
-        }
-        .tabularDigits()
-        .lineLimit(1)
+        var amount = AttributedString(row.amount.keepingMarksOnTheLine)
+        amount.font = Font.body.weight(.semibold).tabularDigits()
+        amount.foregroundColor = Theme.Color.text
+        var share = AttributedString("\u{00A0}· " + row.percent.keepingMarksOnTheLine)
+        share.font = Font.subheadline.tabularDigits()
+        share.foregroundColor = Theme.Color.muted
+        return Text(amount + share)
+            .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 1)
     }
 }
 

@@ -35,6 +35,8 @@ struct ObligationSheet: View {
                     .submitLabel(.next)
                     .focused($isNameFocused)
                     .onSubmit { isAmountFocused = true }
+                    // A field with a prompt hides its label from VoiceOver: once filled, it read only the name.
+                    .accessibilityLabel(Text(verbatim: ObligationForm.namePrompt.text(in: locale)))
                     .accessibilityIdentifier("obligationForm.name")
                 }
                 .listRowBackground(Theme.Color.card)

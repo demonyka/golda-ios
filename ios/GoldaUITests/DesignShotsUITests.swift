@@ -145,4 +145,231 @@ final class DesignShotsUITests: XCTestCase {
         try shoot("prepay")
         app.buttons["prepay.done"].tap()
     }
+
+    /// Not a check either: every screen of `DESIGN.md` → «Экраны» for the stage 2 audit, run once
+    /// per language, appearance and text size (`simctl ui … appearance` / `content_size`). Beside
+    /// each picture lies the accessibility tree (`.txt`), so a button without a spoken label shows
+    /// up in a search. A screen that cannot be reached is recorded and the walk goes on, so one
+    /// run at a large size still pictures the rest.
+    @MainActor
+    func testEveryScreenForTheAudit() throws {
+        let environment = ProcessInfo.processInfo.environment
+        guard let directory = environment["GOLDA_SHOTS_DIR"] else { throw XCTSkip("Screenshots are taken on request only.") }
+        continueAfterFailure = true
+        let prefix = (environment["GOLDA_SHOTS_NAME"] ?? environment["GOLDA_SHOTS_LANG"] ?? "en") + "-audit"
+        var step = 0
+        func shoot(_ walk: Walk, _ name: String) {
+            Thread.sleep(forTimeInterval: 0.8)
+            step += 1
+            let base = (directory as NSString).appendingPathComponent(String(format: "%@-%02d-%@", prefix, step, name))
+            try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: base + ".png"))
+            try? walk.app.debugDescription.write(toFile: base + ".txt", atomically: true, encoding: .utf8)
+        }
+        func appear(_ element: XCUIElement, _ name: String) -> Bool {
+            if element.waitForExistence(timeout: 8) { return true }
+            XCTFail("not reached: \(name)")
+            return false
+        }
+        func toTop(_ walk: Walk) {
+            for _ in 0..<6 { walk.app.swipeDown(velocity: .fast) }
+        }
+
+        // Onboarding, on a fresh install.
+        var walk = Walk(samples: false, shotsName: "audit")
+        for (index, name) in ["onboarding-income", "onboarding-currencies", "onboarding-accounts"].enumerated() {
+            let next = walk.app.buttons[index == 2 ? "onboarding.done" : "onboarding.next"]
+            guard appear(next, name) else { break }
+            shoot(walk, name)
+            if index < 2 { next.tapIfThere() }
+        }
+        walk.app.terminate()
+
+        // The voice consent, on the made-up person's books.
+        walk = Walk(extra: ["-golda.voiceStub=shawarma", "-golda.voiceStub.noConsent"], shotsName: "audit")
+        let app = walk.app
+        if appear(walk.homeHero, "home") {
+            shoot(walk, "home")
+            app.swipeUp(velocity: .slow)
+            shoot(walk, "home-scrolled")
+            toTop(walk)
+        }
+        walk.mic.tapIfThere()
+        if appear(app.buttons["voiceConsent.notNow"], "consent") {
+            shoot(walk, "voice-consent")
+            app.buttons["voiceConsent.notNow"].tapIfThere()
+        }
+
+        // The operation form: an operation of Home, then a new one in each type, then "Not sure".
+        let operation = walk.operations.firstMatch
+        if appear(operation, "operation") {
+            operation.tapIfThere()
+            if appear(app.buttons["entry.cancel"], "entry-edit") {
+                shoot(walk, "entry-edit")
+                app.buttons["entry.cancel"].tapIfThere()
+            }
+        }
+        walk.tapToolbar("add")
+        let amount = app.textFields["entry.amount"]
+        if appear(amount, "entry-new") {
+            amount.typeText("12")
+            shoot(walk, "entry-new")
+            walk.dismissKeyboard()
+            shoot(walk, "entry-new-no-keyboard")
+            let types = app.segmentedControls["entry.type"]
+            for (english, russian) in [("Income", "Доход"), ("Transfer", "Перевод")] {
+                types.buttons[walk.text(english, russian)].tapIfThere()
+                shoot(walk, "entry-" + english.lowercased())
+            }
+            types.buttons[walk.text("Expense", "Расход")].tapIfThere()
+            let consider = app.buttons["entry.consider"]
+            walk.reveal(consider)
+            consider.tapIfThere()
+            if appear(app.buttons["entry.buy"], "entry-not-sure") { shoot(walk, "entry-not-sure") }
+            app.buttons["entry.back"].tapIfThere()
+            app.buttons["entry.cancel"].tapIfThere()
+        }
+
+        // Accounts, a new account's form, an account's page with its form and reconcile, the
+        // bookkeeping sheet of the adjustment, and the loan with its calculator.
+        walk.openTab("Accounts", "Счета", waitingFor: "accounts.hero")
+        shoot(walk, "accounts")
+        app.swipeUp(velocity: .slow)
+        shoot(walk, "accounts-scrolled")
+        let add = app.buttons["accounts.add"]
+        walk.reveal(add)
+        shoot(walk, "accounts-bottom")
+        add.tapIfThere()
+        if appear(app.buttons["accountForm.cancel"], "account-form-new") {
+            walk.dismissKeyboard()
+            shoot(walk, "account-form-new")
+            app.buttons["accountForm.cancel"].tapIfThere()
+        }
+        toTop(walk)
+        let card = walk.accountRow("Карта ₽")
+        walk.reveal(card)
+        card.tapIfThere()
+        if appear(walk.any("account.hero"), "account-page") {
+            shoot(walk, "account-page")
+            app.buttons["account.edit"].tapIfThere()
+            if appear(app.buttons["accountForm.cancel"], "account-form-edit") {
+                shoot(walk, "account-form-edit")
+                app.buttons["accountForm.cancel"].tapIfThere()
+            }
+            app.buttons["account.reconcile"].tapIfThere()
+            let actual = app.textFields["reconcile.amount"]
+            if appear(actual, "reconcile") {
+                walk.type("9000", into: actual)
+                shoot(walk, "reconcile")
+                app.buttons["reconcile.save"].tapIfThere()
+                let adjustment = app.buttons.matching(identifier: "account.operation").firstMatch
+                if appear(adjustment, "bookkeeping") {
+                    walk.reveal(adjustment)
+                    adjustment.tapIfThere()
+                    if appear(app.buttons["bookkeeping.delete"], "bookkeeping") {
+                        shoot(walk, "bookkeeping")
+                        app.buttons["entry.cancel"].tapIfThere()
+                    }
+                }
+            }
+            walk.back()
+        }
+        let loan = walk.accountRow("Кредит")
+        walk.reveal(loan)
+        loan.tapIfThere()
+        if appear(walk.any("account.hero"), "loan") {
+            shoot(walk, "loan")
+            let prepay = app.buttons["debt.prepay"]
+            walk.reveal(prepay)
+            shoot(walk, "loan-terms")
+            prepay.tapIfThere()
+            if appear(app.buttons["prepay.done"], "prepay") {
+                shoot(walk, "prepay")
+                app.buttons["prepay.done"].tapIfThere()
+            }
+            walk.back()
+        }
+
+        // Goals with the goal form.
+        walk.openTab("Goals", "Цели", waitingFor: "goals.hero")
+        shoot(walk, "goals")
+        app.swipeUp(velocity: .slow)
+        shoot(walk, "goals-scrolled")
+        let addGoal = app.buttons["goals.add"]
+        walk.reveal(addGoal)
+        shoot(walk, "goals-bottom")
+        addGoal.tapIfThere()
+        if appear(app.buttons["goalForm.cancel"], "goal-form") {
+            walk.dismissKeyboard()
+            shoot(walk, "goal-form")
+            app.buttons["goalForm.cancel"].tapIfThere()
+        }
+
+        // Insights down to its last card, and a range of one's own.
+        walk.openTab("Insights", "Аналитика", waitingFor: "insights.ring")
+        shoot(walk, "insights")
+        for index in 1...3 {
+            app.swipeUp(velocity: .slow)
+            shoot(walk, "insights-scrolled-\(index)")
+        }
+        toTop(walk)
+        let period = app.segmentedControls["insights.period"]
+        if appear(period, "insights-range") {
+            period.buttons.element(boundBy: period.buttons.count - 1).tapIfThere()
+            if appear(app.buttons["insights.range.cancel"], "insights-range") {
+                shoot(walk, "insights-range")
+                app.buttons["insights.range.cancel"].tapIfThere()
+            }
+        }
+
+        // The settings, a pick sheet and the licences.
+        walk.openTab("Home", "Главная", waitingFor: "home.hero")
+        walk.tapToolbar("settings")
+        if appear(app.buttons["settings.done"], "settings") {
+            shoot(walk, "settings")
+            app.buttons["settings.main"].tapIfThere()
+            if appear(app.buttons["settings.pick.done"], "settings-pick") {
+                shoot(walk, "settings-pick")
+                app.buttons["settings.pick.done"].tapIfThere()
+            }
+            app.swipeUp(velocity: .slow)
+            shoot(walk, "settings-scrolled")
+            let licences = app.buttons["settings.licences.row"]
+            walk.reveal(licences)
+            shoot(walk, "settings-bottom")
+            licences.tapIfThere()
+            if appear(walk.any("settings.licences"), "licences") {
+                shoot(walk, "licences")
+                walk.back()
+            }
+            app.buttons["settings.done"].tapIfThere()
+        }
+
+        // The profiles and a profile's screen.
+        app.buttons["profileMenu"].tapIfThere()
+        if appear(app.buttons["profileMenu.manage"], "profile-menu") {
+            shoot(walk, "profile-menu")
+            app.buttons["profileMenu.manage"].tapIfThere()
+        }
+        if appear(app.buttons["profiles.done"], "profiles") {
+            shoot(walk, "profiles")
+            app.buttons.matching(identifier: "profiles.row").firstMatch.tapIfThere()
+            if appear(app.buttons["profile.name"], "profile") {
+                shoot(walk, "profile")
+                app.swipeUp(velocity: .slow)
+                shoot(walk, "profile-scrolled")
+            }
+        }
+    }
+}
+
+private extension XCUIElement {
+    /// A tap that records a miss instead of ending the walk: a tap on a missing element stops a
+    /// test even with `continueAfterFailure`, and the audit should picture the rest.
+    @MainActor
+    func tapIfThere(file: StaticString = #filePath, line: UInt = #line) {
+        guard waitForExistence(timeout: 5), isHittable else {
+            return XCTFail("not tappable: \(self)", file: file, line: line)
+        }
+        tap()
+    }
 }

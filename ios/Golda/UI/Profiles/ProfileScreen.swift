@@ -230,7 +230,7 @@ struct ProfileScreen: View {
                 Text(verbatim: ProfileIncome.hourNetTitle.text(in: locale))
                     .foregroundStyle(Theme.Color.text)
                 if isLarge { hourNet }
-                Text(verbatim: income.lastMonthText(in: locale))
+                Text(verbatim: income.lastMonthText(in: locale).keepingMarksOnTheLine)
                     .font(.subheadline)
                     .tabularDigits()
                     .foregroundStyle(Theme.Color.muted)

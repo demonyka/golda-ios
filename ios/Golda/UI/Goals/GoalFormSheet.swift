@@ -73,6 +73,8 @@ struct GoalFormSheet: View {
             .textInputAutocapitalization(.sentences)
             .submitLabel(.done)
             .focused($focus, equals: .name)
+            // A field with a prompt hides its label from VoiceOver: once filled, it read only the name.
+            .accessibilityLabel(Text(verbatim: GoalFormModel.namePrompt.text(in: locale)))
             .accessibilityIdentifier("goalForm.name")
         }
         .listRowBackground(Theme.Color.card)
@@ -143,6 +145,8 @@ struct GoalFormSheet: View {
             .monospacedDigit()
             .foregroundStyle(form.isSavedInvalid ? Theme.Color.danger : Theme.Color.text)
             .focused($focus, equals: .saved)
+            // The field carries the title for VoiceOver, which otherwise heard a bare "0".
+            .accessibilityLabel(Text(verbatim: title))
             .accessibilityIdentifier("goalForm.saved")
             Text(verbatim: Currencies.symbol(form.currency))
                 .foregroundStyle(Theme.Color.muted)
@@ -152,6 +156,7 @@ struct GoalFormSheet: View {
             if dynamicTypeSize.isAccessibilitySize {
                 VStack(alignment: .leading, spacing: Theme.Gap.xs) {
                     Text(verbatim: title)
+                        .accessibilityHidden(true)
                     field
                 }
             } else {
@@ -159,6 +164,7 @@ struct GoalFormSheet: View {
                     Text(verbatim: title)
                         .lineLimit(1)
                         .layoutPriority(1)
+                        .accessibilityHidden(true)
                     field
                 }
             }

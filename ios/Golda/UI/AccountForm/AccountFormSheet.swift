@@ -85,6 +85,8 @@ struct AccountFormSheet: View {
             .textInputAutocapitalization(.sentences)
             .submitLabel(.done)
             .focused($focus, equals: .name)
+            // A field with a prompt hides its label from VoiceOver: once named, it read only "Карта ₽".
+            .accessibilityLabel(Text("Name", tableName: "AccountForm"))
             .accessibilityIdentifier("accountForm.name")
             currencyRow
         } footer: {
@@ -213,6 +215,8 @@ struct AccountFormSheet: View {
                 }
                 .submitLabel(.done)
                 .focused($focus, equals: .group)
+                // A field with a prompt hides its label from VoiceOver.
+                .accessibilityLabel(Text("Group", tableName: "AccountForm"))
                 .accessibilityIdentifier("accountForm.newGroup")
             }
         } footer: {
@@ -248,6 +252,8 @@ struct AccountFormSheet: View {
             .monospacedDigit()
             .foregroundStyle(invalid ? Theme.Color.danger : Theme.Color.text)
             .focused($focus, equals: field)
+            // The field carries the title for VoiceOver, which otherwise heard a bare "0".
+            .accessibilityLabel(Text(verbatim: title))
             .accessibilityIdentifier(identifier)
             suffix
                 .foregroundStyle(Theme.Color.muted)
@@ -257,6 +263,7 @@ struct AccountFormSheet: View {
             if dynamicTypeSize.isAccessibilitySize {
                 VStack(alignment: .leading, spacing: Theme.Gap.xs) {
                     Text(verbatim: title)
+                        .accessibilityHidden(true)
                     number
                 }
             } else {
@@ -264,6 +271,7 @@ struct AccountFormSheet: View {
                     Text(verbatim: title)
                         .lineLimit(1)
                         .layoutPriority(1)
+                        .accessibilityHidden(true)
                     number
                 }
             }

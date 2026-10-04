@@ -20,29 +20,35 @@ struct HomeHeroView: View {
                 BigNumber(minor: hero.leftMinor, currency: hero.currency)
                     .padding(.top, Theme.Gap.xs)
                 if !hero.others.isEmpty {
-                    Text(verbatim: "≈ " + hero.others)
+                    Text(verbatim: ("≈ " + hero.others).keepingMarksOnTheLine)
                         .font(.body)
                         .tabularDigits()
                         .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 // The tile's graphite, not its black ink: a black line with no visible track reads as a divider.
                 WavyBar(progress: hero.progress, hero: true, ink: barInk, flat: hero.isBarFlat)
                     .padding(.top, Theme.Gap.m)
+                // In a list row a long line was cut to "7 days to payd…" at the largest sizes
+                // instead of taking a third line; these lines take the height they need.
                 Text(budgetLine)
                     .font(.subheadline)
                     .tabularDigits()
                     .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
                     .padding(.top, Theme.Gap.s)
                 ForEach(Array(hero.graceWarnings.enumerated()), id: \.offset) { _, warning in
-                    Text(verbatim: warning.text(in: locale))
+                    Text(verbatim: warning.text(in: locale).keepingMarksOnTheLine)
                         .font(.subheadline)
+                        .fixedSize(horizontal: false, vertical: true)
                         .padding(.top, Theme.Gap.xs)
                 }
                 if let setAside = hero.setAsideText(in: locale) {
-                    Text(verbatim: setAside)
+                    Text(verbatim: setAside.keepingMarksOnTheLine)
                         .font(.subheadline)
                         .tabularDigits()
                         .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                         .padding(.top, Theme.Gap.xs)
                 }
             }
@@ -60,14 +66,14 @@ struct HomeHeroView: View {
     /// "2 648 ₽ a day ▲120 · 8 days to payday": the pace in the card's main ink when ahead, quiet
     /// when behind, as on Android. One text, so it wraps as a sentence at large type sizes.
     private var budgetLine: AttributedString {
-        var line = AttributedString(hero.perDayText(in: locale))
+        var line = AttributedString(hero.perDayText(in: locale).keepingMarksOnTheLine)
         if let pace = hero.pace, let paceText = hero.paceText {
             var arrow = AttributedString(paceText)
             if pace.isAhead { arrow.foregroundColor = tone.ink }
             line += arrow
         }
         // A no-break space before the dot, so a wrapped line never starts with it.
-        line += AttributedString("\u{00A0}· " + hero.paydayText(in: locale))
+        line += AttributedString("\u{00A0}· " + hero.paydayText(in: locale).keepingMarksOnTheLine)
         return line
     }
 }

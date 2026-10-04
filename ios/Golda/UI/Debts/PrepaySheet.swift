@@ -53,7 +53,7 @@ struct PrepaySheet: View {
             Text(verbatim: PrepayModel.amountCaption.text(in: locale))
         } footer: {
             VStack(alignment: .leading, spacing: Theme.Gap.xs) {
-                Text(verbatim: calculator.owedLine(in: locale))
+                Text(verbatim: calculator.owedLine(in: locale).keepingMarksOnTheLine)
                 if calculator.result(for: text) == nil {
                     Text(verbatim: PrepayModel.prompt.text(in: locale))
                 }
@@ -85,10 +85,10 @@ struct PrepaySheet: View {
         if let savings = result.savingsLine(in: locale), let verdict = result.verdict(in: locale) {
             Section {
                 VStack(alignment: .leading, spacing: Theme.Gap.s) {
-                    Text(verbatim: savings)
+                    Text(verbatim: savings.keepingMarksOnTheLine)
                         .font(.subheadline)
                         .foregroundStyle(Theme.Color.muted)
-                    Text(verbatim: verdict)
+                    Text(verbatim: verdict.keepingMarksOnTheLine)
                         .font(.headline)
                         .foregroundStyle(Theme.Color.text)
                 }

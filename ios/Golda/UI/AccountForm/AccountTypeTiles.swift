@@ -10,6 +10,10 @@ struct AccountTypeTiles: View {
     @Environment(\.locale) private var locale
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    /// One box for every symbol: the five differ in height and width, and without it the names
+    /// sat on different lines in the row and started at different places in the column.
+    @ScaledMetric(relativeTo: .title3) private var symbolHeight: CGFloat = 26
+    @ScaledMetric(relativeTo: .body) private var symbolWidth: CGFloat = 32
 
     var body: some View {
         Group {
@@ -36,6 +40,7 @@ struct AccountTypeTiles: View {
                 if wide {
                     HStack(spacing: Theme.Gap.m) {
                         Image(systemName: Symbols.accountType(type))
+                            .frame(width: symbolWidth)
                         Text(verbatim: title)
                         Spacer(minLength: 0)
                     }
@@ -46,6 +51,7 @@ struct AccountTypeTiles: View {
                     VStack(spacing: Theme.Gap.xs) {
                         Image(systemName: Symbols.accountType(type))
                             .font(.title3)
+                            .frame(height: symbolHeight)
                         Text(verbatim: title)
                             .font(.caption.weight(.medium))
                             .lineLimit(1)
