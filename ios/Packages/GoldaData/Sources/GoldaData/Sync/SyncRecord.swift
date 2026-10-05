@@ -13,6 +13,8 @@ public enum SyncRecordType: String, Codable, Sendable, CaseIterable {
     case obligation = "Obligation"
     case goal = "Goal"
     case wish = "Wish"
+    /// A category of the profile's own (D68).
+    case category = "Category"
 
     /// The table the records of this type are rows of.
     var tableName: String {
@@ -23,6 +25,7 @@ public enum SyncRecordType: String, Codable, Sendable, CaseIterable {
         case .obligation: "obligation"
         case .goal: "goal"
         case .wish: "wish"
+        case .category: "category"
         }
     }
 
@@ -77,6 +80,8 @@ public enum SyncPayload: Equatable, Codable, Sendable {
     /// A goal with its place in the creation order (the oldest becomes main, D27).
     case goal(Goal, createdAt: Int64)
     case wish(Wish)
+    /// A category of the profile's own with its place in the creation order, the order it is listed in.
+    case category(CustomCategory, createdAt: Int64)
 
     public var type: SyncRecordType {
         switch self {
@@ -86,6 +91,7 @@ public enum SyncPayload: Equatable, Codable, Sendable {
         case .obligation: .obligation
         case .goal: .goal
         case .wish: .wish
+        case .category: .category
         }
     }
 
@@ -97,6 +103,7 @@ public enum SyncPayload: Equatable, Codable, Sendable {
         case .obligation(let obligation, _): obligation.id
         case .goal(let goal, _): goal.id
         case .wish(let wish): wish.id
+        case .category(let category, _): category.id
         }
     }
 }

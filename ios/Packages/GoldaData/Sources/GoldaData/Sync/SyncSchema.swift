@@ -21,6 +21,7 @@ enum SyncSchema {
         "obligation": ["name", "amountMinor", "currency", "dayOfMonth"],
         "goal": ["name", "targetMinor", "currency", "accountId", "savedMinor", "isMain"],
         "wish": ["title", "amountMinor", "currency", "createdAt", "decideAt", "status", "decidedAt"],
+        "category": ["name", "kind", "hint", "symbol"],
     ]
 
     static func v2(_ db: Database) throws {
@@ -89,19 +90,10 @@ enum SyncSchema {
             t.column("record", .blob).notNull()
         }
 
-        for (table, columns) in syncedColumns {
-            // The columns as they were then: a later migration that adds one adds it here too.
+        for (table, columns) in syncedColumns where table != "category" {
+            // The tables and columns as they were then: a later migration that adds one adds it here too.
             let columns = columns.filter { !(table == "account" && $0 == "creditLimitMinor") }
-            let profileId = table == "profile" ? "id" : "profileId"
-            func journal(_ row: String, deleted: Bool) -> String {
-                "INSERT OR REPLACE INTO syncJournal (tableName, id, profileId, deleted) VALUES ('\(table)', \(row).id, \(row).\(profileId), \(deleted ? 1 : 0));"
-            }
-            let changed = columns.map { "OLD.\"\($0)\" IS NOT NEW.\"\($0)\"" }.joined(separator: " OR ")
-            try db.execute(sql: """
-                CREATE TRIGGER "syncJournal_\(table)_insert" AFTER INSERT ON "\(table)" BEGIN \(journal("NEW", deleted: false)) END;
-                CREATE TRIGGER "syncJournal_\(table)_update" AFTER UPDATE ON "\(table)" WHEN \(changed) BEGIN \(journal("NEW", deleted: false)) END;
-                CREATE TRIGGER "syncJournal_\(table)_delete" AFTER DELETE ON "\(table)" BEGIN \(journal("OLD", deleted: true)) END;
-                """)
+            try journalTriggers(table, columns: columns, db)
         }
     }
 
@@ -154,6 +146,36 @@ enum SyncSchema {
         try db.execute(sql: """
             DROP TRIGGER "syncJournal_account_update";
             CREATE TRIGGER "syncJournal_account_update" AFTER UPDATE ON "account" WHEN \(changed) BEGIN INSERT OR REPLACE INTO syncJournal (tableName, id, profileId, deleted) VALUES ('account', NEW.id, NEW.profileId, 0); END;
+            """)
+    }
+
+    /// Categories of the profile's own (1.0.3, D68): a table of their own, synced like the rest.
+    static func v5(_ db: Database) throws {
+        try db.create(table: "category") { t in
+            t.primaryKey("id", .blob)
+            t.column("profileId", .blob).notNull().indexed().references("profile", onDelete: .cascade)
+            t.column("name", .text).notNull()
+            t.column("kind", .text).notNull()
+            t.column("hint", .text).notNull()
+            t.column("symbol", .text)
+            // Creation order within the profile: the order the categories are listed in.
+            t.column("createdAt", .integer).notNull()
+        }
+        try journalTriggers("category", db)
+    }
+
+    /// The triggers that journal every change of [table]'s synced columns.
+    private static func journalTriggers(_ table: String, columns: [String]? = nil, _ db: Database) throws {
+        let columns = columns ?? syncedColumns[table] ?? []
+        let profileId = table == "profile" ? "id" : "profileId"
+        func journal(_ row: String, deleted: Bool) -> String {
+            "INSERT OR REPLACE INTO syncJournal (tableName, id, profileId, deleted) VALUES ('\(table)', \(row).id, \(row).\(profileId), \(deleted ? 1 : 0));"
+        }
+        let changed = columns.map { "OLD.\"\($0)\" IS NOT NEW.\"\($0)\"" }.joined(separator: " OR ")
+        try db.execute(sql: """
+            CREATE TRIGGER "syncJournal_\(table)_insert" AFTER INSERT ON "\(table)" BEGIN \(journal("NEW", deleted: false)) END;
+            CREATE TRIGGER "syncJournal_\(table)_update" AFTER UPDATE ON "\(table)" WHEN \(changed) BEGIN \(journal("NEW", deleted: false)) END;
+            CREATE TRIGGER "syncJournal_\(table)_delete" AFTER DELETE ON "\(table)" BEGIN \(journal("OLD", deleted: true)) END;
             """)
     }
 }

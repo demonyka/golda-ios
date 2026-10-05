@@ -237,6 +237,8 @@ struct EntryPillLabel: View {
 /// names no longer fit four abreast, so the tiles become full-width rows.
 struct EntryCategoryGrid: View {
     let categories: [GoldaCore.Category]
+    /// Names and symbols, the person's own categories' included (D68).
+    var catalog: CategoryCatalog = .builtIn
     let selected: String?
     var onPick: (String) -> Void
 
@@ -256,14 +258,14 @@ struct EntryCategoryGrid: View {
 
     private func tile(_ category: GoldaCore.Category, wide: Bool) -> some View {
         let picked = category.key == selected
-        let name = CategoryName.resource(category.key).text(in: locale)
+        let name = catalog.name(category.key, in: locale)
         return Button {
             onPick(category.key)
         } label: {
             Group {
                 if wide {
                     HStack(spacing: Theme.Gap.m) {
-                        Image(systemName: Symbols.category(category.key))
+                        Image(systemName: catalog.symbol(category.key))
                         Text(verbatim: name)
                         Spacer(minLength: 0)
                     }
@@ -272,7 +274,7 @@ struct EntryCategoryGrid: View {
                     .padding(.vertical, Theme.Gap.s)
                 } else {
                     VStack(spacing: Theme.Gap.xs) {
-                        Image(systemName: Symbols.category(category.key))
+                        Image(systemName: catalog.symbol(category.key))
                             .font(.title3)
                             .foregroundStyle(picked ? Theme.Color.onGraphite : Theme.Color.muted)
                         Text(verbatim: name)

@@ -14,6 +14,8 @@ enum Schema {
         migrator.registerMigration("v3", migrate: SyncSchema.v3)
         // A credit card's limit (1.0.1, D62).
         migrator.registerMigration("v4", migrate: SyncSchema.v4)
+        // Categories of the profile's own (1.0.3, D68).
+        migrator.registerMigration("v5", migrate: SyncSchema.v5)
         return migrator
     }
 

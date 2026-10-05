@@ -16,7 +16,8 @@ import Testing
 
     private var now: Int64 { clock.now }
 
-    /// Alice sets «Семья» up (income, payday, two accounts, an expense, a payment, a goal, a wish)
+    /// Alice sets «Семья» up (income, payday, two accounts, an expense, a payment, a goal, a wish,
+    /// a category of her own)
     /// and shares it; Bob, who has his own profile, joins.
     private func sharedFamily(readOnly: Bool = false) async throws -> (alice: Phone, bob: Phone, family: UUID) {
         let alice = try await Phone("alice", cloud: cloud, clock: clock)
@@ -39,6 +40,7 @@ import Testing
         try await alice.repository.saveObligation(Obligation(name: "Аренда", amountMinor: 3_000_000, currency: "RUB", dayOfMonth: 5), profileId: family)
         try await alice.repository.saveGoal(Goal(name: "Отпуск", targetMinor: 30_000_000, currency: "RUB", isMain: true), profileId: family)
         try await alice.repository.think(Consider(title: "Велосипед", amountMinor: 4_000_000, currency: "RUB"), profileId: family)
+        try await alice.repository.saveCategory(CustomCategory(name: "Кот", kind: .expense, hint: "корм"), profileId: family)
         try await alice.sync()
 
         await cloud.share(family, of: "alice", with: "bob", readOnly: readOnly)
@@ -60,6 +62,7 @@ import Testing
         #expect(left.obligations == right.obligations, sourceLocation: sourceLocation)
         #expect(left.goals == right.goals, sourceLocation: sourceLocation)
         #expect(left.wishes == right.wishes, sourceLocation: sourceLocation)
+        #expect(left.categories == right.categories, sourceLocation: sourceLocation)
         #expect(try await a.balances(profileId) == b.balances(profileId), sourceLocation: sourceLocation)
         let leftToday = try await a.safeToSpend(profileId, at: now)
         let rightToday = try await b.safeToSpend(profileId, at: now)
@@ -71,6 +74,7 @@ import Testing
         #expect(try await bob.profiles().map(\.name) == ["Личный", "Семья"])
         try await expectSameBooks(alice, bob, family)
         #expect(try await bob.balances(family) == ["Общая карта": 5_750_000, "Наличные": 500_000])
+        #expect(try await bob.books(family)?.categories.map(\.name) == ["Кот"])
         // Bob's own profile never left his phone.
         #expect(try await alice.profiles().map(\.name) == ["Семья"])
     }

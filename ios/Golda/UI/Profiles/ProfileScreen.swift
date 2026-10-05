@@ -24,6 +24,8 @@ struct ProfileScreen: View {
     @State private var snapshot: ProfileSnapshot?
     @State private var editing: Edit?
     @State private var paymentForm: PaymentFormRequest?
+    @State private var categoryForm: CategoryFormRequest?
+    @State private var categoryDeletion: CategoryDeletion?
     @State private var naming: ProfileNameRequest?
     @State private var deletion: ProfileDeletion?
     @State private var toast: UndoToast?
@@ -44,6 +46,17 @@ struct ProfileScreen: View {
     private struct PaymentFormRequest: Identifiable {
         let obligation: Obligation?
         let id = UUID()
+    }
+
+    private struct CategoryFormRequest: Identifiable {
+        let category: CustomCategory?
+        let id = UUID()
+    }
+
+    /// A category about to go, with how many operations it would send to "Прочее".
+    private struct CategoryDeletion {
+        let category: CustomCategory
+        let operations: Int
     }
 
     var body: some View {
@@ -70,6 +83,25 @@ struct ProfileScreen: View {
                     onSave: save, onDelete: delete
                 )
             }
+        }
+        .sheet(item: $categoryForm) { request in
+            CategorySheet(editing: request.category, onSave: save, onDelete: askToDelete)
+        }
+        .alert(
+            Text(verbatim: categoryDeletion.map { CategoryForm.deleteQuestion($0.category.name, in: locale) } ?? ""),
+            isPresented: Binding(get: { categoryDeletion != nil }, set: { if !$0 { categoryDeletion = nil } }),
+            presenting: categoryDeletion
+        ) { deletion in
+            Button(role: .destructive) {
+                delete(deletion.category)
+            } label: {
+                Text(verbatim: CategoryForm.deleteTitle.text(in: locale))
+            }
+            Button(role: .cancel) {} label: {
+                Text("Cancel", tableName: "Profiles", comment: "Closes an alert or a sheet without changes.")
+            }
+        } message: { deletion in
+            Text(verbatim: CategoryForm.deleteMessage(operations: deletion.operations, kind: deletion.category.kind, in: locale))
         }
         .profileNameAlert($naming) { name in rename(to: name) }
         .alert(
@@ -182,6 +214,17 @@ struct ProfileScreen: View {
                 Text(verbatim: Self.paymentsNote.text(in: locale))
             }
 
+            Section {
+                ForEach(snapshot.categories) { category in
+                    categoryRow(category)
+                }
+                addCategoryRow
+            } header: {
+                Text(verbatim: Self.categoriesTitle.text(in: locale))
+            } footer: {
+                Text(verbatim: Self.categoriesNote.text(in: locale))
+            }
+
             sharingSection(profile, sharing: sharing)
 
             Section {
@@ -224,6 +267,7 @@ struct ProfileScreen: View {
         .scrollContentBackground(.hidden)
         .background(Theme.Color.page)
         .animation(.snappy, value: snapshot.obligations)
+        .animation(.snappy, value: snapshot.categories)
     }
 
     /// Who the profile is shared with, "Пригласить…" (the system share sheet: AirDrop, Messages,
@@ -455,6 +499,68 @@ struct ProfileScreen: View {
         .accessibilityIdentifier("profile.addPayment")
     }
 
+    /// One's own category: its icon, its name, and what goes in it underneath.
+    private func categoryRow(_ category: CustomCategory) -> some View {
+        Button {
+            categoryForm = CategoryFormRequest(category: category)
+        } label: {
+            HStack(spacing: Theme.Gap.m) {
+                Image(systemName: category.symbol ?? Symbols.other)
+                    .foregroundStyle(Theme.Color.muted)
+                    .frame(width: ProfileSymbols.width)
+                    .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(verbatim: category.name)
+                        .foregroundStyle(Theme.Color.text)
+                    let detail = [
+                        (category.kind == .expense ? CategoryForm.expenseTitle : CategoryForm.incomeTitle).text(in: locale),
+                        category.hint.trimmingCharacters(in: .whitespacesAndNewlines),
+                    ].filter { !$0.isEmpty }.joined(separator: " · ")
+                    Text(verbatim: detail)
+                        .font(.subheadline)
+                        .foregroundStyle(Theme.Color.muted)
+                        .lineLimit(2)
+                }
+                Spacer(minLength: 0)
+            }
+            .contentShape(.rect)
+        }
+        .listRowBackground(Theme.Color.card)
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("profile.category")
+        .swipeActions(edge: .trailing) {
+            Button(role: .destructive) {
+                askToDelete(category)
+            } label: {
+                Label {
+                    Text(verbatim: CategoryForm.deleteTitle.text(in: locale))
+                } icon: {
+                    Image(systemName: Symbols.delete)
+                }
+            }
+        }
+    }
+
+    /// "+ Категория" in the system blue, as "+ Платёж" above it.
+    private var addCategoryRow: some View {
+        Button {
+            categoryForm = CategoryFormRequest(category: nil)
+        } label: {
+            HStack(spacing: Theme.Gap.m) {
+                Image(systemName: Symbols.add)
+                    .frame(width: ProfileSymbols.width)
+                Text(verbatim: Self.addCategoryTitle.text(in: locale))
+            }
+            .font(.body.weight(.medium))
+            .foregroundStyle(.tint)
+            .frame(maxWidth: .infinity, minHeight: Theme.minimumTarget, alignment: .leading)
+            .contentShape(.rect)
+        }
+        .listRowBackground(Theme.Color.card)
+        .accessibilityLabel(Text(verbatim: Self.addCategoryLabel.text(in: locale)))
+        .accessibilityIdentifier("profile.addCategory")
+    }
+
     @ViewBuilder private func sheet(_ edit: Edit, settings: ProfileSettings) -> some View {
         switch edit {
         case .rate: RateSheet(settings: settings, onSave: update)
@@ -515,6 +621,39 @@ struct ProfileScreen: View {
                 try await model.saveObligation(obligation, profileId: profileId)
             } catch {
                 log.error("Saving a payment failed: \(String(describing: error))")
+                failed = true
+            }
+        }
+    }
+
+    private func save(_ category: CustomCategory) {
+        let model = model, profileId = profileId
+        Task {
+            do {
+                try await model.saveCategory(category, profileId: profileId)
+            } catch {
+                log.error("Saving a category failed: \(String(describing: error))")
+                failed = true
+            }
+        }
+    }
+
+    /// Counts what the category holds, then asks: its operations go to "Прочее" for good.
+    private func askToDelete(_ category: CustomCategory) {
+        let model = model, profileId = profileId
+        Task {
+            let operations = (try? await model.operationCount(categoryKey: category.key, profileId: profileId)) ?? 0
+            categoryDeletion = CategoryDeletion(category: category, operations: operations)
+        }
+    }
+
+    private func delete(_ category: CustomCategory) {
+        let model = model, profileId = profileId
+        Task {
+            do {
+                try await model.deleteCategory(category, profileId: profileId)
+            } catch {
+                log.error("Deleting a category failed: \(String(describing: error))")
                 failed = true
             }
         }
@@ -603,6 +742,13 @@ struct ProfileScreen: View {
     )
     static let addPaymentTitle = LocalizedStringResource("Payment", table: "Profiles", comment: "A payment: the title of the payment form when changing one, and the last row of the payments, “+ Payment”.")
     static let addPaymentLabel = LocalizedStringResource("Add payment", table: "Profiles", comment: "VoiceOver: the “+ Payment” row.")
+    static let categoriesTitle = LocalizedStringResource("Your categories", table: "Profiles", comment: "Profile screen: the header over the categories made by the person.")
+    static let categoriesNote = LocalizedStringResource(
+        "The built-in categories stay as they are. Voice files into yours too: what goes in each tells it where things belong.",
+        table: "Profiles", comment: "Profile screen: what one's own categories are for."
+    )
+    static let addCategoryTitle = LocalizedStringResource("Category", table: "Profiles", comment: "A category of one’s own: the title of the category form when changing one, and the last row of the categories, “+ Category”.")
+    static let addCategoryLabel = LocalizedStringResource("Add category", table: "Profiles", comment: "VoiceOver: the “+ Category” row.")
     static let failureText = LocalizedStringResource("The change was not saved. Try again.", table: "Profiles", comment: "Profile screens: saving or deleting failed.")
 }
 

@@ -157,6 +157,8 @@ final class BackupHarness {
                 Wish(id: StoreFixture.id(940), title: "Пылесос", amountMinor: 3_000_000, currency: "RUB", createdAt: 1_789_000_000_000, decideAt: 1_790_500_000_000),
                 profileId: family
             )
+            try store.save(CustomCategory(id: StoreFixture.id(950), name: "Кот", kind: .expense, hint: "корм", symbol: "cat"), profileId: family)
+            try store.save(CustomCategory(id: StoreFixture.id(951), name: "Аренда", kind: .income), profileId: family)
             try store.save([RateRecord(code: "USD", rubPerUnit: 83.25, date: "2026-09-21"), RateRecord(code: "EUR", rubPerUnit: 90.4, date: "2026-09-21")])
         }
     }

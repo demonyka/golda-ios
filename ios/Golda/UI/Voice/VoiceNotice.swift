@@ -9,6 +9,8 @@ struct VoiceBooks: Sendable {
     var currencies: [UUID: String]
     var base: Base
     var profileName: String?
+    /// For the names of the profile's own categories (D68).
+    var categories: CategoryCatalog = .builtIn
 }
 
 /// What the voice tells the person, as data: the sentence and what its button does. The texts are
@@ -84,7 +86,7 @@ struct VoiceNotice: Equatable, Sendable {
         let title: String = if !draft.note.allSatisfy(\.isWhitespace) {
             draft.note
         } else if let key = draft.categoryKey {
-            CategoryName.resource(key).text(in: locale)
+            (books?.categories ?? .builtIn).name(key, in: locale)
         } else {
             Strings.saved.text(in: locale)
         }

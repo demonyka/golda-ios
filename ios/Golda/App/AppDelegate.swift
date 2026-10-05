@@ -17,6 +17,17 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
         return configuration
     }
 
+    /// CloudKit's silent push: the other phone wrote. A closed app is launched with no window, so
+    /// the sync starts here, and the widgets get the new figures without the app being opened.
+    func application(
+        _ application: UIApplication,
+        didReceiveRemoteNotification userInfo: [AnyHashable: Any]
+    ) async -> UIBackgroundFetchResult {
+        guard ReminderBackground.sync != nil else { return .noData }
+        await ReminderBackground.catchUp()
+        return .newData
+    }
+
     /// Whether [item] was the app's: only the voice note is.
     @discardableResult
     static func answer(_ item: UIApplicationShortcutItem) -> Bool {

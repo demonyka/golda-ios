@@ -64,10 +64,12 @@ public struct ProfileSnapshot: Equatable, Sendable {
     public var goals: [Goal]
     /// By status, then the latest decision date first.
     public var wishes: [Wish]
+    /// The profile's own categories, in the order they were made (D68).
+    public var categories: [CustomCategory]
 
     public init(
         profile: Profile, accounts: [Account], operations: [OperationFull], obligations: [Obligation], goals: [Goal],
-        wishes: [Wish]
+        wishes: [Wish], categories: [CustomCategory] = []
     ) {
         self.profile = profile
         self.accounts = accounts
@@ -75,5 +77,6 @@ public struct ProfileSnapshot: Equatable, Sendable {
         self.obligations = obligations
         self.goals = goals
         self.wishes = wishes
+        self.categories = categories
     }
 }

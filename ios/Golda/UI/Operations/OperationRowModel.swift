@@ -63,6 +63,7 @@ struct OperationRowModel: Identifiable, Equatable, Sendable {
         let outAccount = data.accountById[out.accountId]
         let intoAccount = into.flatMap { data.accountById[$0.accountId] }
         let category = op.categoryKey.flatMap { key in Category.builtIn.first { $0.key == key } }
+        let ownCategory = op.categoryKey.flatMap(data.categories.own)
         let code = outAccount?.currency ?? "RUB"
         let own = accountId.flatMap { id in full.postings.first { $0.accountId == id } }
         let ownCode = own.flatMap { data.accountById[$0.accountId]?.currency } ?? code
@@ -70,6 +71,8 @@ struct OperationRowModel: Identifiable, Equatable, Sendable {
         var title: Title
         if !op.note.isBlank {
             title = .verbatim(op.note)
+        } else if let ownCategory {
+            title = .verbatim(ownCategory.name)
         } else if let category {
             title = .category(category.key)
         } else {
@@ -122,7 +125,7 @@ struct OperationRowModel: Identifiable, Equatable, Sendable {
         }
 
         self.operation = full
-        self.symbol = Symbols.operation(categoryKey: category?.key, type: op.type)
+        self.symbol = ownCategory.map { data.categories.symbol($0.key) } ?? Symbols.operation(categoryKey: category?.key, type: op.type)
         self.title = title
         self.supporting = supporting
         author = data.authorship?.byOperation[op.id]

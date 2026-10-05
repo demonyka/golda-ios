@@ -205,6 +205,10 @@ public final class SyncStore: Sendable {
                 }
             case .wish:
                 payload = try store.wish(ref.id, profileId: profileId).map(SyncPayload.wish)
+            case .category:
+                payload = try CategoryRecord.owned(by: profileId).filter(id: ref.id).fetchOne(db).map {
+                    .category($0.category, createdAt: $0.createdAt ?? 0)
+                }
             }
             guard let payload else { return nil }
             let meta = try SyncLedger.meta(ref.type, ref.id, db)

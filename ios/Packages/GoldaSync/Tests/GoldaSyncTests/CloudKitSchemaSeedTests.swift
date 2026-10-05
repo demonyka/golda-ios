@@ -26,6 +26,7 @@ import Testing
             .operation: ["categoryKey", "voiceText", "purchaseAmountMinor", "purchaseCurrency", "cbrFrom", "cbrTo", "postings"],
             .goal: ["accountId"],
             .wish: ["decidedAt"],
+            .category: ["symbol"],
         ]
         for (type, keys) in optional {
             #expect(fields[type.rawValue]?.isSuperset(of: keys) == true, "\(type): \(fields[type.rawValue] ?? [])")

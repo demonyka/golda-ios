@@ -18,7 +18,16 @@ enum ReminderBackground {
     static weak var scheduler: ReminderScheduler?
     /// The model's widget snapshot, which the task writes from the books for the same reason.
     static weak var widgets: TodayWidgetPublisher?
+    /// The model's sync: the figures written are worth little without the other phones' changes.
+    static weak var sync: AppSync?
     private static var isRegistered = false
+
+    /// Woken with no window (the refresh, a silent push of the other phones' changes): fetch them,
+    /// then write the widgets from the books, since no screen is there to do it.
+    static func catchUp() async {
+        await sync?.catchUp()
+        await widgets?.publishFromBooks()
+    }
 
     /// Once per process, before the launch finishes, as the system requires; the "Try again" of a
     /// failed launch only points `scheduler` at the new model.
@@ -57,7 +66,7 @@ enum ReminderBackground {
 
     private static func run(_ box: TaskBox) {
         let work = Task {
-            await widgets?.publishFromBooks()
+            await catchUp()
             await scheduler?.replan()
             box.task.setTaskCompleted(success: !Task.isCancelled)
         }
@@ -91,6 +100,7 @@ final class ReminderTaps: NSObject, @preconcurrency UNUserNotificationCenterDele
         UNUserNotificationCenter.current().delegate = shared
         ReminderBackground.scheduler = model.reminders
         ReminderBackground.widgets = model.widgets
+        ReminderBackground.sync = model.sync
         ReminderBackground.register()
     }
 

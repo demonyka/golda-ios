@@ -59,7 +59,7 @@ import Testing
 
     @Test func theNotesPlaceholderSaysWhatTheLineIsFor() {
         func placeholder(_ type: OpType, _ key: String? = nil, deciding: Bool = false) -> String {
-            EntryText.notePlaceholder(type: type, categoryKey: key, deciding: deciding).text(in: Self.ru)
+            EntryText.notePlaceholder(type: type, categoryKey: key, deciding: deciding, in: Self.ru)
         }
         #expect(placeholder(.expense) == "Покупка")
         #expect(placeholder(.income) == "Откуда")

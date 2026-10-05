@@ -213,6 +213,26 @@ public struct Store {
         try deleteOwned(WishRecord.self, id, profileId)
     }
 
+    // MARK: Categories
+
+    /// The profile's own categories in the order they were made (D68).
+    public func categories(profileId: UUID) throws -> [CustomCategory] {
+        try CategoryRecord.owned(by: profileId)
+            .order(Column("createdAt"), Column("id"))
+            .fetchAll(db)
+            .map(\.category)
+    }
+
+    /// [createdAt] as for goals: nil keeps a stored category's place or puts a new one last.
+    public func save(_ category: CustomCategory, profileId: UUID, createdAt: Int64? = nil) throws {
+        try saveInCreationOrder(CategoryRecord(category, profileId: profileId, createdAt: createdAt))
+    }
+
+    @discardableResult
+    public func deleteCategory(_ id: UUID, profileId: UUID) throws -> Bool {
+        try deleteOwned(CategoryRecord.self, id, profileId)
+    }
+
     // MARK: Rates
 
     public func rates() throws -> [RateRecord] {
@@ -237,7 +257,8 @@ public struct Store {
             operations: try operations(profileId: profileId),
             obligations: try obligations(profileId: profileId),
             goals: try goals(profileId: profileId),
-            wishes: try wishes(profileId: profileId)
+            wishes: try wishes(profileId: profileId),
+            categories: try categories(profileId: profileId)
         )
     }
 

@@ -131,6 +131,13 @@ final class AppSync {
         }
     }
 
+    /// Fetches the other phones' changes now, quietly: a push or the background refresh woke the
+    /// app with no window, so nothing on screen started the sync.
+    func catchUp() async {
+        await start()
+        await service?.fetch()
+    }
+
     /// Sends and fetches now: pull to refresh.
     func syncNow() async {
         guard let service else { return }

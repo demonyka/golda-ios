@@ -129,6 +129,7 @@ public actor VoiceService {
         var accounts: [Account]
         var settings: Settings
         var rates: Rates
+        var categories: VoiceCategories
     }
 
     private func work(on file: URL, late: Bool) async -> VoiceOutcome {
@@ -151,8 +152,8 @@ public actor VoiceService {
 
         let zone = zone()
         let system = VoicePrompt.system(
-            accounts: books.accounts, categories: Category.builtIn, settings: books.settings,
-            today: LocalDate(epochMillis: clock(), in: zone)
+            accounts: books.accounts, categories: books.categories.categories, settings: books.settings,
+            today: LocalDate(epochMillis: clock(), in: zone), examples: books.categories.examples
         )
         let result: VoiceResult
         do {
@@ -171,7 +172,7 @@ public actor VoiceService {
         }
 
         let actions = VoiceMapper.actions(
-            result, accounts: books.accounts, categories: Category.builtIn, settings: books.settings, rates: books.rates,
+            result, accounts: books.accounts, categories: books.categories.categories, settings: books.settings, rates: books.rates,
             recordedAt: queue.recordedAt(of: file), zone: zone, unnamedPurchase: unnamedPurchase
         )
         let drafts = actions.compactMap { action -> Draft? in
@@ -217,7 +218,8 @@ public actor VoiceService {
             return Books(
                 accounts: try store.accounts(profileId: profileId),
                 settings: Settings(profile: profile.settings, device: device, profileId: profileId),
-                rates: try Repository.rates(store, markup: profile.settings.markup)
+                rates: try Repository.rates(store, markup: profile.settings.markup),
+                categories: try Repository.voiceCategories(store, profileId: profileId)
             )
         }
     }

@@ -170,6 +170,18 @@ import Testing
         #expect(try await database.read { try $0.wishes(profileId: profileId) } == [bare])
     }
 
+    @Test func category() async throws {
+        let database = try await StoreFixture.database(profiles: 1)
+        let cat = CustomCategory(id: StoreFixture.id(70), name: "Кот", kind: .expense, hint: "корм, ветеринар", symbol: "cat")
+        let bare = CustomCategory(id: StoreFixture.id(71), name: "", kind: .income)
+        try await database.write { store in
+            try store.save(cat, profileId: profileId)
+            try store.save(bare, profileId: profileId)
+        }
+        #expect(try await database.read { try $0.categories(profileId: profileId) } == [cat, bare])
+        #expect(try await database.read { try $0.snapshot(profileId: profileId)?.categories } == [cat, bare])
+    }
+
     @Test func ratesUpsertByCode() async throws {
         let database = try GoldaDatabase.inMemory()
         try await database.write { store in

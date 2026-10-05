@@ -9,14 +9,14 @@ import Testing
     @Test func migrationCreatesEveryTable() async throws {
         let database = try GoldaDatabase.inMemory()
         let tables = [
-            "profile", "account", "operation", "posting", "obligation", "goal", "wish", "rate",
+            "profile", "account", "operation", "posting", "obligation", "goal", "wish", "category", "rate",
             // Sync (v2): the queue and what it needs, in the same file as the books.
             "syncJournal", "syncDevice", "syncZone", "syncOutgoing", "syncMeta", "syncSystemFields", "syncEngineState", "syncInbox",
         ]
         let existing = try await database.writer.read { db in try tables.filter { try db.tableExists($0) } }
         #expect(existing == tables)
         let applied = try await database.writer.read { db in try Schema.migrator.appliedMigrations(db) }
-        #expect(applied == ["v1", "v2", "v3", "v4"])
+        #expect(applied == ["v1", "v2", "v3", "v4", "v5"])
     }
 
     @Test func foreignKeysAreOn() async throws {
@@ -28,11 +28,11 @@ import Testing
     @Test func everyTableButRateBelongsToAProfile() async throws {
         let database = try GoldaDatabase.inMemory()
         let owners = try await database.writer.read { db in
-            try ["account", "operation", "posting", "obligation", "goal", "wish", "rate"].map { table in
+            try ["account", "operation", "posting", "obligation", "goal", "wish", "category", "rate"].map { table in
                 try db.foreignKeys(on: table).contains { $0.destinationTable == "profile" && $0.originColumns == ["profileId"] }
             }
         }
-        #expect(owners == [true, true, true, true, true, true, false])
+        #expect(owners == [true, true, true, true, true, true, true, false])
     }
 
     /// Android's autoincrement ids told the creation order of goals and payments; UUIDs do not, so a
@@ -40,11 +40,11 @@ import Testing
     @Test func goalsAndPaymentsHoldTheirCreationOrder() async throws {
         let database = try await StoreFixture.database(profiles: 1)
         let schema = try await database.writer.read { db in
-            try ["obligation", "goal"].map { table in
+            try ["obligation", "goal", "category"].map { table in
                 try db.columns(in: table).first { $0.name == "createdAt" }.map { "\(table) \($0.type) \($0.isNotNull)" }
             }
         }
-        #expect(schema == ["obligation INTEGER true", "goal INTEGER true"])
+        #expect(schema == ["obligation INTEGER true", "goal INTEGER true", "category INTEGER true"])
         // One day's payments are listed in creation order straight from the index.
         let index = try await database.writer.read { db in
             try db.indexes(on: "obligation").first { $0.name == "obligation_on_profileId_dayOfMonth_createdAt" }?.columns
@@ -155,7 +155,7 @@ import Testing
             (try db.columns(in: "obligation").map(\.name), try Schema.migrator.appliedMigrations(db))
         }
         #expect(schema.0.contains("createdAt"))
-        #expect(schema.1 == ["v1", "v2", "v3", "v4"])
+        #expect(schema.1 == ["v1", "v2", "v3", "v4", "v5"])
         let profileId = StoreFixture.id(1)
         try await database.write { store in
             try store.save(StoreFixture.profile(1))

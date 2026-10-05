@@ -112,6 +112,12 @@ public enum CloudKitMapping {
             values["decideAt"] = wish.decideAt
             values["status"] = wish.status.rawValue
             values["decidedAt"] = wish.decidedAt
+        case .category(let category, let createdAt):
+            values["name"] = category.name
+            values["kind"] = category.kind.rawValue
+            values["hint"] = category.hint
+            values["symbol"] = category.symbol
+            values["createdAt"] = createdAt
         }
         return ck
     }
@@ -213,6 +219,12 @@ public enum CloudKitMapping {
                 id: ref.id, title: title, amountMinor: amountMinor, currency: currency, createdAt: createdAt,
                 decideAt: decideAt, status: status, decidedAt: v.int("decidedAt")
             ))
+        case .category:
+            guard let name = v.string("name"), let kind = v.string("kind").flatMap(CategoryKind.init(rawValue:)) else { return nil }
+            return .category(
+                CustomCategory(id: ref.id, name: name, kind: kind, hint: v.string("hint") ?? "", symbol: v.string("symbol")),
+                createdAt: v.int("createdAt") ?? 0
+            )
         }
     }
 

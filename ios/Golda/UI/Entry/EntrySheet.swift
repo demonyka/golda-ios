@@ -169,9 +169,9 @@ private struct EntryForm: View {
     /// An expense or income: what it was, the account and the day, then every category.
     private var formSection: some View {
         VStack(spacing: Theme.Gap.s) {
-            noteField(EntryText.notePlaceholder(type: form.type, categoryKey: form.categoryKey, deciding: false))
+            noteField(EntryText.notePlaceholder(type: form.type, categoryKey: form.categoryKey, deciding: false, categories: form.data.categories, in: locale))
             pills
-            EntryCategoryGrid(categories: form.categories, selected: form.categoryKey) { form.pickCategory($0) }
+            EntryCategoryGrid(categories: form.categories, catalog: form.data.categories, selected: form.categoryKey) { form.pickCategory($0) }
                 .padding(.top, Theme.Gap.m)
         }
         .padding(.top, Theme.Gap.l)
@@ -180,7 +180,7 @@ private struct EntryForm: View {
     /// A transfer's accounts are in the tiles above; what is left is a note and the day.
     private var transferSection: some View {
         VStack(spacing: Theme.Gap.s) {
-            noteField(EntryText.notePlaceholder(type: .transfer, categoryKey: nil, deciding: false))
+            noteField(EntryText.notePlaceholder(type: .transfer, categoryKey: nil, deciding: false, in: locale))
             HStack {
                 EntryDatePill(date: $form.date, today: form.today, zone: data.zone)
                 Spacer(minLength: 0)
@@ -192,7 +192,7 @@ private struct EntryForm: View {
     private var decidingSection: some View {
         VStack(spacing: Theme.Gap.s) {
             EntryFactsBento(facts: form.facts(facts), isPriced: form.amount != nil)
-            noteField(EntryText.notePlaceholder(type: .expense, categoryKey: nil, deciding: true))
+            noteField(EntryText.notePlaceholder(type: .expense, categoryKey: nil, deciding: true, in: locale))
         }
         .padding(.top, Theme.Gap.l)
     }
@@ -218,9 +218,9 @@ private struct EntryForm: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private func noteField(_ placeholder: LocalizedStringResource) -> some View {
-        TextField(text: $form.note, prompt: Text(verbatim: placeholder.text(in: locale)).foregroundStyle(Theme.Color.muted)) {
-            Text(verbatim: placeholder.text(in: locale))
+    private func noteField(_ placeholder: String) -> some View {
+        TextField(text: $form.note, prompt: Text(verbatim: placeholder).foregroundStyle(Theme.Color.muted)) {
+            Text(verbatim: placeholder)
         }
         .font(.body)
         .textInputAutocapitalization(.sentences)
@@ -324,7 +324,7 @@ private struct EntryForm: View {
 
     private var consider: Consider? {
         form.consider(
-            categoryName: { CategoryName.resource($0).text(in: locale) },
+            categoryName: { [categories = form.data.categories] in categories.name($0, in: locale) },
             unnamed: EntryText.purchase.text(in: locale)
         )
     }
@@ -377,7 +377,7 @@ private struct EntryForm: View {
                 dismiss()
                 guard let token else { return }
                 showUndoToast(UndoToast(
-                    EntryAnnouncement.deleted(operation, in: locale),
+                    EntryAnnouncement.deleted(operation, categories: form.data.categories, in: locale),
                     actionTitle: EntryAnnouncement.restore.text(in: locale),
                     length: .long
                 ) {

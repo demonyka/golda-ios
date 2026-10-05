@@ -90,13 +90,24 @@ public enum VoicePrompt {
     /// The system prompt. [accounts] must be the same list, in the same order, that
     /// `VoiceMapper.actions` later receives: the model answers with positions in it ("3"), which
     /// are short and unambiguous where a UUID is neither.
-    public static func system(accounts: [Account], categories: [Category], settings: Settings, today: LocalDate) -> String {
+    /// [examples]: how the person filed notes before (D68), newest first.
+    public static func system(
+        accounts: [Account], categories: [Category], settings: Settings, today: LocalDate, examples: [CategoryExample] = []
+    ) -> String {
         let accountLines = accounts.enumerated()
             .map { "- \($0.offset + 1): \($0.element.name), \($0.element.currency), \($0.element.type.rawValue.lowercased())" }
             .joined(separator: "\n")
         func cats(_ kind: CategoryKind) -> String {
-            categories.filter { $0.kind == kind }.map { "\($0.key) (\($0.name))" }.joined(separator: ", ")
+            categories.filter { $0.kind == kind }
+                .map { category in "\(category.key) (\(category.name)\(category.hint.map { ": \($0)" } ?? ""))" }
+                .joined(separator: ", ")
         }
+        let filed = examples.isEmpty ? "" : """
+
+
+            Как пользователь раньше раскладывал по категориям (заметка → категория); похожее клади туда же:
+            \(examples.map { "- \($0.note) → \($0.categoryKey)" }.joined(separator: "\n"))
+            """
         let currencyLines = SpokenCurrency.held(accounts, settings).map(SpokenCurrency.line).joined(separator: "\n")
         return """
         Ты разбираешь голосовые записи о личных деньгах в JSON. Ничего не считай и не конвертируй, только извлекай сказанное.
@@ -109,7 +120,7 @@ public enum VoicePrompt {
         \(accountLines)
 
         Категории расходов: \(cats(.expense)).
-        Категории доходов: \(cats(.income)).
+        Категории доходов: \(cats(.income)).\(filed)
 
         Правила:
         - Каждая трата, доход или перевод — отдельный элемент items. «Кофе 8 и круассан 6» — два расхода.
@@ -121,7 +132,7 @@ public enum VoicePrompt {
         - Разменная монета — доля основной валюты: сумму пиши в основной единице, валюту — кодом основной. «50 тетри» — amount "0.50", currency GEL; «2 лари 50 тетри» — "2.50", GEL; «50 копеек» — "0.50", RUB. Это запись числа, а не пересчёт.
         - account_id — номер счёта из списка строкой, только если счёт назван по имени или банку («с Т-Банка», «с мультивалютной», «на накопительный»), иначе null.
         - Если назван только вид счёта, это account_kind, а account_id — null: «с карты», «картой» — card; «наличкой», «налом», «кэшем» — cash; «с кредитки» — credit; «на вклад», «в копилку» — savings. Какой именно счёт этого вида, решит код по валюте. Для перевода то же: to_account_id или to_account_kind («снял с карты» — account_kind card, to_account_kind cash).
-        - category — ключ из списка или null. note — коротко, что купил, с маленькой буквы.
+        - category — ключ из списка или null. После двоеточия у категории сказано, что в неё входит. Своя категория пользователя (ключ custom.…) точнее общей: если трата подходит к ней, выбирай её. note — коротко, что купил, с маленькой буквы.
         - date в формате YYYY-MM-DD, только если назван день («вчера», «в понедельник»), иначе null.
         - Если не про деньги или не разобрать — один элемент с intent unknown.
         """

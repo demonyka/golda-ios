@@ -87,7 +87,7 @@ private func profileRecord(_ name: String, at time: Int64, by device: String) ->
     }
 
     @Test func everyTableOfTheBooksHasItsRecordType() {
-        #expect(SyncRecordType.allCases.map(\.rawValue) == ["Profile", "Account", "Operation", "Obligation", "Goal", "Wish"])
+        #expect(SyncRecordType.allCases.map(\.rawValue) == ["Profile", "Account", "Operation", "Obligation", "Goal", "Wish", "Category"])
         // Postings travel inside their operation's record.
         #expect(Set(SyncRecordType.allCases.map(\.tableName)) == Set(SyncSchema.syncedColumns.keys).subtracting(["posting"]))
     }

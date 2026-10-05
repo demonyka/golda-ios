@@ -18,6 +18,8 @@ struct AppData: Sendable {
     /// The main goal first, then the oldest.
     let goals: [Goal]
     let wishes: [Wish]
+    /// The built-in categories and the profile's own (D68).
+    let categories: CategoryCatalog
     /// Official rates with the profile's markup.
     let rates: Rates
     /// The day of the newest rate in the table, `yyyy-MM-dd`.
@@ -46,6 +48,7 @@ struct AppData: Sendable {
         obligations = snapshot.obligations
         goals = snapshot.goals
         wishes = snapshot.wishes
+        categories = CategoryCatalog(snapshot.categories)
         rates = Rates(
             Dictionary(rateTable.map { ($0.code, $0.rubPerUnit) }, uniquingKeysWith: { _, last in last }),
             markup: snapshot.profile.settings.markup

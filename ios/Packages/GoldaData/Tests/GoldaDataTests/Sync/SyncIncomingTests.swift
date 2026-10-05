@@ -39,6 +39,21 @@ import Testing
         #expect(try await sync.outgoing().isEmpty)
     }
 
+    /// D68: the other phone's categories arrive in their order, and go when deleted there.
+    @Test func categoriesArriveInTheirOrderAndGo() async throws {
+        try await receiveTheProfile()
+        let cat = CustomCategory(name: "Кот", kind: .expense, hint: "корм", symbol: "cat")
+        let rent = CustomCategory(name: "Аренда", kind: .income)
+        try await sync.apply([
+            SyncFixture.record(.category(rent, createdAt: 2), zone: shared, at: now),
+            SyncFixture.record(.category(cat, createdAt: 1), zone: shared, at: now),
+        ])
+        #expect(try await books()?.categories == [cat, rent])
+        try await sync.apply([], deletions: [SyncRecordRef(zone: shared, type: .category, id: cat.id)])
+        #expect(try await books()?.categories == [rent])
+        #expect(try await sync.outgoing().isEmpty)
+    }
+
     @Test func aNewProfileComesAfterThePhonesOwnInTheList() async throws {
         let own = try await harness.profile()
         try await receiveTheProfile()

@@ -29,6 +29,7 @@ import Testing
             try store.save(Obligation(id: StoreFixture.id(40), name: "Аренда", amountMinor: 1, currency: "RUB", dayOfMonth: 5), profileId: personal)
             try store.save(Goal(id: StoreFixture.id(50), name: "Отпуск", targetMinor: 1, currency: "RUB"), profileId: personal)
             try store.save(Wish(id: StoreFixture.id(60), title: "Книга", amountMinor: 1, currency: "RUB", createdAt: 0, decideAt: 0), profileId: personal)
+            try store.save(CustomCategory(id: StoreFixture.id(70), name: "Кот", kind: .expense), profileId: personal)
 
             try store.save(StoreFixture.account(12), profileId: family)
             try store.book(StoreFixture.operation(22, type: .income), [StoreFixture.posting(33, operation: 22, account: 12, amount: 700)], profileId: family)
@@ -45,11 +46,11 @@ import Testing
         #expect(deleted)
 
         let rowsLeft = try await database.writer.read { db in
-            try ["account", "operation", "posting", "obligation", "goal", "wish"].map { table in
+            try ["account", "operation", "posting", "obligation", "goal", "wish", "category"].map { table in
                 try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM \(table) WHERE profileId = ?", arguments: [StoreFixture.id(1)])
             }
         }
-        #expect(rowsLeft == [0, 0, 0, 0, 0, 0])
+        #expect(rowsLeft == [0, 0, 0, 0, 0, 0, 0])
         #expect(try await database.read { try $0.snapshot(profileId: personal) } == nil)
         #expect(try await database.read { try $0.snapshot(profileId: family) } == familyBefore)
         #expect(try await database.read { try $0.rates().count } == 1)

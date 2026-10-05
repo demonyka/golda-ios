@@ -57,7 +57,8 @@ extension AppModel {
                 return VoiceBooks(
                     currencies: Dictionary(accounts.map { ($0.id, $0.currency) }, uniquingKeysWith: { _, last in last }),
                     base: Base.of(settings, rates),
-                    profileName: named ? profile.name : nil
+                    profileName: named ? profile.name : nil,
+                    categories: CategoryCatalog(try store.categories(profileId: profileId))
                 )
             }
         } catch {

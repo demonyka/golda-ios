@@ -48,6 +48,20 @@ extension AppModel {
     // MARK: Payments
 
     /// Adds [obligation] to [profileId], or replaces the one with its id.
+    /// A category of the profile's own, new or changed (D68).
+    func saveCategory(_ category: CustomCategory, profileId: UUID) async throws {
+        try await environment.repository.saveCategory(category, profileId: profileId)
+    }
+
+    /// Deletes the category; its operations go to "Прочее".
+    func deleteCategory(_ category: CustomCategory, profileId: UUID) async throws {
+        try await environment.repository.deleteCategory(category, profileId: profileId)
+    }
+
+    func operationCount(categoryKey: String, profileId: UUID) async throws -> Int {
+        try await environment.repository.operationCount(categoryKey: categoryKey, profileId: profileId)
+    }
+
     func saveObligation(_ obligation: Obligation, profileId: UUID) async throws {
         try await environment.repository.saveObligation(obligation, profileId: profileId)
     }

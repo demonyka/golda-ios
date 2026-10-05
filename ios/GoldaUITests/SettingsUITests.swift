@@ -320,7 +320,7 @@ final class SettingsUITests: XCTestCase {
         let licences = app.buttons["settings.licences.row"]
         reveal(licences, in: app)
         let version = app.descendants(matching: .any)["settings.version"]
-        XCTAssertTrue(version.label.contains("1.0.2 (3)"), version.label)
+        XCTAssertTrue(version.label.contains("1.0.3 (4)"), version.label)
         licences.tap()
         XCTAssertTrue(app.navigationBars["Licences"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Golda"].exists)

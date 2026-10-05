@@ -146,6 +146,7 @@ extension Backup {
         try requireUnique(profiles.flatMap { $0.obligations.map(\.id) }, "obligation")
         try requireUnique(profiles.flatMap { $0.goals.map(\.id) }, "goal")
         try requireUnique(profiles.flatMap { $0.wishes.map(\.id) }, "wish")
+        try requireUnique(profiles.flatMap { $0.categories.map(\.id) }, "category")
 
         for snapshot in profiles {
             let accountIds = Set(snapshot.accounts.map(\.id))

@@ -35,6 +35,7 @@ public enum CloudKitSchemaSeed {
             .obligation(Obligation(name: "Seed", amountMinor: 1, currency: "GEL", dayOfMonth: 1), createdAt: 1),
             .goal(Goal(name: "Seed", targetMinor: 1, currency: "GEL", accountId: accountId, savedMinor: 1, isMain: true), createdAt: 1),
             .wish(Wish(title: "Seed", amountMinor: 1, currency: "GEL", createdAt: 1, decideAt: 1, status: .bought, decidedAt: 1)),
+            .category(CustomCategory(name: "Seed", kind: .expense, hint: "Seed", symbol: "cat"), createdAt: 1),
         ]
         return payloads.map { payload in
             let mapped = CloudKitMapping.ckRecord(

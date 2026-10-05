@@ -402,6 +402,23 @@
         }
       }
     },
+    "Add category" : {
+      "comment" : "VoiceOver: the “+ Category” row.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add category"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить категорию"
+          }
+        }
+      }
+    },
     "Add payment" : {
       "comment" : "VoiceOver: the “+ Payment” row.",
       "localizations" : {
@@ -487,6 +504,40 @@
         }
       }
     },
+    "Category" : {
+      "comment" : "A category of one’s own: the title of the category form when changing one, and the last row of the categories, “+ Category”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Category"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Категория"
+          }
+        }
+      }
+    },
+    "Category name" : {
+      "comment" : "Category form: the placeholder of the category's name, like “Cat”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Category name"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Название категории"
+          }
+        }
+      }
+    },
     "Create" : {
       "comment" : "Name alert: creates the profile.",
       "localizations" : {
@@ -555,6 +606,23 @@
         }
       }
     },
+    "Delete category" : {
+      "comment" : "Category form and row: deletes the category, after asking.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete category"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить категорию"
+          }
+        }
+      }
+    },
     "Delete payment" : {
       "comment" : "Payment form and row: deletes the payment (it can be undone).",
       "localizations" : {
@@ -590,7 +658,7 @@
       }
     },
     "Delete “%@”?" : {
-      "comment" : "Title of the question before a profile is deleted, with its name.",
+      "comment" : "Category: the question before deleting it, with its name.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -725,6 +793,23 @@
         }
       }
     },
+    "For voice: with “food, vet” here, “litter 20 lari” lands in this category." : {
+      "comment" : "Category form: the footer under what goes in the category.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "For voice: with “food, vet” here, “litter 20 lari” lands in this category."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Для голоса: с подсказкой «корм, ветеринар» запись «наполнитель 20 лари» попадёт сюда."
+          }
+        }
+      }
+    },
     "Hasn’t joined yet" : {
       "comment" : "Profile screen, sharing: beside a person who was invited and has not accepted.",
       "localizations" : {
@@ -772,6 +857,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Часов в неделю"
+          }
+        }
+      }
+    },
+    "Icon" : {
+      "comment" : "Category form: the header over the grid of icons.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Icon"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Значок"
           }
         }
       }
@@ -874,6 +976,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Вместе с профилем удалятся его счета, операции, цели, вишлист и платежи. Это не отменить."
+          }
+        }
+      }
+    },
+    "Its operations (%lld) will move to “%@”." : {
+      "comment" : "Category: before deleting one, how many operations move to “Other”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Its operations (%lld) will move to “%@”."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Операции из неё (%lld) перейдут в «%@»."
+          }
+        }
+      }
+    },
+    "Kind" : {
+      "comment" : "Category form: what VoiceOver calls the spending/income picker.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kind"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вид"
           }
         }
       }
@@ -1010,6 +1146,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Название"
+          }
+        }
+      }
+    },
+    "New category" : {
+      "comment" : "Title of the category form when adding one.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New category"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новая категория"
           }
         }
       }
@@ -1354,6 +1507,23 @@
         }
       }
     },
+    "Spending" : {
+      "comment" : "Category form: the category is for expenses.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spending"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Расход"
+          }
+        }
+      }
+    },
     "Stop sharing" : {
       "comment" : "Profile screen, sharing: the owner takes the profile away from everyone invited.",
       "localizations" : {
@@ -1418,6 +1588,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Налог и часы"
+          }
+        }
+      }
+    },
+    "The built-in categories stay as they are. Voice files into yours too: what goes in each tells it where things belong." : {
+      "comment" : "Profile screen: what one's own categories are for.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The built-in categories stay as they are. Voice files into yours too: what goes in each tells it where things belong."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Встроенные категории остаются как есть. Голос раскладывает и по вашим: подсказка «что сюда входит» говорит ему, что куда относится."
           }
         }
       }
@@ -1490,6 +1677,23 @@
         }
       }
     },
+    "There are no operations in it." : {
+      "comment" : "Category: before deleting one with no operations.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There are no operations in it."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В ней нет операций."
+          }
+        }
+      }
+    },
     "There is nothing in it yet." : {
       "comment" : "Question before an empty profile is deleted.",
       "localizations" : {
@@ -1537,6 +1741,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Обновляется сама после обмена рублей"
+          }
+        }
+      }
+    },
+    "What goes in it" : {
+      "comment" : "Category form: the placeholder of the words that tell voice what belongs here.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What goes in it"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Что сюда входит"
           }
         }
       }
@@ -1690,6 +1911,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Хранилище iCloud заполнено. Освободите место, и изменения снова начнут синхронизироваться."
+          }
+        }
+      }
+    },
+    "Your categories" : {
+      "comment" : "Profile screen: the header over the categories made by the person.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your categories"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Свои категории"
           }
         }
       }

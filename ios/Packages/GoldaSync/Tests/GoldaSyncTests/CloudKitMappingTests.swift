@@ -46,6 +46,8 @@ import Testing
             .goal(Goal(name: "Без счёта", targetMinor: 1, currency: "USD"), createdAt: 3),
             .wish(Wish(title: "Велосипед", amountMinor: 1, currency: "RUB", createdAt: 1, decideAt: 2, status: .skipped, decidedAt: 3)),
             .wish(Wish(title: "", amountMinor: 1, currency: "RUB", createdAt: 1, decideAt: 2)),
+            .category(CustomCategory(name: "Кот", kind: .expense, hint: "корм, ветеринар", symbol: "cat"), createdAt: 1),
+            .category(CustomCategory(name: "Аренда", kind: .income), createdAt: 2),
         ]
     }
 

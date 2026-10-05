@@ -98,6 +98,8 @@ struct WireProfile: Codable {
     var obligations: [WireObligation]
     var goals: [WireGoal]
     var wishes: [WireWish]
+    /// The profile's own categories in their order (1.0.3, D68); files before it have none.
+    var categories: [CustomCategory]
 
     init(_ snapshot: ProfileSnapshot, goalCreatedAt: [UUID: Int64], obligationCreatedAt: [UUID: Int64]) {
         id = snapshot.profile.id
@@ -109,6 +111,7 @@ struct WireProfile: Codable {
         obligations = snapshot.obligations.map { WireObligation($0, createdAt: obligationCreatedAt[$0.id]) }
         goals = snapshot.goals.map { WireGoal($0, createdAt: goalCreatedAt[$0.id]) }
         wishes = snapshot.wishes.map(WireWish.init)
+        categories = snapshot.categories
     }
 
     init(from decoder: any Decoder) throws {
@@ -122,13 +125,15 @@ struct WireProfile: Codable {
         obligations = try c.value(.obligations, or: [])
         goals = try c.value(.goals, or: [])
         wishes = try c.value(.wishes, or: [])
+        categories = try c.value(.categories, or: [])
     }
 
     var snapshot: ProfileSnapshot {
         ProfileSnapshot(
             profile: Profile(id: id, name: name, sort: sort, settings: settings.settings),
             accounts: accounts.map(\.account), operations: operations.map(\.full),
-            obligations: obligations.map(\.obligation), goals: goals.map(\.goal), wishes: wishes.map(\.wish)
+            obligations: obligations.map(\.obligation), goals: goals.map(\.goal), wishes: wishes.map(\.wish),
+            categories: categories
         )
     }
 

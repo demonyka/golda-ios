@@ -169,6 +169,59 @@ final class ProfilesUITests: XCTestCase {
     }
 
     @MainActor
+    func testACategoryOfOnesOwnIsOfferedInTheFormAndGoesAfterAsking() {
+        let app = launch()
+        XCTAssertTrue(hero(app).waitForExistence(timeout: 30))
+        openProfiles(app)
+        row("Personal, active", in: app).tap()
+        XCTAssertTrue(app.buttons["profile.name"].waitForExistence(timeout: 5))
+        let add = app.buttons["profile.addCategory"]
+        add.swipeUpUntilHittable(in: app)
+        add.tap()
+        let name = app.textFields["categoryForm.name"]
+        // A tap while the list still glides after the swipes can miss.
+        if !name.waitForExistence(timeout: 3) { add.tap() }
+        XCTAssertTrue(name.waitForExistence(timeout: 5))
+        let save = app.buttons["categoryForm.save"]
+        XCTAssertFalse(save.isEnabled)
+        name.typeText("Cat")
+        let hint = app.textFields["categoryForm.hint"]
+        hint.tap()
+        hint.typeText("food, vet")
+        app.buttons["cat"].tap()
+        save.tap()
+        let category = app.buttons["profile.category"]
+        XCTAssertTrue(category.waitForExistence(timeout: 5))
+        XCTAssertTrue(category.label.contains("Cat"), category.label)
+        XCTAssertTrue(category.label.contains("food, vet"), category.label)
+        back(app)
+        closeProfiles(app)
+
+        // The form offers it beside the built-in ones.
+        let buttons = app.navigationBars.buttons.matching(identifier: "add")
+        buttons.allElementsBoundByIndex.first { $0.exists && $0.isHittable }?.tap()
+        let own = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "entry.category.custom.")).firstMatch
+        XCTAssertTrue(own.waitForExistence(timeout: 5))
+        XCTAssertEqual(own.label, "Cat")
+        app.buttons["entry.cancel"].tap()
+
+        // Deleting it asks first.
+        openProfiles(app)
+        row("Personal, active", in: app).tap()
+        XCTAssertTrue(app.buttons["profile.name"].waitForExistence(timeout: 5))
+        category.swipeUpUntilHittable(in: app)
+        category.tap()
+        let delete = app.buttons["categoryForm.delete"]
+        if !delete.waitForExistence(timeout: 3) { category.tap() }
+        delete.tap()
+        let alert = app.alerts["Delete “Cat”?"]
+        XCTAssertTrue(alert.waitForExistence(timeout: 5))
+        XCTAssertTrue(alert.staticTexts["There are no operations in it."].exists)
+        alert.buttons["Delete category"].tap()
+        XCTAssertTrue(category.waitForNonExistence(timeout: 5))
+    }
+
+    @MainActor
     func testAPaymentIsSetAsideOnHomeAndItsDeleteCanBeUndone() {
         let app = launch()
         XCTAssertTrue(hero(app).waitForExistence(timeout: 30))
@@ -404,5 +457,17 @@ final class ProfilesUITests: XCTestCase {
     private static func daysToPayday(_ payday: Int) -> String {
         let days = daysLeft(to: payday)
         return days == 1 ? "1 day to payday" : "\(days) days to payday"
+    }
+}
+
+private extension XCUIElement {
+    /// Scrolls the list up until the element can be tapped: the profile screen is longer than a phone.
+    @MainActor
+    func swipeUpUntilHittable(in app: XCUIApplication, tries: Int = 10) {
+        var left = tries
+        while !(exists && isHittable), left > 0 {
+            app.swipeUp()
+            left -= 1
+        }
     }
 }

@@ -398,7 +398,7 @@ struct EntryFormModel: Sendable {
         for full in data.operations {
             if let key = full.op.categoryKey { uses[key, default: 0] += 1 }
         }
-        return Category.builtIn.filter { $0.kind == kind }
+        return data.categories.categories(kind)
             .enumerated()
             .sorted { l, r in
                 let a = uses[l.element.key] ?? 0, b = uses[r.element.key] ?? 0

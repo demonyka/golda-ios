@@ -103,6 +103,7 @@ public struct Backups: Sendable {
                     try store.save(goal, profileId: profileId, createdAt: backup.goalCreatedAt[goal.id])
                 }
                 for wish in snapshot.wishes { try store.save(wish, profileId: profileId) }
+                for category in snapshot.categories { try store.save(category, profileId: profileId) }
             }
             guard let first = try store.profiles().first else { throw BackupError.noProfiles }
             return first.id

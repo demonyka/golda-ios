@@ -10,6 +10,8 @@ import GoldaCore
 enum CategoryTitle: Equatable, Sendable {
     /// A built-in category by its key; a key the app does not know reads "Other".
     case key(String)
+    /// A category of the person's own, by the name they gave it (D68).
+    case own(String)
     /// An expense without a category.
     case none
     /// The folded slice: what is under the share a ring slice needs.
@@ -22,6 +24,7 @@ enum CategoryTitle: Equatable, Sendable {
     func text(in locale: Locale) -> String {
         switch self {
         case .key(let key): CategoryName.resource(key).text(in: locale)
+        case .own(let name): name
         case .none: LocalizedStringResource("No category", comment: "Row title of an operation with neither a note nor a category.").text(in: locale)
         case .rest: LocalizedStringResource("Everything else", table: "Insights", comment: "Insights: the ring slice that gathers the small categories.").text(in: locale)
         }
@@ -154,7 +157,7 @@ struct InsightsContent: Equatable, Sendable {
         func share(_ rub: Int64) -> Double { report.spentRub > 0 ? Double(rub) / Double(report.spentRub) : 0 }
         var slices = own.enumerated().map { index, spend in
             InsightsSlice(
-                id: index, title: CategoryTitle(spend.categoryKey), rubMinor: spend.rubMinor,
+                id: index, title: data.categories.title(spend.categoryKey), rubMinor: spend.rubMinor,
                 share: share(spend.rubMinor), amount: base.approx(spend.rubMinor), value: base.major(spend.rubMinor), isRest: false
             )
         }
@@ -162,7 +165,7 @@ struct InsightsContent: Equatable, Sendable {
             let folded = rest.moneySum(\.rubMinor)
             // A lone folded category keeps its own name: "Everything else" would hide what it is.
             slices.append(InsightsSlice(
-                id: slices.count, title: rest.count == 1 ? CategoryTitle(rest[0].categoryKey) : .rest, rubMinor: folded,
+                id: slices.count, title: rest.count == 1 ? data.categories.title(rest[0].categoryKey) : .rest, rubMinor: folded,
                 share: share(folded), amount: base.approx(folded), value: base.major(folded), isRest: true
             ))
         }
@@ -170,8 +173,8 @@ struct InsightsContent: Equatable, Sendable {
         rows = report.categories.enumerated().map { index, spend in
             let slice = min(index, own.count)
             return InsightsRow(
-                id: spend.categoryKey ?? "-", title: CategoryTitle(spend.categoryKey),
-                symbol: Symbols.category(spend.categoryKey),
+                id: spend.categoryKey ?? "-", title: data.categories.title(spend.categoryKey),
+                symbol: data.categories.symbol(spend.categoryKey),
                 amount: base.approx(spend.rubMinor), percent: GoalPercent.whole(share(spend.rubMinor)),
                 slice: slice, isRest: index >= own.count
             )

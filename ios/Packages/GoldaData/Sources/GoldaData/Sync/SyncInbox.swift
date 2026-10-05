@@ -49,6 +49,7 @@ enum SyncInbox {
         case .obligation: try store.deleteObligation(ref.id, profileId: profileId)
         case .goal: try store.deleteGoal(ref.id, profileId: profileId)
         case .wish: try store.deleteWish(ref.id, profileId: profileId)
+        case .category: try store.deleteCategory(ref.id, profileId: profileId)
         }
         try forget(ref, db)
         try db.execute(sql: "DELETE FROM syncOutgoing WHERE key = ?", arguments: [ref.key])
@@ -130,6 +131,8 @@ enum SyncInbox {
                     try store.save(goal, profileId: profileId, createdAt: createdAt)
                 case .wish(let wish):
                     try store.save(wish, profileId: profileId)
+                case .category(let category, let createdAt):
+                    try store.save(category, profileId: profileId, createdAt: createdAt)
                 case .profile, .operation:
                     continue
                 }

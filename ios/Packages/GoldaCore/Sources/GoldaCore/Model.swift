@@ -77,12 +77,25 @@ public struct Category: Equatable, Hashable, Sendable {
     public var name: String
     public var kind: CategoryKind
     public var sort: Int
+    /// What goes into a category of the person's own, in their words; the voice model reads it.
+    public var hint: String?
 
-    public init(key: String, name: String, kind: CategoryKind, sort: Int = 0) {
+    public init(key: String, name: String, kind: CategoryKind, sort: Int = 0, hint: String? = nil) {
         self.key = key
         self.name = name
         self.kind = kind
         self.sort = sort
+        self.hint = hint
+    }
+
+    /// The built-in ones, then the profile's own in the order they were made (D68).
+    public static func all(custom: [CustomCategory]) -> [Category] {
+        builtIn + custom.map(\.category)
+    }
+
+    /// "Прочее" of [kind]: where the operations of a deleted category go.
+    public static func other(_ kind: CategoryKind) -> String {
+        kind == .expense ? "other" : "other_income"
     }
 
     public static let builtIn: [Category] = [
@@ -103,6 +116,68 @@ public struct Category: Equatable, Hashable, Sendable {
         Category(key: "gift", name: "Подарок", kind: .income, sort: 2),
         Category(key: "other_income", name: "Прочее", kind: .income, sort: 3),
     ]
+}
+
+/// A category the person made for the profile (D68): it syncs with the profile, and operations
+/// store its `key`, which no built-in key looks like. Built-in categories are not edited.
+public struct CustomCategory: Equatable, Hashable, Sendable, Codable, Identifiable {
+    public var id: UUID
+    public var name: String
+    public var kind: CategoryKind
+    /// "корм, ветеринар": what goes into it, so voice files "наполнитель 20 лари" here. May be empty.
+    public var hint: String
+    /// The SF Symbol the screens show; nil shows the box of "Прочее".
+    public var symbol: String?
+
+    public init(id: UUID = UUID(), name: String, kind: CategoryKind, hint: String = "", symbol: String? = nil) {
+        self.id = id
+        self.name = name
+        self.kind = kind
+        self.hint = hint
+        self.symbol = symbol
+    }
+
+    static let keyPrefix = "custom."
+
+    public var key: String { Self.keyPrefix + id.uuidString.lowercased() }
+
+    /// The id behind a key of a category of one's own; nil for a built-in key.
+    public static func id(ofKey key: String) -> UUID? {
+        guard key.hasPrefix(keyPrefix) else { return nil }
+        return UUID(uuidString: String(key.dropFirst(keyPrefix.count)))
+    }
+
+    public var category: Category {
+        let hint = hint.trimmingCharacters(in: .whitespacesAndNewlines)
+        return Category(key: key, name: name, kind: kind, hint: hint.isEmpty ? nil : hint)
+    }
+}
+
+/// How the person filed a note before ("шаурма" → `eating_out`): the voice model follows it, so a
+/// category fixed by hand once stays fixed (D68).
+public struct CategoryExample: Equatable, Hashable, Sendable {
+    public var note: String
+    public var categoryKey: String
+
+    public init(note: String, categoryKey: String) {
+        self.note = note
+        self.categoryKey = categoryKey
+    }
+
+    /// The latest filing of each note, newest first, at most [limit]: only spending and income with
+    /// a note and a category still in [categories]. Notes compare trimmed and in lower case.
+    public static func latest(_ operations: [Operation], categories: [Category], limit: Int) -> [CategoryExample] {
+        let known = Set(categories.map(\.key))
+        var seen = Set<String>()
+        var examples: [CategoryExample] = []
+        for op in operations.sorted(by: { $0.timestamp > $1.timestamp }) where op.type != .transfer {
+            guard examples.count < limit else { break }
+            let note = op.note.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+            guard !note.isEmpty, let key = op.categoryKey, known.contains(key), seen.insert(note).inserted else { continue }
+            examples.append(CategoryExample(note: note, categoryKey: key))
+        }
+        return examples
+    }
 }
 
 public struct Operation: Equatable, Hashable, Sendable, Codable, Identifiable {

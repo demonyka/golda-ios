@@ -109,6 +109,21 @@ import Testing
         #expect(try await queued() == [name(.account, card.id): .save])
     }
 
+    /// D68: a category of one's own travels; deleting it sends the operations moved to "Прочее".
+    @Test func aCategoryAndItsDeletionAreSent() async throws {
+        let card = Account(name: "Карта", currency: "RUB", type: .card, includeInFree: true)
+        let profileId = try await harness.profile(accounts: [card])
+        let cat = CustomCategory(name: "Кот", kind: .expense)
+        try await harness.repository.saveCategory(cat, profileId: profileId)
+        let fed = try await harness.repository.save(
+            Draft(type: .expense, timestamp: 1, accountId: card.id, amountMinor: 100, categoryKey: cat.key), profileId: profileId
+        )
+        #expect(try await queued()[name(.category, cat.id)] == .save)
+        try await harness.database.writer.write { db in try db.execute(sql: "DELETE FROM syncOutgoing") }
+        try await harness.repository.deleteCategory(cat, profileId: profileId)
+        #expect(try await queued() == [name(.category, cat.id): .delete, name(.operation, fed): .save])
+    }
+
     /// D67: the server's fields of a profile's operations, by operation, tell who wrote each.
     @Test func theServerFieldsOfAProfilesOperationsAreReadByOperation() async throws {
         let profileId = try await harness.profile()

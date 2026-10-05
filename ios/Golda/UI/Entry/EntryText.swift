@@ -47,13 +47,15 @@ enum EntryText {
     static let correct = LocalizedStringResource("Correct", table: "Entry", comment: "VoiceOver hint: tap to type the bank's real figure over the estimate.")
 
     /// The note's placeholder says what the line is for, never the type picked above it.
-    static func notePlaceholder(type: OpType, categoryKey: String?, deciding: Bool) -> LocalizedStringResource {
-        if deciding { return LocalizedStringResource("What is it", table: "Entry", comment: "“Not sure”: the placeholder of what the purchase is.") }
-        if type == .transfer { return LocalizedStringResource("Note", table: "Entry", comment: "Transfer: the placeholder of its note.") }
-        if let categoryKey { return CategoryName.resource(categoryKey) }
+    static func notePlaceholder(
+        type: OpType, categoryKey: String?, deciding: Bool, categories: CategoryCatalog = .builtIn, in locale: Locale
+    ) -> String {
+        if deciding { return LocalizedStringResource("What is it", table: "Entry", comment: "“Not sure”: the placeholder of what the purchase is.").text(in: locale) }
+        if type == .transfer { return LocalizedStringResource("Note", table: "Entry", comment: "Transfer: the placeholder of its note.").text(in: locale) }
+        if let categoryKey { return categories.name(categoryKey, in: locale) }
         return type == .income
-            ? LocalizedStringResource("From where", table: "Entry", comment: "Income: the placeholder of where the money came from.")
-            : purchase
+            ? LocalizedStringResource("From where", table: "Entry", comment: "Income: the placeholder of where the money came from.").text(in: locale)
+            : purchase.text(in: locale)
     }
 
     /// What a purchase with neither a note nor a category is called.
@@ -152,7 +154,7 @@ enum EntryAnnouncement {
     static func saved(_ draft: Draft, impact: Impact?, data: AppData, in locale: Locale) -> String {
         let code = draft.purchaseCurrency ?? data.accountById[draft.accountId]?.currency ?? "RUB"
         let shown = draft.purchaseAmountMinor ?? draft.amountMinor
-        let title = title(note: draft.note, categoryKey: draft.categoryKey, fallback: savedTitle, in: locale)
+        let title = title(note: draft.note, categoryKey: draft.categoryKey, categories: data.categories, fallback: savedTitle, in: locale)
         return spent(title: title, amount: Fmt.amount(shown, code), impact: impact, base: data.base, in: locale)
     }
 
@@ -184,8 +186,8 @@ enum EntryAnnouncement {
     }
 
     /// "«Шаурма» удалено".
-    static func deleted(_ full: OperationFull, in locale: Locale) -> String {
-        let title = title(note: full.op.note, categoryKey: full.op.categoryKey, fallback: entryTitle, in: locale)
+    static func deleted(_ full: OperationFull, categories: CategoryCatalog = .builtIn, in locale: Locale) -> String {
+        let title = title(note: full.op.note, categoryKey: full.op.categoryKey, categories: categories, fallback: entryTitle, in: locale)
         return LocalizedStringResource("“\(title)” deleted", table: "Entry", comment: "Toast after an operation was deleted, with its note or category.").text(in: locale)
     }
 
@@ -208,10 +210,12 @@ enum EntryAnnouncement {
     private static let savedTitle = LocalizedStringResource("Saved", table: "Entry", comment: "Toast after recording an operation with neither a note nor a category.")
     private static let entryTitle = LocalizedStringResource("Entry", table: "Entry", comment: "What a deleted operation with neither a note nor a category is called in the toast.")
 
-    private static func title(note: String, categoryKey: String?, fallback: LocalizedStringResource, in locale: Locale) -> String {
+    private static func title(
+        note: String, categoryKey: String?, categories: CategoryCatalog, fallback: LocalizedStringResource, in locale: Locale
+    ) -> String {
         let trimmed = note.trimmingCharacters(in: .whitespacesAndNewlines)
         if !trimmed.isEmpty { return trimmed }
-        if let categoryKey { return CategoryName.resource(categoryKey).text(in: locale) }
+        if let categoryKey { return categories.name(categoryKey, in: locale) }
         return fallback.text(in: locale)
     }
 }

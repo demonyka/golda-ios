@@ -268,6 +268,33 @@ struct WishRecord: ProfileOwnedRecord {
     }
 }
 
+struct CategoryRecord: CreationOrderedRecord {
+    static let databaseTableName = "category"
+
+    var id: UUID
+    var profileId: UUID
+    var name: String
+    var kind: CategoryKind
+    var hint: String
+    var symbol: String?
+    /// The category's place in its profile's creation order (1, 2, 3…), the order it is listed in.
+    var createdAt: Int64?
+
+    init(_ category: CustomCategory, profileId: UUID, createdAt: Int64? = nil) {
+        id = category.id
+        self.profileId = profileId
+        name = category.name
+        kind = category.kind
+        hint = category.hint
+        symbol = category.symbol
+        self.createdAt = createdAt
+    }
+
+    var category: CustomCategory {
+        CustomCategory(id: id, name: name, kind: kind, hint: hint, symbol: symbol)
+    }
+}
+
 /// Official CBR rate: rubles per one unit of [code], as of [date] ("2026-10-02").
 public struct RateRecord: Equatable, Hashable, Sendable, Codable, FetchableRecord, PersistableRecord {
     public static let databaseTableName = "rate"
