@@ -80,12 +80,13 @@ final class Phone: Sendable {
         let rates = try await repository.rates(profileId: profileId)
         let day = LocalDate(epochMillis: now, in: TestClock.utc)
         let start = day.startOfDayMillis(in: TestClock.utc)
+        let states = Ledger.states(books.accounts, books.operations.flatMap(\.postings))
         return Budget.today(
-            states: Ledger.states(books.accounts, books.operations.flatMap(\.postings)),
+            states: states,
             operations: books.operations.filter { $0.op.timestamp >= start },
             settings: Settings(profile: books.profile.settings, device: device.current, profileId: profileId),
             today: day, zone: TestClock.utc,
-            obligations: books.obligations + Debts.obligations(books.accounts),
+            obligations: books.obligations + Debts.obligations(books.accounts, states),
             rates: rates
         )
     }

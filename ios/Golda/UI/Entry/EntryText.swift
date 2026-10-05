@@ -30,7 +30,7 @@ enum EntryText {
     static let save = LocalizedStringResource("Save", table: "Entry", comment: "Operation form: the confirmation that saves the changes to an operation.")
     static let delete = LocalizedStringResource("Delete", table: "Entry", comment: "Operation form: deletes the operation, at once, with an undo afterwards.")
     static let notSure = LocalizedStringResource("Not sure", table: "Entry", comment: "Operation form: the button that turns a new expense into “Not sure”, the facts about the price.")
-    static let skip = LocalizedStringResource("Skip", table: "Entry", comment: "“Not sure”: do not buy it; the money goes to the main goal. Russian “Не беру”.")
+    static let skip = LocalizedStringResource("Skip", table: "Entry", comment: "“Not sure”: do not buy it. Russian “Не беру”.")
     static let think = LocalizedStringResource("Think", table: "Entry", comment: "“Not sure”: put it on the wishlist for a while. Russian “Подумаю”.")
     static let buy = LocalizedStringResource("Buy", table: "Entry", comment: "“Not sure”: buy it; the expense is recorded. Russian “Беру”.")
 
@@ -189,15 +189,10 @@ enum EntryAnnouncement {
         return LocalizedStringResource("“\(title)” deleted", table: "Entry", comment: "Toast after an operation was deleted, with its note or category.").text(in: locale)
     }
 
-    /// "+50 $ к «Велосипед»", or "Сэкономлено 50 $" without a main goal.
-    static func skipped(_ outcome: SkipOutcome, in locale: Locale) -> String {
-        if let goal = outcome.goal, let added = outcome.addedMinor {
-            let amount = Fmt.amount(added, goal.currency)
-            let name = goal.name
-            return LocalizedStringResource("+\(amount) to “\(name)”", table: "Entry", comment: "Toast after “Skip”: what went to the main goal, “+50 $ to “Bike””.").text(in: locale)
-        }
-        let saved = Fmt.amount(outcome.wish.amountMinor, outcome.wish.currency)
-        return LocalizedStringResource("Saved \(saved)", table: "Entry", comment: "Toast after “Skip” with no main goal: the money not spent, “Saved 50 $”.").text(in: locale)
+    /// "Сэкономлено 50 $": what was not spent. It goes into no goal (D63).
+    static func skipped(_ wish: Wish, in locale: Locale) -> String {
+        let saved = Fmt.amount(wish.amountMinor, wish.currency)
+        return LocalizedStringResource("Saved \(saved)", table: "Entry", comment: "Toast after “Skip”: the money not spent, “Saved 50 $”. Nothing goes into a goal.").text(in: locale)
     }
 
     /// "«Наушники» — решить через 3 дня".

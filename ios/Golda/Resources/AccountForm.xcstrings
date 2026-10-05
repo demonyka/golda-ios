@@ -269,6 +269,23 @@
         }
       }
     },
+    "Available" : {
+      "comment" : "Debt details: what is left to spend on a credit card.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Available"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Доступно"
+          }
+        }
+      }
+    },
     "Cancel" : {
       "comment" : "Closes a form or a question without doing anything.",
       "localizations" : {
@@ -353,6 +370,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Кредитка"
+          }
+        }
+      }
+    },
+    "Credit limit" : {
+      "comment" : "Account form: how much the bank lends on a credit card.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Credit limit"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кредитный лимит"
           }
         }
       }
@@ -458,6 +492,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Досрочное погашение"
+          }
+        }
+      }
+    },
+    "For a debt: its payment is set aside before payday while something is owed. The debt itself never counts." : {
+      "comment" : "Account form, a debt: what the budget switch does to it.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "For a debt: its payment is set aside before payday while something is owed. The debt itself never counts."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Для долга: пока есть долг, его платёж откладывается до зарплаты. Сам долг не учитывается."
           }
         }
       }
@@ -851,6 +902,23 @@
         }
       }
     },
+    "Nothing owed? Leave it empty." : {
+      "comment" : "Account form, a credit card: under what is owed now, for a card with no debt.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing owed? Leave it empty."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ничего не должен — оставь пустым."
+          }
+        }
+      }
+    },
     "OK" : {
       "comment" : "Closes the message that saving or deleting failed.",
       "localizations" : {
@@ -900,6 +968,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Или оставить на счёте"
+          }
+        }
+      }
+    },
+    "Over the limit" : {
+      "comment" : "Debt details: how far a credit card is past its limit.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Over the limit"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сверх лимита"
           }
         }
       }
@@ -1101,19 +1186,19 @@
         }
       }
     },
-    "Savings and debts usually stay out." : {
-      "comment" : "Account form: why savings and debts start with the budget switch off.",
+    "Savings usually stay out." : {
+      "comment" : "Account form: why savings start with the budget switch off.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Savings and debts usually stay out."
+            "value" : "Savings usually stay out."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Накопления и долги обычно не учитываются."
+            "value" : "Накопления обычно не учитываются."
           }
         }
       }

@@ -168,6 +168,24 @@ import Testing
         #expect(try books.row(books.loan).subline.text(in: F.en) == "Loan")
     }
 
+    /// D62: a credit card with a limit says what is left to spend on it, or how far past it it is.
+    @Test func aCreditCardWithALimitSaysWhatIsAvailable() throws {
+        var books = books
+        books.credit.creditLimitMinor = 15_000_000
+        let row = try books.row(books.credit)
+        #expect(row.subline.credit == CreditLine(limitMinor: 15_000_000, availableMinor: 13_500_000))
+        #expect(row.subline.text(in: F.ru) == "Кредитка · доступно 135\u{202F}000 ₽")
+        #expect(row.subline.text(in: F.en) == "Credit card · 135\u{202F}000 ₽ available")
+        #expect(row.accessibilityLabel(in: F.en).contains("135000 Russian rubles available"))
+
+        books.credit.creditLimitMinor = 1_000_000
+        let over = try books.row(books.credit)
+        #expect(over.subline.text(in: F.ru) == "Кредитка · сверх лимита 5\u{202F}000 ₽")
+        #expect(over.subline.text(in: F.en) == "Credit card · 5\u{202F}000 ₽ over the limit")
+        // The balance is still the debt; the limit is not money.
+        #expect(over.balance == "−15\u{202F}000 ₽")
+    }
+
     @Test func aForeignAccountAddsItsWorthInTheMainCurrency() throws {
         let usd = try books.row(books.usd)
         #expect(usd.subline.approxBase == "9\u{202F}200 ₽")

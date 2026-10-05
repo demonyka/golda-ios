@@ -145,13 +145,9 @@ import Testing
 
     @Test func whatSkippingDid() {
         let wish = Wish(title: "Кроссовки", amountMinor: 25_000, currency: "GEL", createdAt: E.now, decideAt: E.now, status: .skipped)
-        let goal = Goal(name: "Велосипед", targetMinor: 8_000_000, currency: "RUB", savedMinor: 2_232_500, isMain: true)
-        let toGoal = SkipOutcome(wish: wish, goal: goal, addedMinor: 82_500)
-        #expect(EntryAnnouncement.skipped(toGoal, in: Self.ru) == "+825 ₽ к «Велосипед»")
-        #expect(EntryAnnouncement.skipped(toGoal, in: Self.en) == "+825 ₽ to “Велосипед”")
-        let noGoal = SkipOutcome(wish: wish, goal: nil, addedMinor: nil)
-        #expect(EntryAnnouncement.skipped(noGoal, in: Self.ru) == "Сэкономлено 250 ₾")
-        #expect(EntryAnnouncement.skipped(noGoal, in: Self.en) == "Saved 250 ₾")
+        // What was not spent, with or without a main goal: nothing goes into it (D63).
+        #expect(EntryAnnouncement.skipped(wish, in: Self.ru) == "Сэкономлено 250 ₾")
+        #expect(EntryAnnouncement.skipped(wish, in: Self.en) == "Saved 250 ₾")
     }
 
     @Test func whenToDecide() {

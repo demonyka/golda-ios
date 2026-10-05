@@ -25,7 +25,11 @@ import Testing
         try await queue.write { db in
             let store = Store(db: db)
             try store.save(profile)
-            try store.save(card, profileId: profile.id)
+            // In the columns of then: the account's record writes the ones later versions added.
+            try db.execute(
+                sql: "INSERT INTO account (id, profileId, name, currency, type, includeInFree, sort) VALUES (?, ?, ?, ?, ?, ?, 0)",
+                arguments: [card.id, profile.id, card.name, card.currency, card.type.rawValue, card.includeInFree]
+            )
             try store.save(operation, profileId: profile.id, updatedAt: 1)
             try store.save(posting, profileId: profile.id)
             try db.execute(sql: "DELETE FROM syncJournal")
@@ -58,5 +62,38 @@ import Testing
         #expect(postings == [posting])
         let legacyFields = try await queue.read { db in try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM syncSystemFields") }
         #expect(legacyFields == 0)
+    }
+
+    /// 1.0.1 adds a credit card's limit (`v4`, D62): a file of 1.0.0 opens with no limit on its
+    /// accounts, and a limit set later goes to the other phones like any other change.
+    @Test func aFileOfOneZeroZeroGetsTheLimitColumnAndSendsALimitSetLater() async throws {
+        let queue = try DatabaseQueue(configuration: {
+            var configuration = Configuration()
+            configuration.foreignKeysEnabled = true
+            return configuration
+        }())
+        try Schema.migrator.migrate(queue, upTo: "v3")
+        let profile = Profile(name: "Личный")
+        let card = Account(name: "Кредитка", currency: "RUB", type: .credit, includeInFree: false)
+        try await queue.write { db in
+            try db.execute(
+                sql: "INSERT INTO profile (id, name, sort, incomeHourly, hourlyRate, monthlySalary, taxPercent, hoursPerWeek, payday, markup) VALUES (?, ?, 0, 0, 0, 0, 0, 40, 1, 0)",
+                arguments: [profile.id, profile.name]
+            )
+            try db.execute(
+                sql: "INSERT INTO account (id, profileId, name, currency, type, includeInFree, sort) VALUES (?, ?, ?, 'RUB', 'CREDIT', 0, 0)",
+                arguments: [card.id, profile.id, card.name]
+            )
+            try SyncLedger.putZone(.own(profile.id), db)
+            try db.execute(sql: "DELETE FROM syncJournal")
+        }
+
+        let database = try GoldaDatabase(queue, clock: nil)
+        let sync = SyncStore(database: database)
+        #expect(try await database.read { try $0.account(card.id, profileId: profile.id) } == card)
+        let limited = Account(id: card.id, name: card.name, currency: "RUB", type: .credit, includeInFree: false, creditLimitMinor: 15_000_000)
+        try await database.write { try $0.save(limited, profileId: profile.id) }
+        #expect(try await sync.outgoing().map(\.ref) == [SyncRecordRef(zone: .own(profile.id), type: .account, id: card.id)])
+        #expect(try await database.read { try $0.account(card.id, profileId: profile.id) } == limited)
     }
 }

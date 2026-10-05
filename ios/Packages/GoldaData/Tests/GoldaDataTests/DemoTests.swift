@@ -30,7 +30,8 @@ import Testing
         ])
         #expect(books.accounts.map(\.type) == [.card, .savings, .card, .card, .cash, .credit, .loan])
         #expect(books.accounts.map(\.currency) == ["RUB", "RUB", "USD", "GEL", "GEL", "RUB", "RUB"])
-        #expect(books.accounts.map(\.includeInFree) == [true, false, true, true, true, false, false])
+        // The debts are on: their payments are set aside, their balances never count (D64).
+        #expect(books.accounts.map(\.includeInFree) == [true, false, true, true, true, true, true])
         #expect(books.accounts.map(\.groupName) == [nil, nil, "Мультивалютная", "Мультивалютная", nil, nil, nil])
         #expect(books.accounts.map { states[$0.id]?.balanceMinor } == [500_000, 25_000_000, 0, 0, 0, -1_500_000, -20_000_000])
 
@@ -205,8 +206,8 @@ import Testing
         #expect(books.goals.map(\.name) == ["Велосипед", "Подушка"])
         let bike = books.goals[0]
         #expect(bike.isMain && bike.targetMinor == 8_000_000 && bike.currency == "RUB")
-        // The skipped sneakers went towards it.
-        #expect(bike.savedMinor > 2_150_000)
+        // The skipped sneakers stay out of it (D63).
+        #expect(bike.savedMinor == 2_150_000)
         let pillow = books.goals[1]
         #expect(!pillow.isMain && pillow.accountId == savings.id && pillow.targetMinor == 30_000_000 && pillow.savedMinor == 0)
 

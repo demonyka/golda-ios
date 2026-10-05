@@ -3,7 +3,8 @@ import GoldaCore
 
 /// What a debt's page says about its terms, worked out the way Android's `DebtDetails` does: the
 /// rate, the payment and when it is next due, and for a loan how long it has to go, the interest
-/// still to pay and the month of the last payment; for a credit card, its interest-free period.
+/// still to pay and the month of the last payment; for a credit card, its limit and what is left of
+/// it (D62) and its interest-free period.
 /// Plain values; `rows(in:)` writes them in the interface language for the view and for VoiceOver.
 struct DebtDetailsModel: Equatable, Sendable {
     /// How a loan ends at its current payment.
@@ -31,6 +32,8 @@ struct DebtDetailsModel: Equatable, Sendable {
     /// Loans only, while something is owed and the rate and payment are known.
     let payoff: Payoff?
     let grace: Grace?
+    /// A credit card's limit against its balance; nil without one.
+    let credit: CreditLine?
     let today: LocalDate
 
     /// Nil for an account that is not a debt.
@@ -40,6 +43,7 @@ struct DebtDetailsModel: Equatable, Sendable {
         self.account = account
         self.today = today
         owedMinor = -state.balanceMinor
+        credit = CreditLine(account, balanceMinor: state.balanceMinor)
         if let day = account.paymentDay, account.paymentMinor != nil {
             nextPayment = Budget.nextDue(day, today)
         } else {
@@ -79,7 +83,7 @@ struct DebtDetailsModel: Equatable, Sendable {
     /// One line of the details: a title with its value, or a sentence of its own.
     struct Row: Identifiable, Equatable, Sendable {
         enum Kind: Hashable, Sendable {
-            case rate, payment, nextPayment, monthsLeft, interestLeft, lastPayment, notCovering, grace
+            case limit, available, rate, payment, nextPayment, monthsLeft, interestLeft, lastPayment, notCovering, grace
         }
 
         let kind: Kind
@@ -102,6 +106,21 @@ struct DebtDetailsModel: Equatable, Sendable {
     func rows(in locale: Locale) -> [Row] {
         let code = account.currency
         var rows: [Row] = []
+        if let credit {
+            let limit = Fmt.amount(credit.limitMinor, code)
+            rows.append(Row(
+                kind: .limit, title: AccountFormModel.limitTitle.text(in: locale), value: limit,
+                spokenValue: SpokenAmount.text(limit, locale: locale), isWarning: false
+            ))
+            let title = credit.isOverLimit
+                ? LocalizedStringResource("Over the limit", table: "AccountForm", comment: "Debt details: how far a credit card is past its limit.")
+                : LocalizedStringResource("Available", table: "AccountForm", comment: "Debt details: what is left to spend on a credit card.")
+            let amount = Fmt.amount(credit.isOverLimit ? CreditLineText.over(credit) : credit.availableMinor, code)
+            rows.append(Row(
+                kind: .available, title: title.text(in: locale), value: amount,
+                spokenValue: SpokenAmount.text(amount, locale: locale), isWarning: credit.isOverLimit
+            ))
+        }
         if let rate = account.interestRate {
             let percent = Fmt.number(rate, decimals: 1) + " %"
             rows.append(Row(

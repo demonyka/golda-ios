@@ -43,7 +43,7 @@ import Testing
         let full = Account(
             id: StoreFixture.id(10), name: "Кредитка", currency: "RUB", type: .credit, groupName: "Банк",
             includeInFree: false, interestRate: 29.9, sort: -3, paymentDay: 25, paymentMinor: .max,
-            graceUntil: .min, reconciledAt: 1_759_400_000_000
+            graceUntil: .min, reconciledAt: 1_759_400_000_000, creditLimitMinor: .max
         )
         let bare = Account(id: full.id, name: "Наличные ₾", currency: "GEL", type: .cash, includeInFree: true, sort: 7)
 

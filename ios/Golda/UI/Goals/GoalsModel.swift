@@ -6,24 +6,25 @@ import GoldaData
 // phone has already celebrated, the way Android's `GoalsScreen` does it. Plain values: the views
 // only lay them out, and tests check them in both languages with a fixed clock.
 
-/// "+13 700 ₽ отказами": what "Не беру" has put towards the goals so far, in the main currency.
-/// Shown from the start ("0 ₽ отказами"), so the mechanic is visible before it is first used.
+/// "13 700 ₽ сэкономлено отказами": what "Не беру" kept from being spent so far, in the main
+/// currency. It goes into no goal (D63): money not spent is not money put aside. Shown from the
+/// start ("0 ₽"), so the mechanic is visible before it is first used.
 struct SkippedTotal: Equatable, Sendable {
     let rubMinor: Int64
-    /// "+13 700 ₽", or "0 ₽" before the first refusal.
+    /// "13 700 ₽", or "0 ₽" before the first refusal.
     let amount: String
 
     init(wishes: [Wish], rates: Rates, base: Base) {
         // Held at Int64.max: refusals too big to add up show a wrong figure, not a crash (D59).
         rubMinor = wishes.filter { $0.status == .skipped }.moneySum { Goals.rubOf($0.amountMinor, $0.currency, rates) }
-        amount = (rubMinor > 0 ? "+" : "") + base.approx(rubMinor)
+        amount = base.approx(rubMinor)
     }
 
     func text(in locale: Locale, spoken: Bool = false) -> String {
         let figure = spoken ? SpokenAmount.text(amount, locale: locale) : amount
         return LocalizedStringResource(
-            "\(figure) from what you skipped", table: "Goals",
-            comment: "Goals hero: what refusals (“I’ll pass”) have put towards the goals, “+13 700 ₽ from what you skipped”."
+            "\(figure) saved by skipping", table: "Goals",
+            comment: "Goals hero: what refusals (“I’ll pass”) kept from being spent, “13 700 ₽ saved by skipping”. Not put into any goal."
         ).text(in: locale)
     }
 }
@@ -99,7 +100,7 @@ enum GoalsHero: Equatable, Sendable {
     )
     static let setGoalTitle = LocalizedStringResource("Set a goal", table: "Goals", comment: "Goals hero with no goals yet: the call to make one.")
     static let setGoalText = LocalizedStringResource(
-        "A bike, a trip, a cushion. Every purchase is held up against it, and what you skip goes into it.", table: "Goals",
+        "A bike, a trip, a cushion. Every purchase is held up against it.", table: "Goals",
         comment: "Goals hero with no goals yet: what a goal is for."
     )
     static let pickMainTitle = LocalizedStringResource("Pick the main goal", table: "Goals", comment: "Goals hero when goals exist but none is the main one.")

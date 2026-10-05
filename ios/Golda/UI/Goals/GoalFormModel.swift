@@ -155,7 +155,7 @@ struct GoalFormModel: Equatable, Sendable {
             ).text(in: locale)
         case .explains:
             LocalizedStringResource(
-                "Every purchase is held up against the main goal, and what you skip goes into it.", table: "Goals",
+                "Every purchase is held up against the main goal.", table: "Goals",
                 comment: "Goal form, under the main-goal switch turned off: what the main goal is for."
             ).text(in: locale)
         }
@@ -167,7 +167,7 @@ struct GoalFormModel: Equatable, Sendable {
     static let accountTitle = LocalizedStringResource("Saved on", table: "Goals", comment: "Goal form: the account the money for the goal is kept on.")
     static let noAccount = LocalizedStringResource("No account", table: "Goals", comment: "Goal form: the goal is not tied to an account.")
     static let accountFooter = LocalizedStringResource(
-        "Progress is the account’s balance plus what you skip.", table: "Goals",
+        "Progress is the account’s balance plus what is already put aside.", table: "Goals",
         comment: "Goal form: how progress is counted for a goal saved on an account."
     )
     static let savedTitle = LocalizedStringResource("Already put aside", table: "Goals", comment: "Goal form: what has been saved for the goal without an account.")

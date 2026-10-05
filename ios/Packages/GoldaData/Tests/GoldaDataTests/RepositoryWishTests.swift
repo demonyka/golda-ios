@@ -211,45 +211,30 @@ import Testing
         #expect(dollars.decideAt == now + 24 * 3_600_000)
     }
 
-    @Test func skippingWithoutAGoalIsStillRemembered() async throws {
-        let outcome = try await repository.skip(Consider(title: "Бургер", amountMinor: 5_000, currency: "USD"), profileId: profileId)
-        #expect(outcome.goal == nil && outcome.addedMinor == nil)
-        #expect(outcome.wish.status == .skipped && outcome.wish.decidedAt == RepositoryHarness.start)
-        #expect(outcome.wish.title == "Бургер" && outcome.wish.amountMinor == 5_000 && outcome.wish.currency == "USD")
-        #expect(try await wish(outcome.wish.id) == outcome.wish)
+    @Test func skippingIsRemembered() async throws {
+        let wish = try await repository.skip(Consider(title: "Бургер", amountMinor: 5_000, currency: "USD"), profileId: profileId)
+        #expect(wish.status == .skipped && wish.decidedAt == RepositoryHarness.start)
+        #expect(wish.title == "Бургер" && wish.amountMinor == 5_000 && wish.currency == "USD")
+        #expect(try await self.wish(wish.id) == wish)
     }
 
-    /// A goal's savings already at Int64.max (an old backup): a refusal adds to it without trapping (D59).
-    @Test func skippingOntoAHugeGoalDoesNotTrap() async throws {
-        try await repository.saveGoal(Goal(id: StoreFixture.id(50), name: "Дом", targetMinor: 5_000_000, currency: "RUB", savedMinor: .max), profileId: profileId)
-        let outcome = try await repository.skip(Consider(title: "Бургер", amountMinor: 5_000, currency: "RUB"), profileId: profileId)
-        #expect(outcome.goal?.savedMinor == .max)
-    }
-
-    @Test func skippingAWaitingWishPutsTheMoneyTowardsTheMainGoal() async throws {
-        try await repository.saveGoal(Goal(id: StoreFixture.id(50), name: "Велосипед", targetMinor: 5_000_000, currency: "RUB", savedMinor: 100), profileId: profileId)
+    /// Money not spent is not money put aside (D63): a refusal leaves the goals as they are.
+    @Test func skippingAWaitingWishClosesItAndLeavesTheGoalAlone() async throws {
+        let goal = Goal(id: StoreFixture.id(50), name: "Велосипед", targetMinor: 5_000_000, currency: "RUB", savedMinor: 100, isMain: true)
+        try await repository.saveGoal(goal, profileId: profileId)
+        let before = try await goals()
         let consider = Consider(title: "Бургер", amountMinor: 5_000, currency: "USD")
         let waiting = try await repository.think(consider, profileId: profileId)
 
         harness.clock.set(RepositoryHarness.start + 3_600_000)
-        let outcome = try await repository.skip(consider, wishId: waiting.id, profileId: profileId)
-        // 50 $ × 83.2454 × 1.1 = 4 578,50 ₽.
-        #expect(outcome.addedMinor == 457_850)
-        #expect(outcome.goal?.name == "Велосипед" && outcome.goal?.savedMinor == 457_950)
-        #expect(outcome.wish.id == waiting.id && outcome.wish.createdAt == waiting.createdAt)
+        let skipped = try await repository.skip(consider, wishId: waiting.id, profileId: profileId)
+        #expect(skipped.id == waiting.id && skipped.createdAt == waiting.createdAt)
         #expect(try await wish(waiting.id)?.status == .skipped)
         #expect(try await wish(waiting.id)?.decidedAt == RepositoryHarness.start + 3_600_000)
-        #expect(try await goals().first?.savedMinor == 457_950)
+        #expect(try await goals() == before)
         // The refusal was recorded once, on the waiting wish.
         let profileId = profileId
         #expect(try await harness.database.read { try $0.wishes(profileId: profileId) }.count == 1)
-    }
-
-    @Test func skippingConvertsIntoTheGoalsCurrency() async throws {
-        try await repository.saveGoal(Goal(id: StoreFixture.id(50), name: "Поездка", targetMinor: 100_000, currency: "USD"), profileId: profileId)
-        let outcome = try await repository.skip(Consider(title: "Ужин", amountMinor: 457_850, currency: "RUB"), profileId: profileId)
-        #expect(outcome.addedMinor == 5_000)
-        #expect(outcome.goal?.currency == "USD")
     }
 
     @Test func buyingRecordsTheExpenseAndClosesTheWish() async throws {

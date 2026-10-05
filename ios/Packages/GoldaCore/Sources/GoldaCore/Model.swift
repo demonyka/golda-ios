@@ -45,11 +45,13 @@ public struct Account: Equatable, Hashable, Sendable, Codable, Identifiable {
     public var graceUntil: Int64?
     /// When the account was last checked against the bank, epoch milliseconds, matches included.
     public var reconciledAt: Int64?
+    /// Credit cards: how much the bank lends, in the account's minor units (D62; Android has none).
+    public var creditLimitMinor: Int64?
 
     public init(
         id: UUID = UUID(), name: String, currency: String, type: AccountType, groupName: String? = nil,
         includeInFree: Bool, interestRate: Double? = nil, sort: Int = 0, paymentDay: Int? = nil,
-        paymentMinor: Int64? = nil, graceUntil: Int64? = nil, reconciledAt: Int64? = nil
+        paymentMinor: Int64? = nil, graceUntil: Int64? = nil, reconciledAt: Int64? = nil, creditLimitMinor: Int64? = nil
     ) {
         self.id = id
         self.name = name
@@ -63,6 +65,7 @@ public struct Account: Equatable, Hashable, Sendable, Codable, Identifiable {
         self.paymentMinor = paymentMinor
         self.graceUntil = graceUntil
         self.reconciledAt = reconciledAt
+        self.creditLimitMinor = creditLimitMinor
     }
 }
 

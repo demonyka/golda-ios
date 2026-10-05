@@ -142,6 +142,30 @@ import Testing
         #expect(details.rows(in: Self.en).last?.value == "November 11")
     }
 
+    /// D62: the limit and what is left of it come first; past the limit is bad news.
+    @Test func aCreditCardWithALimitSaysWhatIsAvailable() throws {
+        let card = Account(
+            name: "Кредитка", currency: "RUB", type: .credit, includeInFree: false, interestRate: 29.9, creditLimitMinor: 15_000_000
+        )
+        let russian = try details(card, owed: 1_500_000).rows(in: Self.ru)
+        #expect(russian.map(\.kind) == [.limit, .available, .rate])
+        #expect(russian.map(\.title) == ["Кредитный лимит", "Доступно", "Ставка"])
+        #expect(russian.compactMap(\.value) == ["150\u{202F}000 ₽", "135\u{202F}000 ₽", "29,9 % годовых"])
+        #expect(russian.allSatisfy { !$0.isWarning })
+        let english = try details(card, owed: 1_500_000).rows(in: Self.en)
+        #expect(english.prefix(2).map(\.title) == ["Credit limit", "Available"])
+        #expect(english[1].spokenValue == "135000 Russian rubles")
+
+        // Nothing owed: the whole limit.
+        let free = values(try details(card, owed: 0).rows(in: Self.ru))
+        #expect(free[.available] == "150\u{202F}000 ₽")
+
+        let overDetails = try details(card, owed: 15_500_000)
+        let row = try #require(overDetails.rows(in: Self.ru).first { $0.kind == .available })
+        #expect(row.title == "Сверх лимита" && row.value == "5\u{202F}000 ₽" && row.isWarning)
+        #expect(overDetails.rows(in: Self.en)[1].title == "Over the limit")
+    }
+
     @Test func aGracePeriodRunningOutWithMoneyOwedIsHomesWarning() throws {
         let card = Account(
             name: "Кредитка", currency: "RUB", type: .credit, includeInFree: false, graceUntil: Int64(Self.today.plusDays(3).epochDay)

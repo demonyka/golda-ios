@@ -47,18 +47,3 @@ public struct Impact: Equatable, Sendable {
     }
 }
 
-/// What "Не беру" did: "+50 $ к «Велосипед»", or "Сэкономлено 50 $" without a main goal.
-public struct SkipOutcome: Equatable, Sendable {
-    /// The refusal as it was recorded, SKIPPED.
-    public var wish: Wish
-    /// The main goal with the money added; nil when there is no main goal.
-    public var goal: Goal?
-    /// What went to the goal, in the goal's currency; nil when there is no main goal.
-    public var addedMinor: Int64?
-
-    public init(wish: Wish, goal: Goal?, addedMinor: Int64?) {
-        self.wish = wish
-        self.goal = goal
-        self.addedMinor = addedMinor
-    }
-}

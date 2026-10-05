@@ -140,6 +140,7 @@ private func apiError(_ code: Int, _ message: String, _ status: String) -> Data 
            "account_id":null,"to_account_id":null,"to_amount":null,"date":null},
           {"intent":"expense","amount":"15","currency":"  ","note":"такси","category":"","account_id":"2","date":"2026-10-01"},
           {"intent":"transfer","amount":"100","currency":"USD","note":"","account_id":"2","to_account_id":"3","to_amount":"8300"},
+          {"intent":"transfer","amount":"100","currency":"GEL","note":"","account_kind":"card","to_account_kind":"cash"},
           {"note":"что-то"}
         ]}
         """#)
@@ -148,6 +149,7 @@ private func apiError(_ code: Int, _ message: String, _ status: String) -> Data 
             VoiceItem(intent: "expense", amount: "8", currency: "GEL", note: "кофе", category: "eating_out"),
             VoiceItem(intent: "expense", amount: "15", note: "такси", accountId: "2", date: "2026-10-01"),
             VoiceItem(intent: "transfer", amount: "100", currency: "USD", note: "", accountId: "2", toAccountId: "3", toAmount: "8300"),
+            VoiceItem(intent: "transfer", amount: "100", currency: "GEL", note: "", accountKind: "card", toAccountKind: "cash"),
             // A missing intent is "unknown", a missing optional field nil.
             VoiceItem(intent: "unknown", note: "что-то"),
         ]))

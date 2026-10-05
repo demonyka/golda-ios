@@ -12,10 +12,15 @@ public struct VoiceItem: Equatable, Sendable {
     public var toAccountId: String?
     public var toAmount: String?
     public var date: String?
+    /// The kind of account said instead of one (D65): «с карты» is "card", «наличкой» "cash",
+    /// «с кредитки» "credit", «на вклад» "savings". The code picks the account of that kind.
+    public var accountKind: String?
+    public var toAccountKind: String?
 
     public init(
         intent: String, amount: String? = nil, currency: String? = nil, note: String = "", category: String? = nil,
-        accountId: String? = nil, toAccountId: String? = nil, toAmount: String? = nil, date: String? = nil
+        accountId: String? = nil, toAccountId: String? = nil, toAmount: String? = nil, date: String? = nil,
+        accountKind: String? = nil, toAccountKind: String? = nil
     ) {
         self.intent = intent
         self.amount = amount
@@ -26,6 +31,8 @@ public struct VoiceItem: Equatable, Sendable {
         self.toAccountId = toAccountId
         self.toAmount = toAmount
         self.date = date
+        self.accountKind = accountKind
+        self.toAccountKind = toAccountKind
     }
 }
 
@@ -73,7 +80,9 @@ public enum VoicePrompt {
         "account_id":{"type":"string","nullable":true},
         "to_account_id":{"type":"string","nullable":true},
         "to_amount":{"type":"string","nullable":true},
-        "date":{"type":"string","nullable":true}
+        "date":{"type":"string","nullable":true},
+        "account_kind":{"type":"string","enum":["card","cash","credit","savings"],"nullable":true},
+        "to_account_kind":{"type":"string","enum":["card","cash","credit","savings"],"nullable":true}
       },"required":["intent","note"]}}
     },"required":["transcript","items"]}
     """
@@ -110,7 +119,8 @@ public enum VoicePrompt {
         - amount и to_amount — число строкой с точкой: "15", "1500.5". Валюта — код ISO: лари GEL, бат THB, доллар/бакс USD, рубль RUB, евро EUR. Не названа — null.
         - Название, которое носят несколько валют (\(SpokenCurrency.sharedNames.joined(separator: ", "))), — валюта пользователя с этим названием, если среди его валют такая одна: «хлеб 200 песо» при ARS в списке — ARS. Иначе обычная: доллар — USD, фунт — GBP.
         - Разменная монета — доля основной валюты: сумму пиши в основной единице, валюту — кодом основной. «50 тетри» — amount "0.50", currency GEL; «2 лари 50 тетри» — "2.50", GEL; «50 копеек» — "0.50", RUB. Это запись числа, а не пересчёт.
-        - account_id только из списка выше (номер счёта строкой) и только если счёт явно назван или однозначно следует из сказанного («наличкой», «с кредитки»), иначе null.
+        - account_id — номер счёта из списка строкой, только если счёт назван по имени или банку («с Т-Банка», «с мультивалютной», «на накопительный»), иначе null.
+        - Если назван только вид счёта, это account_kind, а account_id — null: «с карты», «картой» — card; «наличкой», «налом», «кэшем» — cash; «с кредитки» — credit; «на вклад», «в копилку» — savings. Какой именно счёт этого вида, решит код по валюте. Для перевода то же: to_account_id или to_account_kind («снял с карты» — account_kind card, to_account_kind cash).
         - category — ключ из списка или null. note — коротко, что купил, с маленькой буквы.
         - date в формате YYYY-MM-DD, только если назван день («вчера», «в понедельник»), иначе null.
         - Если не про деньги или не разобрать — один элемент с intent unknown.
@@ -155,6 +165,19 @@ public enum VoiceMapper {
         let said = item.currency.map { $0.uppercased() }.flatMap { $0.count == 3 ? $0 : nil }
             .map { SpokenCurrency.own($0, among: SpokenCurrency.held(accounts, settings)) }
         let currency = said ?? unsaidCurrency(item, named, settings.localCurrency)
+        /// The account meant: a kind said picks one of that kind in the money (D65), a named one
+        /// stays unless its bank has the part in the money said, and nothing said is the usual pick.
+        func account(_ position: String?, _ kind: String?, orPick: Bool) -> Account? {
+            let named = named(position)
+            if let kind = AccountKind(rawValue: kind ?? ""), let chosen = Self.pick(accounts, kind: kind, currency, settings, named: named) {
+                return chosen
+            }
+            if let named {
+                guard let said, named.currency != said, let group = named.groupName, !group.allSatisfy(\.isWhitespace) else { return named }
+                return accounts.first { $0.groupName == group && $0.currency == said } ?? named
+            }
+            return orPick ? pick(accounts, currency, settings) : nil
+        }
         let amount = item.amount.flatMap { Fmt.parseMinor($0, currency) }.flatMap { $0 > 0 ? $0 : nil }
         let trimmed = item.note.trimmingCharacters(in: .whitespacesAndNewlines)
         let note = trimmed.prefix(1).uppercased() + trimmed.dropFirst()
@@ -168,7 +191,7 @@ public enum VoiceMapper {
             return .consider(Consider(title: note.isEmpty ? unnamedPurchase : note, amountMinor: amount, currency: currency))
 
         case "expense":
-            guard let amount, let account = named(item.accountId) ?? pick(accounts, currency, settings) else { return lost }
+            guard let amount, let account = account(item.accountId, item.accountKind, orPick: true) else { return lost }
             if account.currency == currency {
                 return .record(Draft(
                     type: .expense, timestamp: timestamp, accountId: account.id, amountMinor: amount,
@@ -183,7 +206,7 @@ public enum VoiceMapper {
             ))
 
         case "income":
-            guard let amount, let account = named(item.accountId) ?? pick(accounts, currency, settings) else { return lost }
+            guard let amount, let account = account(item.accountId, item.accountKind, orPick: true) else { return lost }
             let credited = account.currency == currency ? amount : rates.convert(amount, from: currency, to: account.currency)
             guard let credited else { return lost }
             return .record(Draft(
@@ -192,8 +215,8 @@ public enum VoiceMapper {
             ))
 
         case "transfer":
-            guard let from = named(item.accountId) ?? pick(accounts, currency, settings),
-                  let to = named(item.toAccountId), to.id != from.id
+            guard let from = account(item.accountId, item.accountKind, orPick: true),
+                  let to = account(item.toAccountId, item.toAccountKind, orPick: false), to.id != from.id
             else { return lost }
             let said = item.toAmount.flatMap { Fmt.parseMinor($0, to.currency) }.flatMap { $0 > 0 ? $0 : nil }
             let sent: Int64?
@@ -239,9 +262,46 @@ public enum VoiceMapper {
     /// (the purchase is then converted).
     public static func pick(_ accounts: [Account], _ currency: String, _ settings: Settings) -> Account? {
         let last = settings.lastAccountId.flatMap { id in accounts.first { $0.id == id } }
-        let spendable = accounts.filter { $0.includeInFree || $0.type == .credit }
+        // A loan's switch sets its payment aside (D64); it is not money to pay with.
+        let spendable = accounts.filter { Budget.isFree($0) || $0.type == .credit }
         if let last, last.currency == currency { return last }
         return spendable.first { $0.currency == currency } ?? last ?? spendable.first ?? accounts.first
+    }
+
+    /// The kinds of account a phrase can name without naming one (D65). A loan is never paid with.
+    enum AccountKind: String {
+        case card, cash, credit, savings
+
+        /// The account types of the kind, the most likely first: «с карты» is a debit card before a
+        /// credit card.
+        var types: [AccountType] {
+            switch self {
+            case .card: [.card, .credit]
+            case .cash: [.cash]
+            case .credit: [.credit]
+            case .savings: [.savings]
+            }
+        }
+    }
+
+    /// The account of [kind] a phrase means: one in [currency] if there is one (the named one, the
+    /// last one used, the likeliest type, one in "Можно сегодня", the first), else one of the kind
+    /// in another money, charged in its own. Nil when there is no account of the kind.
+    static func pick(_ accounts: [Account], kind: AccountKind, _ currency: String, _ settings: Settings, named: Account?) -> Account? {
+        let candidates = accounts.filter { kind.types.contains($0.type) }
+        guard !candidates.isEmpty else { return nil }
+        let last = settings.lastAccountId.flatMap { id in candidates.first { $0.id == id } }
+        func best(_ among: [Account]) -> Account? {
+            if let named, among.contains(named) { return named }
+            if let last, among.contains(last) { return last }
+            return among.enumerated().min { a, b in
+                let rank = { (account: Account, index: Int) in
+                    (kind.types.firstIndex(of: account.type) ?? 0, Budget.isFree(account) ? 0 : 1, index)
+                }
+                return rank(a.element, a.offset) < rank(b.element, b.offset)
+            }?.element
+        }
+        return best(candidates.filter { $0.currency == currency }) ?? best(candidates)
     }
 
     /// The currency of an amount said without one (D44). A purchase is priced in the local money,

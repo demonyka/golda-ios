@@ -101,6 +101,27 @@ import Testing
         #expect(t.leftTodayRub == 700_000)
     }
 
+    /// D64: a debt is never free money. Its switch only sets its payment aside, so a credit card in
+    /// the budget leaves out what it owes and what was bought on it today.
+    @Test func aDebtInTheBudgetIsNotFreeMoney() throws {
+        let settings = Settings(payday: 15)
+        let today = LocalDate(2026, 10, 2)
+        let credit = Account(id: uid(9), name: "Кредитка", currency: "RUB", type: .credit, includeInFree: true)
+        let all = accounts + [credit]
+        func posting(_ account: Account, _ minor: Int64, _ type: OpType, _ time: Int64) -> OperationFull {
+            OperationFull(Operation(id: UUID(), type: type, timestamp: time), [Posting(accountId: account.id, amountMinor: minor, rubMinor: minor)])
+        }
+        let ops = [
+            posting(rubCard, 13_000_000, .opening, 0),
+            posting(credit, -5_000_000, .opening, 0),
+            posting(credit, -300_000, .expense, today.atTimeMillis(hour: 9, in: utc)),
+        ]
+        let t = Budget.today(states: Ledger.states(all, ops.flatMap(\.postings)), operations: ops, settings: settings, today: today, zone: utc)
+        #expect(t.freeRub == 13_000_000)
+        #expect(t.spentTodayRub == 0)
+        #expect(t.perDayRub == 1_000_000)
+    }
+
     /// Free money before payday, the salary on Sep 15, then [spent] rubles over the next weeks; today is Oct 2.
     func paceAfter(_ spent: Int64) throws -> Int64? {
         let settings = Settings(payday: 15)

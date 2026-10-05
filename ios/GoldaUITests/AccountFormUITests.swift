@@ -217,6 +217,30 @@ final class AccountFormUITests: XCTestCase {
         XCTAssertFalse(row(app, "Never saved").exists)
     }
 
+    /// D62: a credit card with nothing owed is added with its limit alone and says what is available.
+    @MainActor
+    func testACreditCardWithNothingOwedIsAddedWithItsLimit() {
+        let app = launch()
+        openAccounts(app)
+
+        let name = openNewAccountForm(app)
+        name.tap()
+        name.typeText("Visa")
+        app.buttons["accountForm.type.credit"].tap()
+        XCTAssertTrue(app.staticTexts["Nothing owed? Leave it empty."].exists)
+        let limit = app.textFields["accountForm.limit"]
+        scrollTo(limit, in: app)
+        limit.tap()
+        limit.typeText("50000")
+        app.buttons["accountForm.save"].tap()
+        XCTAssertTrue(eventually { !name.exists }, "the form closes")
+
+        let card = row(app, "Visa")
+        scrollTo(card, in: app)
+        XCTAssertTrue(card.label.contains("Credit card, 50000 Georgian laris available"), card.label)
+        XCTAssertTrue(card.label.hasSuffix(", 0 Georgian laris"), card.label)
+    }
+
     @MainActor
     func testTheLoanPageShowsItsTermsAndOpensTheEarlyRepaymentCalculator() {
         let app = launch()
@@ -255,9 +279,15 @@ final class AccountFormUITests: XCTestCase {
         openAccounts(app)
         let card = row(app, "Кредитка")
         scrollTo(card, in: app)
+        XCTAssertTrue(card.label.contains("Credit card, 135000 Russian rubles available"), card.label)
         card.tap()
 
         XCTAssertTrue(page(app).waitForExistence(timeout: 5))
+        // The samples' card lends 150 000 ₽ and 15 000 ₽ of it is owed (D62).
+        let limit = app.descendants(matching: .any)["debt.limit"]
+        XCTAssertTrue(limit.waitForExistence(timeout: 5))
+        XCTAssertEqual(limit.label, "Credit limit")
+        XCTAssertEqual(app.descendants(matching: .any)["debt.available"].value as? String, "135000 Russian rubles")
         let rate = app.descendants(matching: .any)["debt.rate"]
         XCTAssertTrue(rate.waitForExistence(timeout: 5))
         XCTAssertEqual(rate.value as? String, "29,9 % a year")

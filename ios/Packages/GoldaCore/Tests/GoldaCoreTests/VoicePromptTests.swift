@@ -9,6 +9,17 @@ import Testing
         let properties = try #require(object?["properties"] as? [String: Any])
         #expect(Set(properties.keys) == ["transcript", "items"])
         #expect(VoicePrompt.schema.contains("\"enum\":[\"expense\",\"income\",\"transfer\",\"consider\",\"unknown\"]"))
+        // D65: a kind of account said instead of one.
+        #expect(VoicePrompt.schema.contains("\"account_kind\":{\"type\":\"string\",\"enum\":[\"card\",\"cash\",\"credit\",\"savings\"]"))
+        #expect(VoicePrompt.schema.contains("\"to_account_kind\""))
+    }
+
+    /// D65: «с карты» is a kind, not the first card in the list.
+    @Test func aKindOfAccountIsLeftToTheCode() {
+        let prompt = VoicePrompt.system(accounts: [], categories: Category.builtIn, settings: Settings(), today: LocalDate(2026, 10, 2))
+        #expect(prompt.contains("«с карты», «картой» — card"))
+        #expect(prompt.contains("«наличкой», «налом», «кэшем» — cash"))
+        #expect(prompt.contains("account_id — null"))
     }
 
     @Test func accountsAreNumberedByPositionInTheListGiven() {

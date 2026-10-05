@@ -598,7 +598,7 @@ struct ProfileScreen: View {
     static let exchangeTitle = LocalizedStringResource("Exchange", table: "Profiles", comment: "Profile screen: the header over the markup over the CBR rate.")
     static let paymentsTitle = LocalizedStringResource("Payments", table: "Profiles", comment: "Profile screen: the header over the monthly payments.")
     static let paymentsNote = LocalizedStringResource(
-        "Payments due before payday are set aside from “Safe to spend today”. Loan and credit card payments are added by themselves.",
+        "Payments due before payday are set aside from “Safe to spend today”. A loan’s or a credit card’s payment is added when the debt counts in it.",
         table: "Profiles", comment: "Profile screen: what the monthly payments do."
     )
     static let addPaymentTitle = LocalizedStringResource("Payment", table: "Profiles", comment: "A payment: the title of the payment form when changing one, and the last row of the payments, “+ Payment”.")

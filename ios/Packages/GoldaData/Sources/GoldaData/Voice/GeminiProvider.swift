@@ -120,7 +120,9 @@ public struct GeminiProvider: VoiceProvider {
                     accountId: optional("account_id"),
                     toAccountId: optional("to_account_id"),
                     toAmount: optional("to_amount"),
-                    date: optional("date")
+                    date: optional("date"),
+                    accountKind: optional("account_kind"),
+                    toAccountKind: optional("to_account_kind")
                 )
             }
         )

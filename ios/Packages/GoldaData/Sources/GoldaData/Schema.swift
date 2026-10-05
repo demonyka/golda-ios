@@ -12,6 +12,8 @@ enum Schema {
         migrator.registerMigration("v2", migrate: SyncSchema.v2)
         // Postings travel inside their operation's record (D58).
         migrator.registerMigration("v3", migrate: SyncSchema.v3)
+        // A credit card's limit (1.0.1, D62).
+        migrator.registerMigration("v4", migrate: SyncSchema.v4)
         return migrator
     }
 

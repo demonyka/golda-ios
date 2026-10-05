@@ -15,7 +15,7 @@ struct AccountFormModel: Equatable, Sendable {
 
     /// The fields that can hold text the form cannot read; the sheet paints them red.
     enum Field: Hashable, Sendable {
-        case opening, rate, payment
+        case opening, rate, payment, limit
     }
 
     /// What saving hands to the repository.
@@ -62,6 +62,9 @@ struct AccountFormModel: Equatable, Sendable {
     /// A debt's monthly payment, as typed. A plain field, as Android's, so no grouping.
     var paymentText: String
 
+    /// A credit card's limit, as typed (D62). A plain field, as the payment beside it.
+    var limitText: String
+
     // MARK: Building
 
     /// The form for [editing], or for a new account when it is nil, over the open profile's books.
@@ -98,6 +101,7 @@ struct AccountFormModel: Equatable, Sendable {
         paymentText = editing.flatMap { account in account.paymentMinor.map { Fmt.editable($0, account.currency) } } ?? ""
         paymentDay = editing?.paymentDay
         graceUntil = editing?.graceUntil.map { LocalDate(epochDay: Int($0)) }
+        limitText = editing.flatMap { account in account.creditLimitMinor.map { Fmt.editable($0, account.currency) } } ?? ""
     }
 
     // MARK: What the type brings
@@ -112,10 +116,13 @@ struct AccountFormModel: Equatable, Sendable {
     /// Only a credit card has an interest-free period.
     var hasGracePeriod: Bool { type == .credit }
 
-    /// Cards and cash are money to spend; savings and debts stay out of "Можно сегодня" unless the
-    /// switch says otherwise.
+    /// Only a credit card has a limit (D62).
+    var hasLimit: Bool { type == .credit }
+
+    /// Cards and cash are money to spend; savings stay out of "Можно сегодня" unless the switch says
+    /// otherwise. A debt's switch sets its payment aside (D64), which is what a debt usually wants.
     static func countsInBudgetByDefault(_ type: AccountType) -> Bool {
-        type == .card || type == .cash
+        type != .savings
     }
 
     /// Counts towards "Можно сегодня". Follows the type until it is set; once set, it stays through
@@ -170,6 +177,8 @@ struct AccountFormModel: Equatable, Sendable {
 
     var payment: Parsed<Int64> { Self.amount(paymentText, currency) }
 
+    var limit: Parsed<Int64> { Self.amount(limitText, currency) }
+
     /// Fields the account uses whose text cannot be read. A field the type hides does not count:
     /// it is not saved.
     var invalidFields: Set<Field> {
@@ -177,6 +186,7 @@ struct AccountFormModel: Equatable, Sendable {
         if isNew, opening == .invalid { fields.insert(.opening) }
         if hasRate, rate == .invalid { fields.insert(.rate) }
         if isDebt, payment == .invalid { fields.insert(.payment) }
+        if hasLimit, limit == .invalid { fields.insert(.limit) }
         return fields
     }
 
@@ -200,7 +210,9 @@ struct AccountFormModel: Equatable, Sendable {
             graceUntil: hasGracePeriod ? graceUntil.map { Int64($0.epochDay) } : nil,
             // The repository keeps the stored stamp whatever comes here; this only spares the
             // reader a wrong-looking value.
-            reconciledAt: editing?.reconciledAt
+            reconciledAt: editing?.reconciledAt,
+            // A limit of nothing is no limit.
+            creditLimitMinor: hasLimit ? limit.value.flatMap { $0 > 0 ? $0 : nil } : nil
         )
         guard isNew else { return Output(account: account, openingMinor: nil) }
         // How much is owed is typed as a positive amount; the ledger keeps a debt negative.
@@ -249,6 +261,26 @@ struct AccountFormModel: Equatable, Sendable {
         isDebt
             ? LocalizedStringResource("How much you owe now", table: "AccountForm", comment: "Account form: caption over the opening balance of a debt.")
             : LocalizedStringResource("How much is there now", table: "AccountForm", comment: "Account form: caption over the opening balance.")
+    }
+
+    /// Under the opening balance of a credit card: one the bank lends on, with nothing owed yet,
+    /// is added just as well.
+    var openingFooter: LocalizedStringResource? {
+        type == .credit
+            ? LocalizedStringResource("Nothing owed? Leave it empty.", table: "AccountForm", comment: "Account form, a credit card: under what is owed now, for a card with no debt.")
+            : nil
+    }
+
+    static let limitTitle = LocalizedStringResource("Credit limit", table: "AccountForm", comment: "Account form: how much the bank lends on a credit card.")
+
+    /// Under the budget switch: what it does to a debt (D64), or why savings start off.
+    var budgetFooter: LocalizedStringResource {
+        isDebt
+            ? LocalizedStringResource(
+                "For a debt: its payment is set aside before payday while something is owed. The debt itself never counts.", table: "AccountForm",
+                comment: "Account form, a debt: what the budget switch does to it."
+            )
+            : LocalizedStringResource("Savings usually stay out.", table: "AccountForm", comment: "Account form: why savings start with the budget switch off.")
     }
 
     var rateTitle: LocalizedStringResource {

@@ -135,7 +135,7 @@ import Testing
         #expect(!form.isMain)
         #expect(!form.isMainLocked)
         #expect(form.mainNote == .explains)
-        #expect(form.mainNoteText(in: F.ru) == "С главной целью сравнивается каждая покупка, а отказы копятся в неё.")
+        #expect(form.mainNoteText(in: F.ru) == "С главной целью сравнивается каждая покупка.")
         form.isMain = true
         #expect(form.mainNote == .takesOverFrom("Велосипед"))
         #expect(form.mainNoteText(in: F.ru) == "«Велосипед» перестанет быть главной.")
@@ -185,7 +185,7 @@ import Testing
             (GoalFormModel.currencyTitle, "Валюта", "Currency"),
             (GoalFormModel.accountTitle, "Копится на", "Saved on"),
             (GoalFormModel.noAccount, "Без счёта", "No account"),
-            (GoalFormModel.accountFooter, "Прогресс — остаток на счёте плюс отказы.", "Progress is the account’s balance plus what you skip."),
+            (GoalFormModel.accountFooter, "Прогресс — остаток на счёте плюс уже отложенное.", "Progress is the account’s balance plus what is already put aside."),
             (GoalFormModel.savedTitle, "Уже отложено", "Already put aside"),
             (GoalFormModel.mainTitle, "Главная цель", "Main goal"),
             (GoalFormModel.cancelTitle, "Отмена", "Cancel"),

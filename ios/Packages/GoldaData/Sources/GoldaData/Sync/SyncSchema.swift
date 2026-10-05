@@ -11,7 +11,7 @@ enum SyncSchema {
         "profile": ["name", "incomeHourly", "hourlyRate", "monthlySalary", "taxPercent", "hoursPerWeek", "payday", "markup"],
         "account": [
             "name", "currency", "type", "groupName", "includeInFree", "sort", "interestRate", "paymentDay", "paymentMinor",
-            "graceUntil", "reconciledAt",
+            "graceUntil", "reconciledAt", "creditLimitMinor",
         ],
         "operation": [
             "type", "timestamp", "categoryKey", "note", "voiceText", "purchaseAmountMinor", "purchaseCurrency", "isEstimate",
@@ -90,6 +90,8 @@ enum SyncSchema {
         }
 
         for (table, columns) in syncedColumns {
+            // The columns as they were then: a later migration that adds one adds it here too.
+            let columns = columns.filter { !(table == "account" && $0 == "creditLimitMinor") }
             let profileId = table == "profile" ? "id" : "profileId"
             func journal(_ row: String, deleted: Bool) -> String {
                 "INSERT OR REPLACE INTO syncJournal (tableName, id, profileId, deleted) VALUES ('\(table)', \(row).id, \(row).\(profileId), \(deleted ? 1 : 0));"
@@ -141,5 +143,17 @@ enum SyncSchema {
             guard let zone = try SyncLedger.zoneRow(profileId, db)?.zone else { continue }
             try SyncLedger.enqueue(.save, SyncRecordRef(zone: zone, type: .operation, id: row["id"]), profileId: profileId, now: 0, db)
         }
+    }
+
+    /// A credit card's limit (1.0.1, D62): a column of its own, and the account's update trigger
+    /// made again with it, so a new limit alone goes to the other phones. Nothing is sent again:
+    /// no account has a limit yet.
+    static func v4(_ db: Database) throws {
+        try db.alter(table: "account") { t in t.add(column: "creditLimitMinor", .integer) }
+        let changed = (syncedColumns["account"] ?? []).map { "OLD.\"\($0)\" IS NOT NEW.\"\($0)\"" }.joined(separator: " OR ")
+        try db.execute(sql: """
+            DROP TRIGGER "syncJournal_account_update";
+            CREATE TRIGGER "syncJournal_account_update" AFTER UPDATE ON "account" WHEN \(changed) BEGIN INSERT OR REPLACE INTO syncJournal (tableName, id, profileId, deleted) VALUES ('account', NEW.id, NEW.profileId, 0); END;
+            """)
     }
 }

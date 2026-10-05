@@ -25,7 +25,8 @@ import Testing
             ))),
             .account(Account(
                 id: Self.accountId, name: "Кредитка", currency: "GEL", type: .credit, groupName: "TBC", includeInFree: false,
-                interestRate: 24.9, sort: 3, paymentDay: 15, paymentMinor: 50_000, graceUntil: 20_400, reconciledAt: 1_759_000_000_000
+                interestRate: 24.9, sort: 3, paymentDay: 15, paymentMinor: 50_000, graceUntil: 20_400, reconciledAt: 1_759_000_000_000,
+                creditLimitMinor: 15_000_000
             )),
             .account(Account(name: "Наличные", currency: "RUB", type: .cash, includeInFree: true)),
             .operation(

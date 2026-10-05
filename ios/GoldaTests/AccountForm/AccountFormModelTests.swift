@@ -58,9 +58,10 @@ import Testing
         #expect(output.openingMinor == 0)
     }
 
-    @Test func savingsAndDebtsStartOutsideTheBudget() {
+    /// A debt's switch sets its payment aside (D64), so a debt starts with it on.
+    @Test func savingsStartOutsideTheBudget() {
         var form = newForm()
-        for (type, counts) in [(AccountType.card, true), (.cash, true), (.savings, false), (.credit, false), (.loan, false)] {
+        for (type, counts) in [(AccountType.card, true), (.cash, true), (.savings, false), (.credit, true), (.loan, true)] {
             form.type = type
             #expect(form.includeInFree == counts, "\(type)")
             #expect(AccountFormModel.countsInBudgetByDefault(type) == counts)
@@ -76,9 +77,9 @@ import Testing
         form.type = .savings
         #expect(form.hasRate && !form.isDebt && !form.hasGracePeriod)
         form.type = .credit
-        #expect(form.hasRate && form.isDebt && form.hasGracePeriod)
+        #expect(form.hasRate && form.isDebt && form.hasGracePeriod && form.hasLimit)
         form.type = .loan
-        #expect(form.hasRate && form.isDebt && !form.hasGracePeriod)
+        #expect(form.hasRate && form.isDebt && !form.hasGracePeriod && !form.hasLimit)
     }
 
     @Test func theBudgetSwitchOnceTouchedStaysThroughAChangeOfType() throws {
@@ -117,6 +118,7 @@ import Testing
         form.paymentDay = 25
         form.setGracePeriod(true, today: Self.today)
         form.graceUntil = Self.today.plusDays(40)
+        form.limitText = "150 000"
 
         form.type = .credit
         var account = try #require(form.output).account
@@ -124,6 +126,7 @@ import Testing
         #expect(account.paymentMinor == 300_000)
         #expect(account.paymentDay == 25)
         #expect(account.graceUntil == Int64(Self.today.plusDays(40).epochDay))
+        #expect(account.creditLimitMinor == 15_000_000)
 
         form.type = .loan
         account = try #require(form.output).account
@@ -131,6 +134,7 @@ import Testing
         #expect(account.paymentMinor == 300_000)
         #expect(account.paymentDay == 25)
         #expect(account.graceUntil == nil, "only a credit card has a grace period")
+        #expect(account.creditLimitMinor == nil, "only a credit card has a limit")
 
         form.type = .savings
         account = try #require(form.output).account
@@ -214,6 +218,34 @@ import Testing
         form.type = .card
         #expect(form.invalidFields.isEmpty)
         #expect(form.canSave)
+    }
+
+    /// D62: a card the bank lends on, with nothing owed yet, is added with its limit alone.
+    @Test func aCreditCardWithNothingOwedIsAddedWithItsLimit() throws {
+        var form = newForm()
+        form.name = "Кредитка"
+        form.type = .credit
+        form.pickCurrency("RUB")
+        form.limitText = "200000"
+        let output = try #require(form.output)
+        #expect(output.openingMinor == 0)
+        #expect(output.account.creditLimitMinor == 20_000_000)
+        // No limit, or a limit of nothing, is no limit.
+        form.limitText = ""
+        #expect(try #require(form.output).account.creditLimitMinor == nil)
+        form.limitText = "0"
+        #expect(try #require(form.output).account.creditLimitMinor == nil)
+    }
+
+    @Test func aLimitThatCannotBeReadStopsTheSaveOnlyOnACreditCard() {
+        var form = newForm()
+        form.name = "Кредитка"
+        form.type = .credit
+        form.limitText = "много"
+        #expect(form.invalidFields == [.limit])
+        #expect(!form.canSave)
+        form.type = .loan
+        #expect(form.invalidFields.isEmpty)
     }
 
     @Test func emptyTermsAreSavedAsNone() throws {
@@ -338,11 +370,12 @@ import Testing
     @Test func editingKeepsTheGroupAndTheGracePeriod() throws {
         let credit = Account(
             name: "Кредитка", currency: "RUB", type: .credit, groupName: "Т-Банк", includeInFree: true, interestRate: 29.9,
-            paymentDay: 25, paymentMinor: 300_000, graceUntil: Int64(Self.today.plusDays(40).epochDay)
+            paymentDay: 25, paymentMinor: 300_000, graceUntil: Int64(Self.today.plusDays(40).epochDay), creditLimitMinor: 15_000_000
         )
         let form = AccountFormModel(accounts: accounts + [credit], settings: settings, editing: credit)
         #expect(form.groupChoice == .existing("Т-Банк"))
         #expect(form.graceUntil == Self.today.plusDays(40))
+        #expect(form.limitText == "150000")
         // A debt that was put in the budget by hand stays there.
         #expect(form.includeInFree)
         #expect(try #require(form.output).account == credit)
@@ -364,12 +397,20 @@ import Testing
         #expect(form.saveTitle.text(in: Self.ru) == "Добавить")
         #expect(form.saveTitle.text(in: Self.en) == "Add")
         #expect(form.openingCaption.text(in: Self.ru) == "Сколько сейчас")
+        #expect(form.openingFooter == nil)
+        #expect(form.budgetFooter.text(in: Self.ru) == "Накопления обычно не учитываются.")
         #expect(form.rateTitle.text(in: Self.en) == "Rate on balance")
         form.type = .credit
         #expect(form.openingCaption.text(in: Self.ru) == "Сколько должен сейчас")
         #expect(form.openingCaption.text(in: Self.en) == "How much you owe now")
         #expect(form.rateTitle.text(in: Self.ru) == "Ставка")
         #expect(form.paymentTitle.text(in: Self.ru) == "Минимальный платёж")
+        #expect(AccountFormModel.limitTitle.text(in: Self.ru) == "Кредитный лимит")
+        #expect(AccountFormModel.limitTitle.text(in: Self.en) == "Credit limit")
+        #expect(form.openingFooter?.text(in: Self.ru) == "Ничего не должен — оставь пустым.")
+        #expect(form.openingFooter?.text(in: Self.en) == "Nothing owed? Leave it empty.")
+        #expect(form.budgetFooter.text(in: Self.ru) == "Для долга: пока есть долг, его платёж откладывается до зарплаты. Сам долг не учитывается.")
+        #expect(form.budgetFooter.text(in: Self.en) == "For a debt: its payment is set aside before payday while something is owed. The debt itself never counts.")
         form.type = .loan
         #expect(form.paymentTitle.text(in: Self.en) == "Payment")
 

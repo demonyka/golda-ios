@@ -154,14 +154,15 @@ public enum Demo {
             (Account(name: "Наличные ₾", currency: "GEL", type: .cash, includeInFree: true, sort: 4), nil),
             (
                 Account(
-                    name: "Кредитка", currency: "RUB", type: .credit, includeInFree: false, interestRate: 29.9, sort: 5,
-                    paymentDay: 25, paymentMinor: 300_000, graceUntil: Int64(today.plusDays(40).epochDay)
+                    name: "Кредитка", currency: "RUB", type: .credit, includeInFree: true, interestRate: 29.9, sort: 5,
+                    paymentDay: 25, paymentMinor: 300_000, graceUntil: Int64(today.plusDays(40).epochDay),
+                    creditLimitMinor: 15_000_000
                 ),
                 -1_500_000
             ),
             (
                 Account(
-                    name: "Кредит", currency: "RUB", type: .loan, includeInFree: false, interestRate: 19.9, sort: 6,
+                    name: "Кредит", currency: "RUB", type: .loan, includeInFree: true, interestRate: 19.9, sort: 6,
                     paymentDay: 5, paymentMinor: 1_000_000
                 ),
                 -20_000_000

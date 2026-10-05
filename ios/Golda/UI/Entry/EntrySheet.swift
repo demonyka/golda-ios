@@ -398,9 +398,9 @@ private struct EntryForm: View {
         let model = model, locale = locale, showUndoToast = showUndoToast, wishId = request.wishId
         Task {
             do {
-                let outcome = try await model.skipPurchase(consider, wishId: wishId)
+                let wish = try await model.skipPurchase(consider, wishId: wishId)
                 dismiss()
-                showUndoToast(UndoToast(EntryAnnouncement.skipped(outcome, in: locale), actionTitle: EntryText.ok.text(in: locale), length: .long) {})
+                showUndoToast(UndoToast(EntryAnnouncement.skipped(wish, in: locale), actionTitle: EntryText.ok.text(in: locale), length: .long) {})
             } catch {
                 isBusy = false
                 failure = EntryText.decideFailed

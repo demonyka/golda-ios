@@ -52,9 +52,9 @@ struct AppData: Sendable {
         states = Ledger.states(accounts, operations.flatMap(\.postings))
         accountById = Dictionary(accounts.map { ($0.id, $0) }, uniquingKeysWith: { _, last in last })
         self.zone = zone
-        allObligations = obligations + Debts.obligations(accounts)
+        allObligations = obligations + Debts.obligations(accounts, states)
         visibleOperations = operations.filter { $0.op.type != .opening }
-        usualAccountId = settings.lastAccountId ?? accounts.first(where: \.includeInFree)?.id
+        usualAccountId = settings.lastAccountId ?? accounts.first(where: Budget.isFree)?.id
     }
 
     /// "45,8 $ · 124 ₾ · 1 498 ฿": [rubMinor] in every display currency but [exclude], the local one first.

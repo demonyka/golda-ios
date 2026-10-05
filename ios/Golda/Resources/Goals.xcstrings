@@ -1,6 +1,78 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%@ saved by skipping" : {
+      "comment" : "Goals hero: what refusals (“I’ll pass”) kept from being spent, “13 700 ₽ saved by skipping”. Not put into any goal.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ saved by skipping"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ сэкономлено отказами"
+          }
+        }
+      }
+    },
+    "A bike, a trip, a cushion. Every purchase is held up against it." : {
+      "comment" : "Goals hero with no goals yet: what a goal is for.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A bike, a trip, a cushion. Every purchase is held up against it."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Велосипед, поездка, подушка. С ней сравнивается каждая покупка."
+          }
+        }
+      }
+    },
+    "Every purchase is held up against the main goal." : {
+      "comment" : "Goal form, under the main-goal switch turned off: what the main goal is for.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every purchase is held up against the main goal."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "С главной целью сравнивается каждая покупка."
+          }
+        }
+      }
+    },
+    "Progress is the account’s balance plus what is already put aside." : {
+      "comment" : "Goal form: how progress is counted for a goal saved on an account.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Progress is the account’s balance plus what is already put aside."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Прогресс — остаток на счёте плюс уже отложенное."
+          }
+        }
+      }
+    },
     "“%@” removed" : {
       "comment" : "Toast after a wish was taken off the list, with its name.",
       "extractionState" : "stale",
@@ -33,24 +105,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "«%@» перестанет быть главной."
-          }
-        }
-      }
-    },
-    "%@ from what you skipped" : {
-      "comment" : "Goals hero: what refusals (“I’ll pass”) have put towards the goals, “+13 700 ₽ from what you skipped”.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ from what you skipped"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ отказами"
           }
         }
       }
@@ -105,24 +159,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Расход %@ с «%@». Цель закроется."
-          }
-        }
-      }
-    },
-    "A bike, a trip, a cushion. Every purchase is held up against it, and what you skip goes into it." : {
-      "comment" : "Goals hero with no goals yet: what a goal is for.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A bike, a trip, a cushion. Every purchase is held up against it, and what you skip goes into it."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Велосипед, поездка, подушка. С ней сравнивается каждая покупка, а отказы копятся в неё."
           }
         }
       }
@@ -321,24 +357,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Удалить цель"
-          }
-        }
-      }
-    },
-    "Every purchase is held up against the main goal, and what you skip goes into it." : {
-      "comment" : "Goal form, under the main-goal switch turned off: what the main goal is for.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Every purchase is held up against the main goal, and what you skip goes into it."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "С главной целью сравнивается каждая покупка, а отказы копятся в неё."
           }
         }
       }
@@ -717,24 +735,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Выбери главную цель"
-          }
-        }
-      }
-    },
-    "Progress is the account’s balance plus what you skip." : {
-      "comment" : "Goal form: how progress is counted for a goal saved on an account.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Progress is the account’s balance plus what you skip."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Прогресс — остаток на счёте плюс отказы."
           }
         }
       }

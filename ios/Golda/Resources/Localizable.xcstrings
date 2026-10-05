@@ -1,6 +1,40 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%@ available" : {
+      "comment" : "What is left to spend on a credit card, under its name: “135 000 ₽ available”. Russian “доступно 135 000 ₽”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ available"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "доступно %@"
+          }
+        }
+      }
+    },
+    "%@ over the limit" : {
+      "comment" : "A credit card spent past its limit, under its name: “5 000 ₽ over the limit”. Russian “сверх лимита 5 000 ₽”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ over the limit"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "сверх лимита %@"
+          }
+        }
+      }
+    },
     "“%@” costs %@, more than “%@” earns (%@). Spare money does more paying it off." : {
       "comment" : "Accounts hero: the dearest debt costs more than the best savings account earns. Debt name, its rate, savings name, its rate.",
       "extractionState" : "stale",

@@ -199,7 +199,8 @@ public struct Today: Equatable, Sendable {
 
 public enum Budget {
     /// "Можно сегодня": free money at the start of the day split evenly over the days left until
-    /// payday, minus what is already spent today.
+    /// payday, minus what is already spent today. A debt is never free money (D64): its switch
+    /// only sets its payment aside (`Debts.obligations`).
     public static func today(
         states: [UUID: AccountState],
         operations: [OperationFull],
@@ -209,7 +210,7 @@ public enum Budget {
         obligations: [Obligation] = [],
         rates: Rates? = nil
     ) -> Today {
-        let free = states.values.filter(\.account.includeInFree)
+        let free = states.values.filter { isFree($0.account) }
         let freeIds = Set(free.map(\.account.id))
         let freeRub = free.moneySum(\.rubMinor)
         let spentToday = operations
@@ -247,7 +248,7 @@ public enum Budget {
         let next = settings.nextPayday(date)
         let last = settings.nextPayday(next.minusMonths(1).minusDays(1))
         if last == date { return nil }
-        let freeIds = Set(accounts.filter(\.includeInFree).map(\.id))
+        let freeIds = Set(accounts.filter(isFree).map(\.id))
         let start = last.startOfDayMillis(in: zone)
         let end = last.plusDays(1).startOfDayMillis(in: zone)
         let free = operations.flatMap { full in
@@ -258,6 +259,12 @@ public enum Budget {
         let due = dueRub(obligations, before: next, from: last, rates: rates)
         let days = max(LocalDate.daysBetween(last, next), 1)
         return Money.subtract(today.perDayRub, Money.subtract(freeThen, due) / Int64(days))
+    }
+
+    /// Money that counts in "Можно сегодня": an account whose switch is on, unless it is a debt.
+    /// Android counted a debt's balance too, which took a whole loan off the day's budget.
+    public static func isFree(_ account: Account) -> Bool {
+        account.includeInFree && !account.isDebt
     }
 
     private static func dueRub(_ obligations: [Obligation], before limit: LocalDate, from date: LocalDate, rates: Rates?) -> Int64 {

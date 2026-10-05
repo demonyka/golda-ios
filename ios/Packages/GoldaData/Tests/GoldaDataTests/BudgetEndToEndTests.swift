@@ -28,7 +28,7 @@ import Testing
         let rates = try await repository.rates(profileId: profileId)
         let date = LocalDate(epochMillis: harness.clock.now, in: utc)
         let states = Ledger.states(books.accounts, books.operations.flatMap(\.postings))
-        let obligations = books.obligations + Debts.obligations(books.accounts)
+        let obligations = books.obligations + Debts.obligations(books.accounts, states)
         let today = Budget.today(
             states: states, operations: books.operations, settings: settings, today: date, zone: utc,
             obligations: obligations, rates: rates
@@ -149,7 +149,7 @@ import Testing
 
         // Two coffees and a shawarma today, all paid in cash.
         let dayStart = LocalDate(2026, 10, 15).startOfDayMillis(in: utc)
-        let freeIds = Set(books.accounts.filter(\.includeInFree).map(\.id))
+        let freeIds = Set(books.accounts.filter(Budget.isFree).map(\.id))
         let spent = books.operations
             .filter { $0.op.type == .expense && $0.op.timestamp >= dayStart }
             .flatMap(\.postings).filter { freeIds.contains($0.accountId) }

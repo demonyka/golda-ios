@@ -29,6 +29,30 @@ public extension Account {
     var isDebt: Bool { type == .credit || type == .loan }
 }
 
+/// A credit card's limit against its balance (D62): what can still be spent is the limit less what
+/// is owed, and more when the card was paid in over its debt. Below zero the card is over its limit.
+public struct CreditLine: Equatable, Sendable {
+    public let limitMinor: Int64
+    public let availableMinor: Int64
+
+    public init(limitMinor: Int64, availableMinor: Int64) {
+        self.limitMinor = limitMinor
+        self.availableMinor = availableMinor
+    }
+
+    /// Nil unless [account] is a credit card with a limit.
+    public init?(_ account: Account, balanceMinor: Int64) {
+        guard account.type == .credit, let limit = account.creditLimitMinor, limit > 0 else { return nil }
+        let (available, overflow) = limit.addingReportingOverflow(balanceMinor)
+        self.init(limitMinor: limit, availableMinor: overflow ? (balanceMinor < 0 ? .min : .max) : available)
+    }
+
+    /// What is owed, or zero when nothing is.
+    public var owedMinor: Int64 { max(limitMinor - availableMinor, 0) }
+
+    public var isOverLimit: Bool { availableMinor < 0 }
+}
+
 public enum Debts {
     /// Months left on an annuity: n = −ln(1 − rB/P) / ln(1 + r). Nil when the payment does not even
     /// cover the interest.
@@ -80,11 +104,18 @@ public enum Debts {
     }
 
     /// Monthly debt payments set aside before payday like any other obligation. A derived
-    /// obligation carries its account's id.
-    public static func obligations(_ accounts: [Account]) -> [Obligation] {
-        accounts
-            .filter { $0.isDebt && $0.paymentDay != nil && ($0.paymentMinor ?? 0) > 0 }
-            .map { Obligation(id: $0.id, name: $0.name, amountMinor: $0.paymentMinor!, currency: $0.currency, dayOfMonth: $0.paymentDay!) }
+    /// obligation carries its account's id. Unlike Android (D64), only a debt counted in "Можно
+    /// сегодня" sets its payment aside, only while something is owed, and no more than is owed:
+    /// a credit card with nothing on it, or a debt kept out of the budget, takes nothing from it.
+    public static func obligations(_ accounts: [Account], _ states: [UUID: AccountState]) -> [Obligation] {
+        accounts.compactMap { account in
+            guard account.isDebt, account.includeInFree, let day = account.paymentDay, let payment = account.paymentMinor, payment > 0,
+                  let balance = states[account.id]?.balanceMinor, balance < 0
+            else { return nil }
+            // −Int64.min does not fit; a debt that big is owed more than any payment anyway.
+            let owed = balance == .min ? Int64.max : -balance
+            return Obligation(id: account.id, name: account.name, amountMinor: min(payment, owed), currency: account.currency, dayOfMonth: day)
+        }
     }
 
     public static func advice(_ accounts: [Account], _ states: [UUID: AccountState]) -> DebtAdvice? {

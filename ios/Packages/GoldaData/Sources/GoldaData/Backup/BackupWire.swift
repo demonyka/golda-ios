@@ -203,6 +203,8 @@ struct WireAccount: Codable {
     var paymentMinor: Int64?
     var graceUntil: Int64?
     var reconciledAt: Int64?
+    /// Since 1.0.1 (D62); files before it have none.
+    var creditLimitMinor: Int64?
 
     init(_ a: Account) {
         id = a.id
@@ -217,6 +219,7 @@ struct WireAccount: Codable {
         paymentMinor = a.paymentMinor
         graceUntil = a.graceUntil
         reconciledAt = a.reconciledAt
+        creditLimitMinor = a.creditLimitMinor
     }
 
     init(from decoder: any Decoder) throws {
@@ -233,13 +236,14 @@ struct WireAccount: Codable {
         paymentMinor = try c.decodeIfPresent(Int64.self, forKey: .paymentMinor)
         graceUntil = try c.decodeIfPresent(Int64.self, forKey: .graceUntil)
         reconciledAt = try c.decodeIfPresent(Int64.self, forKey: .reconciledAt)
+        creditLimitMinor = try c.decodeIfPresent(Int64.self, forKey: .creditLimitMinor)
     }
 
     var account: Account {
         Account(
             id: id, name: name, currency: currency, type: type, groupName: groupName, includeInFree: includeInFree,
             interestRate: interestRate, sort: sort, paymentDay: paymentDay, paymentMinor: paymentMinor,
-            graceUntil: graceUntil, reconciledAt: reconciledAt
+            graceUntil: graceUntil, reconciledAt: reconciledAt, creditLimitMinor: creditLimitMinor
         )
     }
 }

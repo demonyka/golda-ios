@@ -99,6 +99,16 @@ import Testing
         #expect(queue[name(.account, cash.id)] == .save)
     }
 
+    @Test func aNewCreditLimitAloneSendsTheAccount() async throws {
+        let card = Account(name: "Кредитка", currency: "RUB", type: .credit, includeInFree: false)
+        let profileId = try await harness.profile(accounts: [card])
+        try await harness.database.writer.write { db in try db.execute(sql: "DELETE FROM syncOutgoing") }
+        var limited = card
+        limited.creditLimitMinor = 15_000_000
+        try await harness.repository.saveAccount(limited, profileId: profileId)
+        #expect(try await queued() == [name(.account, card.id): .save])
+    }
+
     @Test func whatOnlyThisPhoneSeesIsNotSent() async throws {
         let profileId = try await harness.profile()
         let other = try await harness.profile("Семья")

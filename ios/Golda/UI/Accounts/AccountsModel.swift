@@ -155,7 +155,8 @@ struct InterestForecast: Equatable, Sendable {
 
 /// The line under an account's name: what the account is, and what it is worth in the main
 /// currency when it is in another one ("Карта · ≈ 16 001 ₽"). A savings account with a rate says
-/// what it earns instead of its type: that says what it is.
+/// what it earns instead of its type: that says what it is. A credit card with a limit says what is
+/// left to spend on it after its type (D62): "Кредитка · доступно 135 000 ₽".
 struct AccountSubline: Equatable, Sendable {
     enum Lead: Equatable, Sendable {
         case interest(InterestForecast)
@@ -163,6 +164,9 @@ struct AccountSubline: Equatable, Sendable {
     }
 
     let lead: Lead
+    /// A credit card's limit against its balance; nil without a limit.
+    let credit: CreditLine?
+    let currency: String
     /// "16 001 ₽", the main currency's worth; nil when the account is in the main currency.
     let approxBase: String?
 
@@ -172,21 +176,31 @@ struct AccountSubline: Equatable, Sendable {
         } else {
             lead = .type(state.account.type)
         }
+        credit = CreditLine(state.account, balanceMinor: state.balanceMinor)
+        currency = state.currency
         approxBase = state.currency == data.base.code ? nil : data.base.approx(state.rubMinor)
     }
 
     func text(in locale: Locale) -> String {
-        ([leadText(in: locale, spoken: false)] + (approxBase.map { ["≈ " + $0] } ?? [])).joined(separator: " · ")
+        ([leadText(in: locale, spoken: false)] + (creditText(in: locale, spoken: false).map { [$0] } ?? []) + (approxBase.map { ["≈ " + $0] } ?? []))
+            .joined(separator: " · ")
     }
 
     /// The same for VoiceOver: amounts in words, "about" for the approximate one.
     func accessibilityText(in locale: Locale) -> String {
         var parts = [leadText(in: locale, spoken: true)]
+        if let credit = creditText(in: locale, spoken: true) { parts.append(credit) }
         if let approxBase {
             let spoken = SpokenAmount.text(approxBase, locale: locale)
             parts.append(LocalizedStringResource("about \(spoken)", comment: "VoiceOver: an approximate amount, “about 1849 Russian rubles”.").text(in: locale))
         }
         return parts.joined(separator: ", ")
+    }
+
+    /// "доступно 135 000 ₽", or "сверх лимита 5 000 ₽" once the card is past its limit.
+    private func creditText(in locale: Locale, spoken: Bool) -> String? {
+        guard let credit else { return nil }
+        return CreditLineText.short(credit, currency: currency, in: locale, spoken: spoken)
     }
 
     private func leadText(in locale: Locale, spoken: Bool) -> String {
@@ -208,7 +222,8 @@ struct AccountRowModel: Identifiable, Equatable, Sendable {
     var account: Account { state.account }
     var name: String { state.account.name }
     /// Counts towards "Можно сегодня": marked with a dot, not painted.
-    var isInBudget: Bool { state.account.includeInFree }
+    /// A debt's switch only sets its payment aside (D64): no dot, its money is not the day's.
+    var isInBudget: Bool { Budget.isFree(state.account) }
 
     init(_ state: AccountState, in data: AppData, today: LocalDate) {
         self.state = state
@@ -286,5 +301,32 @@ struct ReconcileRound: Equatable, Sendable {
     /// not a finished round: the callback comes only after a check.
     func isComplete(_ accounts: [Account]) -> Bool {
         !accounts.isEmpty && accounts.allSatisfy { isChecked($0.id) }
+    }
+}
+
+/// A credit card's limit in words (D62), for its row and its page.
+enum CreditLineText {
+    /// "доступно 135 000 ₽", "135 000 ₽ available"; "сверх лимита 5 000 ₽" past the limit.
+    static func short(_ credit: CreditLine, currency: String, in locale: Locale, spoken: Bool = false) -> String {
+        if credit.isOverLimit {
+            let amount = figure(over(credit), currency, in: locale, spoken: spoken)
+            return LocalizedStringResource(
+                "\(amount) over the limit", comment: "A credit card spent past its limit, under its name: “5 000 ₽ over the limit”. Russian “сверх лимита 5 000 ₽”."
+            ).text(in: locale)
+        }
+        let amount = figure(credit.availableMinor, currency, in: locale, spoken: spoken)
+        return LocalizedStringResource(
+            "\(amount) available", comment: "What is left to spend on a credit card, under its name: “135 000 ₽ available”. Russian “доступно 135 000 ₽”."
+        ).text(in: locale)
+    }
+
+    /// How far past the limit, positive.
+    static func over(_ credit: CreditLine) -> Int64 {
+        credit.availableMinor == .min ? .max : -credit.availableMinor
+    }
+
+    static func figure(_ minor: Int64, _ currency: String, in locale: Locale, spoken: Bool) -> String {
+        let written = Fmt.amount(minor, currency)
+        return spoken ? SpokenAmount.text(written, locale: locale) : written
     }
 }

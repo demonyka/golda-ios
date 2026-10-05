@@ -1,9 +1,25 @@
-# App Store: Golda 1.0.0
+# App Store: Golda 1.0.1
 
 Ссылки (страницы на telegra.ph публикует `telegraph.py`):
 - Политика конфиденциальности: https://telegra.ph/Golda--politika-konfidencialnosti-10-04
 - Поддержка: https://telegra.ph/Golda--podderzhka-10-04
 - Категория: Финансы (вторая — Производительность). Цена: бесплатно.
+
+## Что нового в 1.0.1
+
+**Русский:**
+- Кредитный лимит: у кредитки видно, сколько ещё доступно. Кредитку без долга можно добавить с одним лимитом.
+- Голос понимает «с карты» по валюте: «шаурма 15 лари с карты» — карта в лари, «подписка 100 рублей с карты» — рублёвая.
+- Долг больше не вычитается из «Можно сегодня»; переключатель у долга решает, откладывать ли его платёж.
+- Отказы в «Сомневаюсь» больше не добавляются в цель.
+- Главный экран и уведомление округляют сумму одинаково.
+
+**English:**
+- Credit limit: a credit card shows how much is still available. A card with nothing owed can be added with its limit alone.
+- Voice picks the card by currency: “shawarma 15 lari by card” is the lari card, “subscription 100 rubles by card” the ruble one.
+- A debt no longer comes off “Safe to spend today”; its switch decides whether its payment is set aside.
+- Skipped purchases no longer go into your goal.
+- Home and its notification now round the same way.
 
 ## Русский (основной)
 
@@ -27,10 +43,10 @@ Golda — учёт денег, в котором не нужно заполня�
 Живёте между странами? Счета в лари, долларах, песо и рублях живут вместе. Суммы показываются сразу в нескольких валютах, курсы обновляются сами, а потери на обмене видны в аналитике.
 
 СЧЕТА И ДОЛГИ
-Карты, наличные, накопления, кредитки и кредиты. Golda напомнит о платеже и о конце льготного периода, подскажет, какой долг гасить первым, и посчитает выгоду досрочного погашения. Раз в неделю — сверка с банком, чтобы забытые траты не терялись.
+Карты, наличные, накопления, кредитки с лимитом и кредиты. Golda напомнит о платеже и о конце льготного периода, подскажет, какой долг гасить первым, и посчитает выгоду досрочного погашения. Раз в неделю — сверка с банком, чтобы забытые траты не терялись.
 
 ЦЕЛИ И «СОМНЕВАЮСЬ»
-Каждая покупка показывается в часах вашей работы и в днях до цели. Не уверены — отложите покупку на «Сомневаюсь», и Golda спросит о ней позже. Всё, от чего вы отказались, идёт в копилку цели.
+Каждая покупка показывается в часах вашей работы и в днях до цели. Не уверены — отложите покупку на «Сомневаюсь», и Golda спросит о ней позже. А сколько вы сэкономили отказами, видно в «Целях».
 
 ОБЩИЙ БЮДЖЕТ С СЕМЬЁЙ
 Заведите профиль «Семья» и пригласите близкого через AirDrop или Сообщения. Траты обоих видны на обоих iPhone за секунды, через ваш iCloud.
@@ -65,10 +81,10 @@ ANY CURRENCY
 Living between countries? Accounts in lari, dollars, pesos and rubles live together. Amounts show in several currencies at once, rates update themselves, and exchange losses show up in Insights.
 
 ACCOUNTS AND DEBTS
-Cards, cash, savings, credit cards and loans. Golda reminds you of payments and of the end of an interest-free period, tells you which debt to pay first and what paying early saves. A weekly check against your bank catches forgotten purchases.
+Cards, cash, savings, credit cards with their limits, and loans. Golda reminds you of payments and of the end of an interest-free period, tells you which debt to pay first and what paying early saves. A weekly check against your bank catches forgotten purchases.
 
 GOALS AND “NOT SURE”
-Every purchase is shown in hours of your work and in days to your goal. Not sure? Put it on hold and Golda will ask again later. Whatever you skip goes towards your goal.
+Every purchase is shown in hours of your work and in days to your goal. Not sure? Put it on hold and Golda will ask again later. What skipping saved you shows in Goals.
 
 A SHARED BUDGET
 Create a “Family” profile and invite someone over AirDrop or Messages. Both iPhones see each other’s spending in seconds, through your iCloud.

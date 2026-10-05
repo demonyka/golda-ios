@@ -98,15 +98,13 @@ import Testing
         #expect(stored.map(\.id) == [wish.id])
     }
 
-    @Test func skippingAddsThePriceToTheMainGoal() async throws {
+    /// A refusal is not put towards the goal (D63).
+    @Test func skippingLeavesTheMainGoalAlone() async throws {
         let (harness, profile, _, goal) = try await books()
-        let outcome = try await harness.model.skipPurchase(Consider(title: "Кроссовки", amountMinor: 750_000, currency: "RUB"))
-        #expect(outcome.goal?.id == goal.id)
-        #expect(outcome.addedMinor == 750_000)
-        #expect(outcome.goal?.savedMinor == 2_900_000)
-        #expect(outcome.wish.status == .skipped)
+        let wish = try await harness.model.skipPurchase(Consider(title: "Кроссовки", amountMinor: 750_000, currency: "RUB"))
+        #expect(wish.status == .skipped)
         let goals = try await harness.environment.database.read { try $0.goals(profileId: profile) }
-        #expect(goals.first?.savedMinor == 2_900_000)
+        #expect(goals.first == goal)
     }
 
     @Test func theFactsOfAPrice() async throws {

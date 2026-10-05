@@ -217,24 +217,6 @@
         }
       }
     },
-    "+%@ to “%@”" : {
-      "comment" : "Toast after “Skip”: what went to the main goal, “+50 $ to “Bike””.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "+%1$@ to “%2$@”"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "+%1$@ к «%2$@»"
-          }
-        }
-      }
-    },
     "≈ %@ h of work" : {
       "comment" : "After an expense: the hours of work it cost, “≈ 2,6 h of work”.",
       "extractionState" : "stale",
@@ -920,7 +902,7 @@
       }
     },
     "Saved %@" : {
-      "comment" : "Toast after “Skip” with no main goal: the money not spent, “Saved 50 $”.",
+      "comment" : "Toast after “Skip”: the money not spent, “Saved 50 $”. Nothing goes into a goal.",
       "extractionState" : "stale",
       "localizations" : {
         "en" : {

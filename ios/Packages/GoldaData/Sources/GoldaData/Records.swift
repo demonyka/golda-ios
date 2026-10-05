@@ -71,6 +71,7 @@ struct AccountRecord: ProfileOwnedRecord {
     var paymentMinor: Int64?
     var graceUntil: Int64?
     var reconciledAt: Int64?
+    var creditLimitMinor: Int64?
 
     init(_ account: Account, profileId: UUID) {
         id = account.id
@@ -86,13 +87,14 @@ struct AccountRecord: ProfileOwnedRecord {
         paymentMinor = account.paymentMinor
         graceUntil = account.graceUntil
         reconciledAt = account.reconciledAt
+        creditLimitMinor = account.creditLimitMinor
     }
 
     var account: Account {
         Account(
             id: id, name: name, currency: currency, type: type, groupName: groupName, includeInFree: includeInFree,
             interestRate: interestRate, sort: sort, paymentDay: paymentDay, paymentMinor: paymentMinor,
-            graceUntil: graceUntil, reconciledAt: reconciledAt
+            graceUntil: graceUntil, reconciledAt: reconciledAt, creditLimitMinor: creditLimitMinor
         )
     }
 }

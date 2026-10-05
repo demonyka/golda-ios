@@ -29,8 +29,8 @@ import Testing
         #expect(!hero.celebrates)
         // 250 ₾ skipped at 33 ₽ (30 ₽ and the 10 % markup).
         #expect(hero.skipped.rubMinor == 825_000)
-        #expect(hero.skipped.text(in: F.ru) == "+8\u{202F}250 ₽ отказами")
-        #expect(hero.skipped.text(in: F.en) == "+8\u{202F}250 ₽ from what you skipped")
+        #expect(hero.skipped.text(in: F.ru) == "8\u{202F}250 ₽ сэкономлено отказами")
+        #expect(hero.skipped.text(in: F.en) == "8\u{202F}250 ₽ saved by skipping")
     }
 
     @Test func withoutGoalsTheHeroAsksForOneAndStillShowsTheRefusals() {
@@ -42,11 +42,11 @@ import Testing
             Issue.record("expected the empty hero, got \(content.hero)")
             return
         }
-        #expect(skipped.amount == "+8\u{202F}250 ₽")
+        #expect(skipped.amount == "8\u{202F}250 ₽")
         #expect(GoalsHero.caption.text(in: F.ru) == "Копилка")
         #expect(GoalsHero.setGoalTitle.text(in: F.ru) == "Поставь цель")
         #expect(GoalsHero.setGoalTitle.text(in: F.en) == "Set a goal")
-        #expect(GoalsHero.setGoalText.text(in: F.ru) == "Велосипед, поездка, подушка. С ней сравнивается каждая покупка, а отказы копятся в неё.")
+        #expect(GoalsHero.setGoalText.text(in: F.ru) == "Велосипед, поездка, подушка. С ней сравнивается каждая покупка.")
         #expect(content.goals.isEmpty)
         #expect(content.goalsHeader == nil)
         #expect(!content.hasMainGoal)
@@ -59,8 +59,8 @@ import Testing
         fixture.wishes = [fixture.headphones, fixture.coffee]
         let skipped = SkippedTotal(wishes: fixture.wishes, rates: fixture.data.rates, base: fixture.data.base)
         #expect(skipped.rubMinor == 0)
-        #expect(skipped.text(in: F.ru) == "0 ₽ отказами")
-        #expect(skipped.text(in: F.en) == "0 ₽ from what you skipped")
+        #expect(skipped.text(in: F.ru) == "0 ₽ сэкономлено отказами")
+        #expect(skipped.text(in: F.en) == "0 ₽ saved by skipping")
     }
 
     @Test func refusalsAreCountedInTheMainCurrency() {
@@ -68,7 +68,7 @@ import Testing
         fixture.home.device.baseCurrency = "USD"
         let skipped = SkippedTotal(wishes: fixture.wishes, rates: fixture.data.rates, base: fixture.data.base)
         // 8 250 ₽ at 88 ₽ a dollar.
-        #expect(skipped.amount == "+93,8 $")
+        #expect(skipped.amount == "93,8 $")
     }
 
     /// Refusals too big to add up (an old Android backup) hold at Int64.max instead of trapping (D59).
@@ -134,7 +134,7 @@ import Testing
     @Test func theHeroReadsAsOneSentence() throws {
         let fixture = GoalsFixture()
         let hero = try fixture.mainHero(fixture.content())
-        #expect(hero.accessibilityLabel(in: F.en) == "Велосипед. 30330.19 Russian rubles. 38\u{00A0}% of 80000 Russian rubles. 8250 Russian rubles from what you skipped")
+        #expect(hero.accessibilityLabel(in: F.en) == "Велосипед. 30330.19 Russian rubles. 38\u{00A0}% of 80000 Russian rubles. 8250 Russian rubles saved by skipping")
     }
 
     // MARK: Percent

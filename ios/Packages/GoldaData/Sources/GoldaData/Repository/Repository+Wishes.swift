@@ -98,14 +98,12 @@ extension Repository {
     }
 
     /// "Не беру": the refusal is remembered (the waiting [wishId], or a new one decided on the spot,
-    /// since "Не купил" sums them all) and the money goes towards the main goal.
+    /// since the Goals tab sums them all). Unlike Android, the money goes into no goal (D63): not
+    /// spending it is not putting it aside.
     @discardableResult
-    public func skip(_ consider: Consider, wishId: UUID? = nil, profileId: UUID) async throws -> SkipOutcome {
+    public func skip(_ consider: Consider, wishId: UUID? = nil, profileId: UUID) async throws -> Wish {
         let now = clock()
-        let device = deviceSettings.current
-        let zone = zone()
         return try await write { store in
-            let context = try Self.budgetContext(store, profileId: profileId, device: device, now: now, zone: zone)
             let waiting = try wishId.flatMap { try store.wish($0, profileId: profileId) }
             var wish = waiting ?? Wish(
                 title: consider.title, amountMinor: consider.amountMinor, currency: consider.currency, createdAt: now,
@@ -114,14 +112,7 @@ extension Repository {
             wish.status = .skipped
             wish.decidedAt = now
             try store.save(wish, profileId: profileId)
-
-            guard var goal = context.mainGoal else { return SkipOutcome(wish: wish, goal: nil, addedMinor: nil) }
-            let rub = Goals.rubOf(consider.amountMinor, consider.currency, context.rates)
-            let added = Goals.minorOfRub(rub, goal.currency, context.rates)
-            // Held at Int64.max: savings already that big (an old backup) must not trap (D59).
-            goal.savedMinor = Money.add(goal.savedMinor, added)
-            try store.save(goal, profileId: profileId)
-            return SkipOutcome(wish: wish, goal: goal, addedMinor: added)
+            return wish
         }
     }
 
@@ -237,13 +228,14 @@ extension Repository {
         let rates = try rates(store, markup: profile.settings.markup)
         let accounts = try store.accounts(profileId: profileId)
         let day = LocalDate(epochMillis: now, in: zone)
+        let states = Ledger.states(accounts, try store.postings(profileId: profileId))
         let today = Budget.today(
-            states: Ledger.states(accounts, try store.postings(profileId: profileId)),
+            states: states,
             operations: try store.operations(profileId: profileId, since: day.startOfDayMillis(in: zone)),
             settings: settings,
             today: day,
             zone: zone,
-            obligations: try store.obligations(profileId: profileId) + Debts.obligations(accounts),
+            obligations: try store.obligations(profileId: profileId) + Debts.obligations(accounts, states),
             rates: rates
         )
         let mainGoal = try store.goals(profileId: profileId).first(where: \.isMain)

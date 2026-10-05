@@ -77,6 +77,7 @@ public enum CloudKitMapping {
             values["paymentMinor"] = account.paymentMinor
             values["graceUntil"] = account.graceUntil
             values["reconciledAt"] = account.reconciledAt
+            values["creditLimitMinor"] = account.creditLimitMinor
         case .operation(let op, let postings):
             values["type"] = op.type.rawValue
             values["timestamp"] = op.timestamp
@@ -168,7 +169,8 @@ public enum CloudKitMapping {
                 id: ref.id, name: name, currency: currency, type: type, groupName: v.string("groupName"),
                 includeInFree: v.flag("includeInFree"), interestRate: v.double("interestRate"), sort: Int(v.int("sort") ?? 0),
                 paymentDay: v.int("paymentDay").map { Int($0) }, paymentMinor: v.int("paymentMinor"),
-                graceUntil: v.int("graceUntil"), reconciledAt: v.int("reconciledAt")
+                graceUntil: v.int("graceUntil"), reconciledAt: v.int("reconciledAt"),
+                creditLimitMinor: v.int("creditLimitMinor")
             ))
         case .operation:
             // An operation of the first 5b builds has no postings in it, only their count: skipped,

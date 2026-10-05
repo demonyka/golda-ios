@@ -38,8 +38,9 @@ extension AppModel {
         try await environment.repository.consider(consider, profileId: try profileOnScreen())
     }
 
-    /// "Не беру": the refusal is remembered and the money goes towards the main goal.
-    func skipPurchase(_ consider: Consider, wishId: UUID? = nil) async throws -> SkipOutcome {
+    /// "Не беру": the refusal is remembered; the money goes into no goal (D63).
+    @discardableResult
+    func skipPurchase(_ consider: Consider, wishId: UUID? = nil) async throws -> Wish {
         try await environment.repository.skip(consider, wishId: wishId, profileId: try profileOnScreen())
     }
 

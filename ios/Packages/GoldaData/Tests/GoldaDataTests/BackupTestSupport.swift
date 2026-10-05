@@ -117,7 +117,8 @@ final class BackupHarness {
             try store.save(
                 Account(
                     id: StoreFixture.id(903), name: "Ипотека", currency: "RUB", type: .loan, includeInFree: false,
-                    interestRate: 9.1, sort: 2, paymentDay: 12, paymentMinor: 4_500_000, graceUntil: 20_800
+                    interestRate: 9.1, sort: 2, paymentDay: 12, paymentMinor: 4_500_000, graceUntil: 20_800,
+                    creditLimitMinor: 30_000_000
                 ),
                 profileId: family
             )

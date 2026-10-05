@@ -22,7 +22,8 @@ public enum CloudKitSchemaSeed {
             .profile(Profile(name: "Seed", sort: 1, settings: ProfileSettings())),
             .account(Account(
                 id: accountId, name: "Seed", currency: "GEL", type: .credit, groupName: "Seed", includeInFree: true,
-                interestRate: 1, sort: 1, paymentDay: 1, paymentMinor: 1, graceUntil: 1, reconciledAt: 1
+                interestRate: 1, sort: 1, paymentDay: 1, paymentMinor: 1, graceUntil: 1, reconciledAt: 1,
+                creditLimitMinor: 1
             )),
             .operation(
                 GoldaCore.Operation(

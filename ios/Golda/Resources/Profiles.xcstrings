@@ -1167,19 +1167,19 @@
         }
       }
     },
-    "Payments due before payday are set aside from “Safe to spend today”. Loan and credit card payments are added by themselves." : {
+    "Payments due before payday are set aside from “Safe to spend today”. A loan’s or a credit card’s payment is added when the debt counts in it." : {
       "comment" : "Profile screen: what the monthly payments do.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Payments due before payday are set aside from “Safe to spend today”. Loan and credit card payments are added by themselves."
+            "value" : "Payments due before payday are set aside from “Safe to spend today”. A loan’s or a credit card’s payment is added when the debt counts in it."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Платежи до зарплаты откладываются из «Можно сегодня». Платежи по кредитам и кредиткам добавляются сами."
+            "value" : "Платежи до зарплаты откладываются из «Можно сегодня». Платёж по кредиту или кредитке добавляется, если долг там учитывается."
           }
         }
       }

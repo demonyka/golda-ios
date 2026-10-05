@@ -22,7 +22,7 @@ import Testing
             ($0.recordType, Set($0.allKeys() + $0.encryptedValues.allKeys()))
         })
         let optional: [SyncRecordType: Set<String>] = [
-            .account: ["groupName", "interestRate", "paymentDay", "paymentMinor", "graceUntil", "reconciledAt"],
+            .account: ["groupName", "interestRate", "paymentDay", "paymentMinor", "graceUntil", "reconciledAt", "creditLimitMinor"],
             .operation: ["categoryKey", "voiceText", "purchaseAmountMinor", "purchaseCurrency", "cbrFrom", "cbrTo", "postings"],
             .goal: ["accountId"],
             .wish: ["decidedAt"],

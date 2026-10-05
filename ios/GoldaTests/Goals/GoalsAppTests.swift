@@ -35,7 +35,8 @@ import Testing
         }
         #expect(hero.goal.name == "Велосипед")
         #expect(hero.skipped.rubMinor > 0)
-        #expect(hero.savedMinor == 2_150_000 + hero.skipped.rubMinor)
+        // The skipped sneakers are counted, not put into the bike (D63).
+        #expect(hero.savedMinor == 2_150_000)
         #expect(content.goals.map(\.goal.name) == ["Подушка"])
         // 250 000 ₽ opened and 80 000 ₽ put in on payday: 110 % of 300 000 ₽.
         #expect(content.goals[0].percent == 110)

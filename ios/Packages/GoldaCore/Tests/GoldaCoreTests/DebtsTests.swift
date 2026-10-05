@@ -33,13 +33,31 @@ import Testing
         expectClose(Double(interest), 1_000_000 * Debts.monthsLeft(balance, rate, payment)! - Double(balance), 1.0)
     }
 
+    /// A debt's payment is set aside only when its switch counts it in "Можно сегодня", while
+    /// something is owed, and never more than is owed (D64; Android sets every one aside).
     @Test func debtPaymentsBecomeObligations() {
-        let loan = Account(id: uid(1), name: "Кредит", currency: "RUB", type: .loan, includeInFree: false, interestRate: 24.9, paymentDay: 10, paymentMinor: 750_000)
+        let loan = Account(id: uid(1), name: "Кредит", currency: "RUB", type: .loan, includeInFree: true, interestRate: 24.9, paymentDay: 10, paymentMinor: 750_000)
         let card = Account(id: uid(2), name: "Карта", currency: "RUB", type: .card, includeInFree: true, paymentDay: 5, paymentMinor: 1)
-        let obligations = Debts.obligations([loan, card])
+        let owing = Ledger.states([loan, card], [Posting(accountId: loan.id, amountMinor: -balance, rubMinor: -balance)])
+        let obligations = Debts.obligations([loan, card], owing)
         #expect(obligations.count == 1)
         #expect(obligations[0].amountMinor == 750_000)
         #expect(obligations[0].dayOfMonth == 10)
+    }
+
+    @Test func aDebtLeftOutOfTheBudgetSetsNothingAside() {
+        let loan = Account(id: uid(1), name: "Кредит", currency: "RUB", type: .loan, includeInFree: false, paymentDay: 10, paymentMinor: 750_000)
+        let owing = Ledger.states([loan], [Posting(accountId: loan.id, amountMinor: -balance, rubMinor: -balance)])
+        #expect(Debts.obligations([loan], owing).isEmpty)
+    }
+
+    @Test func aPaymentIsNoMoreThanIsOwedAndNothingWhenNothingIs() {
+        let card = Account(id: uid(2), name: "Кредитка", currency: "RUB", type: .credit, includeInFree: true, paymentDay: 25, paymentMinor: 300_000, creditLimitMinor: 15_000_000)
+        #expect(Debts.obligations([card], Ledger.states([card], [])).isEmpty)
+        let paidIn = Ledger.states([card], [Posting(accountId: card.id, amountMinor: 5_000, rubMinor: 5_000)])
+        #expect(Debts.obligations([card], paidIn).isEmpty)
+        let little = Ledger.states([card], [Posting(accountId: card.id, amountMinor: -120_000, rubMinor: -120_000)])
+        #expect(Debts.obligations([card], little).map(\.amountMinor) == [120_000])
     }
 
     @Test func adviceComparesWithSavings() {
@@ -49,5 +67,30 @@ import Testing
         #expect(Debts.advice([loan, savings], owing) == .payOffInsteadOfSaving(debt: "Кредит", debtRate: 24.9, savings: "Накопительный", savingsRate: 12.0))
         // Nothing owed, nothing to advise.
         #expect(Debts.advice([loan, savings], Ledger.states([loan, savings], [])) == nil)
+    }
+
+    // A credit card's limit (D62): what is left to spend is the limit less what is owed.
+    @Test func aCreditLineIsTheLimitLessWhatIsOwed() {
+        let card = Account(name: "Кредитка", currency: "RUB", type: .credit, includeInFree: false, creditLimitMinor: 15_000_000)
+        // Nothing owed: the whole limit.
+        #expect(CreditLine(card, balanceMinor: 0) == CreditLine(limitMinor: 15_000_000, availableMinor: 15_000_000))
+        let owing = CreditLine(card, balanceMinor: -4_250_050)!
+        #expect(owing.availableMinor == 10_749_950)
+        #expect(owing.owedMinor == 4_250_050)
+        #expect(!owing.isOverLimit)
+        // Paid in over the debt: the overpayment is spendable too.
+        #expect(CreditLine(card, balanceMinor: 100_000)?.availableMinor == 15_100_000)
+        // Spent past the limit: below zero, and over it.
+        let over = CreditLine(card, balanceMinor: -15_200_000)!
+        #expect(over.availableMinor == -200_000)
+        #expect(over.isOverLimit)
+    }
+
+    @Test func onlyACreditCardWithALimitHasACreditLine() {
+        #expect(CreditLine(Account(name: "Кредитка", currency: "RUB", type: .credit, includeInFree: false), balanceMinor: 0) == nil)
+        let loan = Account(name: "Кредит", currency: "RUB", type: .loan, includeInFree: false, creditLimitMinor: 100)
+        #expect(CreditLine(loan, balanceMinor: 0) == nil)
+        let zero = Account(name: "Кредитка", currency: "RUB", type: .credit, includeInFree: false, creditLimitMinor: 0)
+        #expect(CreditLine(zero, balanceMinor: 0) == nil)
     }
 }

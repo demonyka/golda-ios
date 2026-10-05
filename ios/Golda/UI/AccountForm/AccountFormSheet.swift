@@ -5,7 +5,7 @@ import SwiftUI
 /// as an iOS form sheet. "Отмена" on the left; on the right the trash when editing and the
 /// confirmation, "Добавить" or "Сохранить", in the system blue (D34). The name and currency come
 /// first, then the type, how much is there for a new account, what a savings account or a debt
-/// needs, the group and whether it counts in "Можно сегодня". The rules live in `AccountFormModel`.
+/// needs (a credit card's limit first), the group and whether it counts in "Можно сегодня". The rules live in `AccountFormModel`.
 ///
 /// Present it with `.sheet`; it sets its own detent. Saving and deleting go through the `AppModel`
 /// in the environment, to the profile on screen; [onDismiss] closes the sheet after either, and
@@ -28,7 +28,7 @@ struct AccountFormSheet: View {
     @State private var isOpeningFocused = false
 
     private enum Focus: Hashable {
-        case name, rate, payment, group
+        case name, limit, rate, payment, group
     }
 
     private enum Failure {
@@ -133,12 +133,22 @@ struct AccountFormSheet: View {
             )
         } header: {
             Text(verbatim: form.openingCaption.text(in: locale))
+        } footer: {
+            if let footer = form.openingFooter {
+                Text(verbatim: footer.text(in: locale))
+            }
         }
         .listRowBackground(Theme.Color.card)
     }
 
     private var termsSection: some View {
         Section {
+            if form.hasLimit {
+                numberRow(
+                    title: AccountFormModel.limitTitle, text: $form.limitText, suffix: Text(verbatim: Currencies.symbol(form.currency)),
+                    invalid: form.invalidFields.contains(.limit), focus: .limit, identifier: "accountForm.limit"
+                )
+            }
             numberRow(
                 title: form.rateTitle, text: $form.rateText,
                 // The percent sign stays out of the catalog, where it would read as a format.
@@ -226,7 +236,7 @@ struct AccountFormSheet: View {
             }
             .accessibilityIdentifier("accountForm.includeInFree")
         } footer: {
-            Text("Savings and debts usually stay out.", tableName: "AccountForm", comment: "Account form: why savings and debts start with the budget switch off.")
+            Text(verbatim: form.budgetFooter.text(in: locale))
         }
         .listRowBackground(Theme.Color.card)
     }

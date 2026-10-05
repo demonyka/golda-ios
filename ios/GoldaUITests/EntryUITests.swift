@@ -259,7 +259,7 @@ final class EntryUITests: XCTestCase {
     // MARK: "Not sure"
 
     @MainActor
-    func testNotSureThenSkipPutsTheMoneyTowardsTheMainGoal() {
+    func testNotSureThenSkipSaysWhatWasNotSpent() {
         let app = launch()
         weighUp(app, amount: "50", note: "Sneakers")
         // Back to the form and in again: the amount stays.
@@ -270,10 +270,8 @@ final class EntryUITests: XCTestCase {
         XCTAssertTrue(app.buttons["entry.skip"].waitForExistence(timeout: 5))
         app.buttons["entry.skip"].tap()
         XCTAssertTrue(app.buttons["entry.skip"].waitForNonExistence(timeout: 5))
-        // The price in rubles goes towards the bike.
-        let toast = toastText(app, containing: " ₽ to “Велосипед”")
-        XCTAssertTrue(toast.waitForExistence(timeout: 5))
-        XCTAssertTrue(toast.label.hasPrefix("+"), toast.label)
+        // What was not spent; nothing goes into the bike (D63).
+        XCTAssertTrue(toastText(app, containing: "Saved 50 ₾").waitForExistence(timeout: 5))
     }
 
     @MainActor
