@@ -53,14 +53,19 @@ public struct SyncParticipant: Equatable, Sendable, Identifiable {
     public var id: String
     /// The name iCloud knows them by, nil when it does not tell (an invitation not yet accepted).
     public var name: String?
+    /// The short form, the given name as a rule ("Лекла"), for beside each operation (D67).
+    public var shortName: String?
     public var isOwner: Bool
     public var isCurrentUser: Bool
     public var status: Status
     public var canWrite: Bool
 
-    public init(id: String, name: String?, isOwner: Bool, isCurrentUser: Bool, status: Status, canWrite: Bool) {
+    public init(
+        id: String, name: String?, shortName: String? = nil, isOwner: Bool, isCurrentUser: Bool, status: Status, canWrite: Bool
+    ) {
         self.id = id
         self.name = name
+        self.shortName = shortName
         self.isOwner = isOwner
         self.isCurrentUser = isCurrentUser
         self.status = status

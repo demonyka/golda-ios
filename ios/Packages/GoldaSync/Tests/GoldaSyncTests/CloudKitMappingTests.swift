@@ -133,4 +133,12 @@ import Testing
         let partial = CKError(.partialFailure, userInfo: [CKPartialErrorsByItemIDKey: ["x": CKError(.quotaExceeded)]])
         #expect(SyncProblem(partial) == .iCloudFull)
     }
+
+    /// D67: who created a record comes from the server's fields; one the server never saw, or
+    /// fields that cannot be read, have no creator yet.
+    @Test func aRecordTheServerNeverSawHasNoCreator() {
+        let ck = CloudKitMapping.ckRecord(for: record(everyKind[3]), systemFields: nil)
+        #expect(CloudKitMapping.creator(ofSystemFields: CloudKitMapping.systemFields(of: ck)) == nil)
+        #expect(CloudKitMapping.creator(ofSystemFields: Data([1, 2, 3])) == nil)
+    }
 }

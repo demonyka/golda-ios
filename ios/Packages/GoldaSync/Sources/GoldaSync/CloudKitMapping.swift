@@ -256,6 +256,12 @@ public enum CloudKitMapping {
         return coder.encodedData
     }
 
+    /// The user record name of whoever created the record, from its server fields (D67):
+    /// `CKCurrentUserDefaultName` for this iCloud account, nil before the server has saved it.
+    public static func creator(ofSystemFields data: Data) -> String? {
+        record(fromSystemFields: data)?.creatorUserRecordID?.recordName
+    }
+
     public static func record(fromSystemFields data: Data) -> CKRecord? {
         guard let coder = try? NSKeyedUnarchiver(forReadingFrom: data) else { return nil }
         coder.requiresSecureCoding = true

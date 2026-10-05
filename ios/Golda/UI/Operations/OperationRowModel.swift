@@ -45,6 +45,8 @@ struct OperationRowModel: Identifiable, Equatable, Sendable {
     /// The note under a transfer's accounts, or the account a purchase was paid from when it is
     /// not the usual one.
     let supporting: String?
+    /// Who wrote it, in a shared profile (D67).
+    let author: OperationAuthor?
     let main: String
     let secondary: Secondary?
     let tone: Tone
@@ -123,6 +125,7 @@ struct OperationRowModel: Identifiable, Equatable, Sendable {
         self.symbol = Symbols.operation(categoryKey: category?.key, type: op.type)
         self.title = title
         self.supporting = supporting
+        author = data.authorship?.byOperation[op.id]
         self.main = main
         self.secondary = secondary
     }
@@ -138,10 +141,17 @@ struct OperationRowModel: Identifiable, Equatable, Sendable {
         }
     }
 
+    /// The line under the title: the note or the account, then who wrote it in a shared profile,
+    /// "Наличные ₾ · Лекла".
+    func supportingText(in locale: Locale) -> String? {
+        let parts = [supporting, author?.text(in: locale)].compactMap { $0 }
+        return parts.isEmpty ? nil : parts.joined(separator: " · ")
+    }
+
     /// The whole row as VoiceOver reads it: the title, the line under it, then the amounts in words.
     func accessibilityLabel(in locale: Locale) -> String {
         var parts = [title(in: locale)]
-        if let supporting { parts.append(supporting) }
+        if let supporting = supportingText(in: locale) { parts.append(supporting) }
         parts.append(SpokenAmount.text(main, locale: locale))
         if let secondary {
             let spoken = SpokenAmount.text(secondary.amount, locale: locale)

@@ -48,10 +48,17 @@ final class AppSync {
     @ObservationIgnored private var cloudKit: CloudKitSyncTransport?
     @ObservationIgnored private var following: Task<Void, Never>?
     @ObservationIgnored private var starting = false
+    /// Asks for the other phones' changes while the app is on screen (D66).
+    @ObservationIgnored private var polling: Task<Void, Never>?
     /// Invitations accepted before sync could start; taken once it has.
     @ObservationIgnored private var waitingInvitations: [CKShare.Metadata] = []
     /// Hears a profile that just arrived through an accepted invitation, to open it.
     @ObservationIgnored var onJoined: ((UUID) -> Void)?
+    /// Hears the zones change: sync started, a profile became shared or stopped being.
+    @ObservationIgnored var onZonesChanged: (() -> Void)?
+    /// The people in each shared profile, and when they were asked for: names beside operations
+    /// (D67) need them on every change, the server only now and then.
+    @ObservationIgnored private var people: [UUID: (asked: Date, participants: [SyncParticipant])] = [:]
 
     init(database: GoldaDatabase, backend: SyncBackend, clock: @escaping @Sendable () -> Int64) {
         // When sync takes the last profile away, an empty «Личный» takes its place.
@@ -81,6 +88,7 @@ final class AppSync {
 
     isolated deinit {
         following?.cancel()
+        polling?.cancel()
     }
 
     // MARK: Running
@@ -102,6 +110,25 @@ final class AppSync {
         }
         followZones()
         await reloadZones()
+    }
+
+    /// How often the app asks for changes while it is open: CloudKit's push brings them in a
+    /// second or two as a rule, but now and then late; this bounds the wait.
+    static let pollInterval: Duration = .seconds(15)
+
+    /// On screen, the app asks for the other phones' changes every `pollInterval`; off screen it
+    /// leaves that to CloudKit's push (D66).
+    func setActive(_ active: Bool) {
+        polling?.cancel()
+        polling = nil
+        guard active, let service else { return }
+        polling = Task {
+            while !Task.isCancelled {
+                try? await Task.sleep(for: Self.pollInterval)
+                guard !Task.isCancelled else { return }
+                await service.fetch()
+            }
+        }
     }
 
     /// Sends and fetches now: pull to refresh.
@@ -183,6 +210,27 @@ final class AppSync {
         }
     }
 
+    // MARK: Authors
+
+    /// Who wrote each of [operations] in [profileId] (D67), nil when the profile is not shared with
+    /// anyone who joined. The share is asked for at most every ten minutes, or sooner when a writer
+    /// is someone it did not list; offline, the last list answers.
+    func authorship(of profileId: UUID, operations: [UUID]) async -> Authorship? {
+        guard let service, zones[profileId] != nil, await service.isStarted else { return nil }
+        let fields = (try? await store.operationSystemFields(profileId: profileId)) ?? [:]
+        let creators = await Task.detached { fields.compactMapValues(CloudKitMapping.creator(ofSystemFields:)) }.value
+        let cached = people[profileId]
+        let strangers = Set(creators.values).subtracting([CKCurrentUserDefaultName]).subtracting(cached?.participants.map(\.id) ?? [])
+        var participants = cached?.participants ?? []
+        if cached == nil || Date().timeIntervalSince(cached!.asked) > 600 || !strangers.isEmpty {
+            if let fresh = try? await service.participants(profileId) {
+                participants = fresh
+                people[profileId] = (Date(), fresh)
+            }
+        }
+        return Authorship.resolve(operations: operations, creators: creators, participants: participants, currentUser: CKCurrentUserDefaultName)
+    }
+
     // MARK: State
 
     private func apply(_ state: SyncService.State) {
@@ -227,7 +275,10 @@ final class AppSync {
     func reloadZones() async {
         do {
             let fresh = try await store.zones()
-            if fresh != zones { zones = fresh }
+            if fresh != zones {
+                zones = fresh
+                onZonesChanged?()
+            }
         } catch {
             log.error("Reading the zones failed: \(String(describing: error))")
         }

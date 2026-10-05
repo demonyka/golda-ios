@@ -184,8 +184,9 @@ final class ButtonInventoryUITests: XCTestCase {
         XCTAssertTrue(waitUntil { !walk.operations.firstMatch.label.hasPrefix("Lunch,") }, "undo takes it back")
         XCTAssertTrue(waitUntil { firstWholeNumber(in: walk.homeHero.label) == before }, walk.homeHero.label)
 
-        // "Think" and "Skip": each closes the form with a toast and records nothing.
-        for (answer, words) in [("entry.think", walk.text("decide in", "решить через")), ("entry.skip", "Велосипед")] {
+        // "Think" and "Skip": each closes the form with a toast and records nothing; a skip goes
+        // into no goal (D63).
+        for (answer, words) in [("entry.think", walk.text("decide in", "решить через")), ("entry.skip", walk.text("Saved", "Сэкономлено"))] {
             walk.tapToolbar("add")
             XCTAssertTrue(amount.waitForExistence(timeout: 5))
             amount.typeText("20")

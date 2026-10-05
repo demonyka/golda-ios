@@ -19,6 +19,9 @@ public actor CloudKitSyncTransport: SyncTransport, CKSyncEngineDelegate {
     private let now: @Sendable () -> Int64
     private var engines: [SyncScope: CKSyncEngine] = [:]
     private var wakeUp: Task<Void, Never>?
+    private var sending: Task<Void, Never>?
+    /// The databases with changes handed over since the last send.
+    private var toSend: Set<SyncScope> = []
     private var accountChanged: (@Sendable () async -> Void)?
     /// Not before these moments (ms) may a zone's share be asked for again: the server said so.
     private var shareNotBefore: [SyncZone: Int64] = [:]
@@ -74,6 +77,7 @@ public actor CloudKitSyncTransport: SyncTransport, CKSyncEngineDelegate {
 
     public func outgoingChanged() async {
         do {
+            var handed: Set<SyncScope> = []
             for change in try await store.takeDue(at: now()) {
                 guard let engine = engines[change.ref.zone.scope] else { continue }
                 let id = change.ref.recordID
@@ -81,8 +85,10 @@ public actor CloudKitSyncTransport: SyncTransport, CKSyncEngineDelegate {
                     change.kind == .save ? (.saveRecord(id), .deleteRecord(id)) : (.deleteRecord(id), .saveRecord(id))
                 engine.state.remove(pendingRecordZoneChanges: [drop])
                 engine.state.add(pendingRecordZoneChanges: [add])
+                handed.insert(change.ref.zone.scope)
                 say(change.ref.zone.scope, "queued \(change.kind.rawValue) \(change.ref.recordName)")
             }
+            if !handed.isEmpty { sendSoon(handed) }
             scheduleWakeUp(at: try await store.nextDue(after: now()))
         } catch {
             say(nil, "handing over the queue failed: \(error)")
@@ -134,13 +140,15 @@ public actor CloudKitSyncTransport: SyncTransport, CKSyncEngineDelegate {
             let name = identity.nameComponents.map { PersonNameComponentsFormatter.localizedString(from: $0, style: .default) }
                 .flatMap { $0.isEmpty ? nil : $0 }
                 ?? identity.lookupInfo?.emailAddress ?? identity.lookupInfo?.phoneNumber
+            let shortName = identity.nameComponents.map { PersonNameComponentsFormatter.localizedString(from: $0, style: .short) }
+                .flatMap { $0.isEmpty ? nil : $0 }
             let status: SyncParticipant.Status = switch participant.acceptanceStatus {
             case .accepted: .joined
             case .removed: .removed
             default: .invited
             }
             return SyncParticipant(
-                id: identity.userRecordID?.recordName ?? UUID().uuidString, name: name,
+                id: identity.userRecordID?.recordName ?? UUID().uuidString, name: name, shortName: shortName,
                 isOwner: participant.role == .owner, isCurrentUser: participant == share.currentUserParticipant,
                 status: status, canWrite: participant.permission == .readWrite
             )
@@ -471,6 +479,32 @@ public actor CloudKitSyncTransport: SyncTransport, CKSyncEngineDelegate {
             guard !Task.isCancelled else { return }
             await self?.outgoingChanged()
         }
+    }
+
+    /// Sends what was just handed over (D66). Left to itself the engine sends when the system
+    /// schedules it, often seconds later; a short pause first lets a burst of writes (a voice note
+    /// of three items) go in one batch. A failure is the engine's to retry, as before.
+    private func sendSoon(_ scopes: Set<SyncScope>) {
+        toSend.formUnion(scopes)
+        sending?.cancel()
+        sending = Task { [weak self] in
+            try? await Task.sleep(for: .milliseconds(300))
+            guard !Task.isCancelled, let self else { return }
+            for scope in await self.takeScopesToSend() {
+                do {
+                    try await self.engine(scope)?.sendChanges()
+                } catch {
+                    self.say(scope, "send failed: \(error)")
+                }
+            }
+        }
+    }
+
+    private func engine(_ scope: SyncScope) -> CKSyncEngine? { engines[scope] }
+
+    private func takeScopesToSend() -> Set<SyncScope> {
+        defer { toSend = [] }
+        return toSend
     }
 
     private nonisolated func say(_ scope: SyncScope?, _ message: String) {

@@ -34,6 +34,9 @@ struct AppData: Sendable {
     let visibleOperations: [OperationFull]
     /// The account things are usually paid from; lists name an account only when it is a different one.
     let usualAccountId: UUID?
+    /// Who wrote each operation, in a profile shared with someone (D67); nil otherwise, or until
+    /// it is worked out. Set after the snapshot: it needs the server's fields and the share.
+    var authorship: Authorship?
 
     init(snapshot: ProfileSnapshot, device: DeviceSettings, rates rateTable: [RateRecord], zone: TimeZone) {
         profile = snapshot.profile

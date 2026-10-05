@@ -40,7 +40,7 @@ struct OperationRowView: View {
                 .font(.body)
                 .foregroundStyle(Theme.Color.text)
                 .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 3)
-            if let supporting = row.supporting {
+            if let supporting = row.supportingText(in: locale) {
                 Text(verbatim: supporting)
                     .font(.subheadline)
                     .foregroundStyle(Theme.Color.muted)

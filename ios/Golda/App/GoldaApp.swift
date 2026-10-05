@@ -34,6 +34,7 @@ struct GoldaApp: App {
                         // Back in the app: iCloud may have been signed in meanwhile, and the other
                         // phones may have written.
                         if phase == .active, !options.isHostingTests { Task { await model.sync.start() } }
+                        if !options.isHostingTests { model.sync.setActive(phase == .active) }
                     }
                     .task {
                         // A unit-test host stays idle: the tests build and drive their own models.
@@ -43,6 +44,7 @@ struct GoldaApp: App {
                         await voice.start()
                         model.startReminders()
                         await model.sync.start()
+                        model.sync.setActive(scenePhase == .active)
                         #if DEBUG
                         if options.seedsCloudKitSchema { await seedCloudKitSchema() }
                         #endif

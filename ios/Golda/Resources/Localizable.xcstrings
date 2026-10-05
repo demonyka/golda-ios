@@ -35,6 +35,23 @@
         }
       }
     },
+    "You" : {
+      "comment" : "Beside an operation in a shared profile: this person wrote it. Russian “Вы”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы"
+          }
+        }
+      }
+    },
     "“%@” costs %@, more than “%@” earns (%@). Spare money does more paying it off." : {
       "comment" : "Accounts hero: the dearest debt costs more than the best savings account earns. Debt name, its rate, savings name, its rate.",
       "extractionState" : "stale",

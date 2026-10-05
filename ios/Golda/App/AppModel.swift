@@ -62,6 +62,7 @@ final class AppModel {
     @ObservationIgnored private var rateTable: [RateRecord] = []
     @ObservationIgnored private var tasks: [Task<Void, Never>] = []
     @ObservationIgnored private var snapshotTask: Task<Void, Never>?
+    @ObservationIgnored private var authorshipTask: Task<Void, Never>?
     /// Remembered profiles missing from the list, being looked up.
     @ObservationIgnored private var checkingProfileIds: Set<UUID> = []
     @ObservationIgnored private var started = false
@@ -75,6 +76,8 @@ final class AppModel {
         device = environment.deviceSettings.current
         // A profile that arrived through an invitation opens at once.
         sync.onJoined = { [weak self] profileId in self?.joined(profileId) }
+        // A profile that became shared, or sync that just started, may bring names (D67).
+        sync.onZonesChanged = { [weak self] in self?.refreshAuthorship() }
     }
 
     isolated deinit {
@@ -398,8 +401,26 @@ final class AppModel {
             data = nil
             return
         }
-        data = AppData(snapshot: snapshot, device: device, rates: rateTable, zone: environment.zone())
+        var fresh = AppData(snapshot: snapshot, device: device, rates: rateTable, zone: environment.zone())
+        // The last names stay until the new ones are worked out, so they do not blink.
+        if data?.profile.id == fresh.profile.id { fresh.authorship = data?.authorship }
+        data = fresh
         publishWidgets()
+        refreshAuthorship()
+    }
+
+    /// Works out who wrote each operation of the profile on screen (D67) and puts it on the data.
+    private func refreshAuthorship() {
+        authorshipTask?.cancel()
+        guard let data else { return }
+        let profileId = data.profile.id
+        let operations = data.operations.map(\.op.id)
+        authorshipTask = Task { [weak self] in
+            guard let self else { return }
+            let authorship = await self.sync.authorship(of: profileId, operations: operations)
+            guard !Task.isCancelled, self.data?.profile.id == profileId, self.data?.authorship != authorship else { return }
+            self.data?.authorship = authorship
+        }
     }
 
     func reloadProfiles() async {

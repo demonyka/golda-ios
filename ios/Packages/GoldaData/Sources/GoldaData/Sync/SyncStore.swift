@@ -355,6 +355,25 @@ public final class SyncStore: Sendable {
         }
     }
 
+    /// The server's fields of [profileId]'s operations, by operation id: the server keeps who
+    /// created each record there, so they say who wrote each operation (D67).
+    public func operationSystemFields(profileId: UUID) async throws -> [UUID: Data] {
+        let marker = "|\(SyncRecordType.operation.rawValue)."
+        return try await writer.read { db -> [UUID: Data] in
+            let rows = try Row.fetchAll(
+                db, sql: "SELECT key, data FROM syncSystemFields WHERE profileId = ? AND instr(key, ?) > 0",
+                arguments: [profileId, marker]
+            )
+            var fields: [UUID: Data] = [:]
+            for row in rows {
+                let key: String = row["key"]
+                guard let range = key.range(of: marker), let id = UUID(uuidString: String(key[range.upperBound...])) else { continue }
+                fields[id] = row["data"]
+            }
+            return fields
+        }
+    }
+
     /// Keeps the server's fields of [ref], or forgets them with nil (the server no longer has it).
     public func setSystemFields(_ data: Data?, for ref: SyncRecordRef) async throws {
         try await writer.write { db in

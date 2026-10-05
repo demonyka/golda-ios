@@ -109,6 +109,18 @@ import Testing
         #expect(try await queued() == [name(.account, card.id): .save])
     }
 
+    /// D67: the server's fields of a profile's operations, by operation, tell who wrote each.
+    @Test func theServerFieldsOfAProfilesOperationsAreReadByOperation() async throws {
+        let profileId = try await harness.profile()
+        let other = try await harness.profile("Семья")
+        let operation = UUID()
+        let zone = SyncZone.own(profileId)
+        try await sync.setSystemFields(Data([1]), for: SyncRecordRef(zone: zone, type: .operation, id: operation))
+        try await sync.setSystemFields(Data([2]), for: SyncRecordRef(zone: zone, type: .account, id: UUID()))
+        try await sync.setSystemFields(Data([3]), for: SyncRecordRef(zone: .own(other), type: .operation, id: UUID()))
+        #expect(try await sync.operationSystemFields(profileId: profileId) == [operation: Data([1])])
+    }
+
     @Test func whatOnlyThisPhoneSeesIsNotSent() async throws {
         let profileId = try await harness.profile()
         let other = try await harness.profile("Семья")

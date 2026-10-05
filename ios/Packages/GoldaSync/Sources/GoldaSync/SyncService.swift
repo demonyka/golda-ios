@@ -100,6 +100,13 @@ public actor SyncService {
         }
     }
 
+    /// Fetches what the other phones changed, while the app is open (D66): CloudKit's push comes
+    /// late now and then. Quiet: a failure here (offline) is not news, the next try or push follows.
+    public func fetch() async {
+        guard started else { return }
+        try? await transport.fetchNow()
+    }
+
     /// The owner stops sharing the profile: the participants lose it, the owner keeps it.
     public func stopSharing(_ profileId: UUID) async throws {
         guard started, let zone = try await store.zone(of: profileId), zone.isOwned else { throw SyncProblem.notPermitted }

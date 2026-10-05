@@ -94,6 +94,16 @@ import Testing
         #expect(try await bob.store.outgoing().isEmpty)
     }
 
+    /// D66: the app asks for changes now and then while it is open; a fetch alone brings them.
+    @Test func aFetchAloneBringsTheOthersChange() async throws {
+        let (alice, bob, family) = try await sharedFamily()
+        clock.advance(60_000)
+        try await bob.repository.save(Draft(type: .expense, timestamp: now, accountId: cash.id, amountMinor: 90_000, note: "Такси"), profileId: family)
+        try await bob.sync()
+        await alice.service.fetch()
+        #expect(try await alice.books(family)?.operations.map(\.op.note).contains("Такси") == true)
+    }
+
     @Test func anEditKeepsItsRowsAndReachesTheOther() async throws {
         let (alice, bob, family) = try await sharedFamily()
         let expense = try #require(try await bob.books(family)?.operations.first { $0.op.type == .expense })
