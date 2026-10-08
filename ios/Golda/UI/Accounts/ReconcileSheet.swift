@@ -8,7 +8,9 @@ import SwiftUI
 /// The confirmation is pinned at the bottom rather than in the toolbar: it names the amount it will
 /// record ("Записать −101 ₽"), which a toolbar button has no room for.
 ///
-/// The field is not focused on opening: a glance and "Сходится" is the common case.
+/// The field is not focused on opening: a glance and "Сходится" is the common case. The balance
+/// stands in it as text and is selected whole on the first touch, so typing replaces it and
+/// backspace erases it.
 struct ReconcileSheet: View {
     let state: AccountState
     var onReconcile: (Int64) -> Void
@@ -16,6 +18,8 @@ struct ReconcileSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.locale) private var locale
     @State private var entry: ReconcileEntry
+    @State private var selection: TextSelection?
+    @FocusState private var isFocused: Bool
     @ScaledMetric(relativeTo: .largeTitle) private var amountSize: CGFloat = 48
 
     init(state: AccountState, onReconcile: @escaping (Int64) -> Void) {
@@ -97,10 +101,18 @@ struct ReconcileSheet: View {
                 Text(verbatim: "−")
                     .accessibilityHidden(true)
             }
-            TextField(text: $entry.text, prompt: Text(verbatim: entry.placeholder).foregroundStyle(Theme.Color.text)) {
+            TextField(text: $entry.text, selection: $selection, prompt: Text(verbatim: entry.placeholder).foregroundStyle(Theme.Color.text)) {
                 Text(verbatim: Self.question.text(in: locale))
             }
             .keyboardType(.decimalPad)
+            .focused($isFocused)
+            .onChange(of: isFocused) { _, focused in
+                guard focused else { return }
+                // After the tap has placed its caret, or the caret wins over the selection.
+                Task { @MainActor in
+                    selection = TextSelection(range: entry.text.startIndex..<entry.text.endIndex)
+                }
+            }
             .multilineTextAlignment(.center)
             .fixedSize()
             // A field with a prompt hides its label from VoiceOver, which otherwise heard a bare number.

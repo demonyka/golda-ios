@@ -116,7 +116,8 @@ import Testing
     typealias F = HomeFixture
 
     @Test func nothingTypedIsTheBalanceAndItMatches() {
-        let entry = ReconcileEntry(balanceMinor: 160_000, currency: "RUB")
+        var entry = ReconcileEntry(balanceMinor: 160_000, currency: "RUB")
+        entry.text = ""
         #expect(entry.actualMinor == 160_000)
         #expect(entry.differenceMinor == 0)
         #expect(entry.matches)
@@ -126,6 +127,18 @@ import Testing
         #expect(entry.differenceText(in: F.ru) == nil)
         #expect(entry.placeholder == "1\u{202F}600,00")
         #expect(!entry.isNegative)
+    }
+
+    /// The balance stands in the field as text, so it can be erased and changed; the sign lives on
+    /// its own switch, so a debt's text has none.
+    @Test func theBalanceIsTextThatCanBeChanged() {
+        #expect(ReconcileEntry(balanceMinor: 160_000, currency: "RUB").text == "1600")
+        #expect(ReconcileEntry(balanceMinor: 7_801, currency: "USD").text == "78,01")
+        var debt = ReconcileEntry(balanceMinor: -1_500_000, currency: "RUB")
+        #expect(debt.text == "15000")
+        #expect(debt.matches)
+        debt.text = ""
+        #expect(debt.actualMinor == -1_500_000)
     }
 
     @Test func aDifferentBalanceSaysWhatWillBeRecorded() {

@@ -65,8 +65,9 @@ struct AccountPageModel: Equatable, Sendable {
 struct ReconcileEntry: Equatable, Sendable {
     let balanceMinor: Int64
     let currency: String
-    /// What was typed; empty means "the same as the balance".
-    var text = ""
+    /// What the field holds. It starts as the balance itself, so the number in the field can be
+    /// erased and changed; emptied, it still means "the same as the balance".
+    var text: String
     /// The decimal pad has no minus key, so the sign is a switch of its own. It starts as the
     /// balance's, so a debt is typed as the number the bank shows and stays a debt.
     var isNegative: Bool
@@ -75,6 +76,8 @@ struct ReconcileEntry: Equatable, Sendable {
         self.balanceMinor = balanceMinor
         self.currency = currency
         isNegative = balanceMinor < 0
+        // The magnitude only: the sign is the switch's.
+        text = Fmt.editable(Int64(clamping: balanceMinor.magnitude), currency)
     }
 
     init(_ state: AccountState) {
